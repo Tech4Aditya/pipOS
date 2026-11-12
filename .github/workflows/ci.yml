@@ -1,0 +1,42 @@
+
+name: pipOS CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Code Quality & Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: JavaScript Syntax Check
+        run: |
+          find js -name "*.js" -print0 | xargs -0 -r -n1 node --check
+
+      - name: Run Unit Tests
+        run: |
+          if find . -path ./node_modules -prune -o \
+            -type f \( -name "*.test.js" -o -name "*.spec.js" \) \
+            -print -quit | grep -q .; then
+            node --test
+          else
+            echo "No unit tests found. Skipping."
+          fi
+
+      - name: CI Complete
+        run: echo "pipOS checks completed successfully."

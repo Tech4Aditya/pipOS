@@ -1,115 +1,463 @@
 #!/usr/bin/env bash
-# Creates labels and starter issues. Needs GitHub CLI: https://cli.github.com  then: gh auth login
-set -e
-REPO=Tech4Aditya/pipOS
 
-gh label create 'good first issue' --color 7057ff --repo $REPO --force >/dev/null
-gh label create 'help wanted' --color 008672 --repo $REPO --force >/dev/null
-gh label create testing --color fbca04 --repo $REPO --force >/dev/null
-gh label create accessibility --color 0e8a16 --repo $REPO --force >/dev/null
-gh label create enhancement --color a2eeef --repo $REPO --force >/dev/null
-gh label create 'new toy' --color f9d0c4 --repo $REPO --force >/dev/null
-gh label create performance --color d93f0b --repo $REPO --force >/dev/null
-gh label create bug --color d73a4a --repo $REPO --force >/dev/null
-gh label create documentation --color 0075ca --repo $REPO --force >/dev/null
-gh label create i18n --color c5def5 --repo $REPO --force >/dev/null
+# pipOS - GitHub Issues Automation
+# Repository: Tech4Aditya/pipOS
+# Creates labels and 13 starter issues.
 
-gh issue create --repo $REPO --title 'Test on Safari, Firefox and real phones, report what breaks' --label 'good first issue,testing' --body '**Why**
-The site was tested in Chromium only. Safari and Firefox handle Web Audio, `mask-image`, `<dialog>` and `100svh` differently.
+set -Eeuo pipefail
 
-**Task**
-- Open the live site in Safari (macOS/iOS), Firefox and a real Android phone
-- Check: sound on/off, Lullaby Lab, Nightlight flashlight, Rattle & Blocks, route scroll, story scroll, night mode, gold-star Easter egg
-- Comment on this issue with browser, OS, what broke, and a screenshot
+REPO="Tech4Aditya/pipOS"
 
-**Done when**
-A table of browser results is posted and each real bug has its own issue.'
-sleep 2
-gh issue create --repo $REPO --title 'Accessibility audit: screen reader, focus order and contrast' --label 'good first issue,accessibility' --body '**Task**
-- Tab through the whole page. Is every control reachable, visible when focused, and in a sensible order?
-- Test with NVDA, VoiceOver or TalkBack
-- Check colour contrast in day AND night mode (use a contrast checker)
-- Fix problems in `index.html` / `css/style.css`
+# --------------------------------------------------
+# 1. Locate GitHub CLI
+# --------------------------------------------------
 
-**Areas to look at**
-Story scenes (inactive scenes are only visually hidden), the dark-room lantern radio group, the Pip SVG labels, the wish wall form errors.
+# GitHub CLI Windows compatibility
 
-**Done when**
-A PR lists what was found and fixed, with before/after notes.'
-sleep 2
-gh issue create --repo $REPO --title 'Shared wish wall backend (replace device-only storage)' --label 'help wanted,enhancement' --body '**Why**
-The wish wall currently saves to `localStorage` (this device only). A real shared wall would be a stronger guestbook.
+GH_EXE="/c/Program Files/GitHub CLI/gh.exe"
 
-**Task**
-- Propose a free backend (Supabase, Firebase, Cloudflare Workers + KV) in a comment first
-- Implement read/post with basic rate limiting and length limits
-- Keep rendering via `textContent` (no `innerHTML`) to avoid XSS
-- Keep the local fallback if the backend is down, and keep the console clean
+if [ -f "$GH_EXE" ]; then
+    gh() {
+        "$GH_EXE" "$@"
+    }
+elif command -v gh >/dev/null 2>&1; then
+    :
+else
+    echo "ERROR: GitHub CLI not found."
+    exit 1
+fi
 
-**Done when**
-Wishes from two different browsers appear on the same wall, with a short setup guide in the README.'
-sleep 2
-gh issue create --repo $REPO --title 'New toy: Bedtime Storybook (flipbook)' --label 'enhancement,new toy' --body 'Add a fifth Work window: a short illustrated storybook with page-flip interaction (CSS 3D or simple slide transitions).
+echo "[OK] GitHub CLI detected."
 
-**Requirements**
-- Plain JS, no new dependencies
-- 5 to 8 pages, each under 60 words, original story and art (SVG preferred)
-- Works with touch swipe, arrow keys and buttons
-- Respects `prefers-reduced-motion`
-- Matches the window style in `css/style.css`'
-sleep 2
-gh issue create --repo $REPO --title 'New toy: Pip'"'"'s Growth Chart (skills on a nursery wall)' --label 'enhancement,new toy' --body 'Show Pip'"'"'s skills as marks on a nursery height chart (lullabies, nightlights, rooftop navigation, giggling).
+echo "========================================="
+echo "        pipOS ISSUE AUTOMATION"
+echo "========================================="
 
-**Requirements**
-- Animated when scrolled into view (use `IntersectionObserver`, see `js/util.js`)
-- Accessible: values available as text, not only visuals
-- Mobile friendly, theme-aware (day/night tokens in `css/style.css`)'
-sleep 2
-gh issue create --repo $REPO --title 'Lullaby Lab: volume slider and more melodies' --label 'good first issue,enhancement' --body '**Task**
-- Add a labelled volume slider wired to the master gain in `js/audio.js`
-- Add 2 more original short tunes (arrays like `TUNE` in `js/toys.js`) with a picker
-- Do not use copyrighted melodies
+echo "[1/4] Checking GitHub authentication..."
 
-**Done when**
-Volume persists via the existing `store` helper, the mute switch still wins, and the console stays clean.'
-sleep 2
-gh issue create --repo $REPO --title 'Lighthouse performance and mobile polish pass' --label 'good first issue,performance' --body '**Task**
-- Run Lighthouse (mobile) and post the scores
-- Fix quick wins: font loading, unused CSS, layout shift, tap target sizes
-- Do not add dependencies
+gh auth status
 
-**Done when**
-A PR improves at least one category and includes before/after scores.'
-sleep 2
-gh issue create --repo $REPO --title 'Make it a PWA (manifest + offline service worker)' --label enhancement --body 'Add `manifest.webmanifest`, icons (reuse `assets/favicon.svg`) and a small service worker so Pip works offline and can be installed.
+echo "[2/4] Checking repository access..."
 
-**Notes**
-Cache only local files. Google Fonts must degrade gracefully when offline.'
-sleep 2
-gh issue create --repo $REPO --title 'Unit tests for block game and audio logic' --label 'good first issue,testing' --body '**Task**
-- Extract the pure logic from `drop()` in `js/toys.js` (overlap, perfect-drop snap, chips) into a function that does not touch the DOM
-- Add tests with Node'"'"'s built-in `node --test` (no frameworks)
-- Add a short "Running tests" section to the README
+gh repo view "$REPO" >/dev/null
 
-**Done when**
-Tests cover miss, partial overlap and perfect drop.'
-sleep 2
-gh issue create --repo $REPO --title 'Dark room on touch devices: scrolling vs light dragging' --label 'bug,help wanted' --body 'The Nightlight dark room uses `touch-action: pan-y` so the page still scrolls. On some phones dragging the light can feel unreliable or scroll the page.
+echo "Repository access confirmed."
 
-**Task**
-- Reproduce on iOS Safari and Android Chrome
-- Propose and implement a better touch approach (for example a drag handle or a press-and-hold mode)
-- Keep keyboard arrow control working'
-sleep 2
-gh issue create --repo $REPO --title 'README: screenshots, GIF demo and architecture notes' --label 'good first issue,documentation' --body 'Add to `README.md`:
-- 3 screenshots (day, night, mobile) and a short GIF of the music box and flashlight
-- A diagram or table of how `js/` modules interact (`window.PIP` namespace)
-- A "Good first issues" link'
-sleep 2
-gh issue create --repo $REPO --title 'Add Hindi (and other language) support' --label enhancement,i18n --body 'Extract visible strings into a small JSON dictionary and add a language switch. Start with Hindi.
+# --------------------------------------------------
+# 2. Create Labels
+# --------------------------------------------------
 
-**Notes**
-Keep the no-framework approach. Story scenes must stay under 150 words each.'
-sleep 2
-gh issue create --repo $REPO --title 'Add LICENSE and CODE_OF_CONDUCT' --label 'good first issue,documentation' --body 'Add an MIT `LICENSE` (confirm with the maintainer first) and a Contributor Covenant `CODE_OF_CONDUCT.md`, then link both from the README.'
-sleep 2
+echo "[3/4] Creating repository labels..."
+
+create_label() {
+    local name="$1"
+    local color="$2"
+    local description="$3"
+
+    gh label create "$name" \
+        --color "$color" \
+        --description "$description" \
+        --repo "$REPO" \
+        --force >/dev/null
+
+    echo "  [LABEL] $name"
+}
+
+create_label "good first issue" "7057ff" "Good for newcomers"
+create_label "help wanted" "008672" "Extra attention needed"
+create_label "testing" "fbca04" "Testing and QA"
+create_label "accessibility" "0e8a16" "Accessibility improvements"
+create_label "enhancement" "a2eeef" "New feature or request"
+create_label "new toy" "f9d0c4" "New interactive toy"
+create_label "performance" "d93f0b" "Performance improvements"
+create_label "bug" "d73a4a" "Something is not working"
+create_label "documentation" "0075ca" "Documentation improvements"
+create_label "i18n" "c5def5" "Internationalization"
+
+# --------------------------------------------------
+# 3. Create Issues
+# --------------------------------------------------
+
+CREATED=0
+SKIPPED=0
+FAILED=0
+
+create_issue() {
+    local title="$1"
+    local labels="$2"
+    local body="$3"
+
+    echo ""
+    echo "-----------------------------------------"
+    echo "Issue: $title"
+
+    # Prevent duplicate issues, including closed ones.
+    if gh issue list \
+        --repo "$REPO" \
+        --state all \
+        --limit 500 \
+        --json title \
+        --jq '.[].title' |
+        grep -Fqx -- "$title"; then
+
+        echo "[SKIP] Issue already exists."
+        ((SKIPPED+=1))
+        return 0
+    fi
+
+    if gh issue create \
+        --repo "$REPO" \
+        --title "$title" \
+        --label "$labels" \
+        --body "$body"; then
+
+        echo "[SUCCESS] Issue created."
+        ((CREATED+=1))
+    else
+        echo "[FAILED] Could not create issue."
+        ((FAILED+=1))
+    fi
+}
+
+# --------------------------------------------------
+# ISSUE 1
+# --------------------------------------------------
+
+create_issue \
+"Test on Safari, Firefox and real phones, report what breaks" \
+"good first issue,testing" \
+"## Why
+
+The site needs testing beyond Chromium. Safari and Firefox handle Web Audio, CSS masks, dialogs and viewport units differently.
+
+## Tasks
+
+- Test the website in Safari (macOS/iOS).
+- Test in Firefox.
+- Test on a real Android phone.
+- Check sound on/off.
+- Check Lullaby Lab.
+- Check Nightlight flashlight.
+- Check Rattle & Blocks.
+- Check story scrolling and night mode.
+- Report bugs with browser, OS and screenshots.
+
+## Done when
+
+A browser compatibility report is submitted and individual bugs are documented."
+
+# --------------------------------------------------
+# ISSUE 2
+# --------------------------------------------------
+
+create_issue \
+"Accessibility audit: screen reader, focus order and contrast" \
+"good first issue,accessibility" \
+"## Objective
+
+Make pipOS more accessible for everyone.
+
+## Tasks
+
+- Test keyboard navigation throughout the website.
+- Ensure every interactive element is reachable.
+- Check visible focus indicators.
+- Test with NVDA, VoiceOver or TalkBack.
+- Check colour contrast in day and night modes.
+- Improve accessibility labels and descriptions.
+- Check forms and error messages.
+
+## Done when
+
+A pull request documents accessibility problems and their fixes."
+
+# --------------------------------------------------
+# ISSUE 3
+# --------------------------------------------------
+
+create_issue \
+"Shared Wish Wall backend (replace device-only storage)" \
+"help wanted,enhancement" \
+"## Current limitation
+
+The Wish Wall currently uses localStorage, meaning wishes are only available on the current device.
+
+## Tasks
+
+- Propose a free backend such as Supabase or Firebase.
+- Implement shared wish submission and retrieval.
+- Add basic rate limiting.
+- Add input length validation.
+- Prevent XSS attacks.
+- Keep local fallback functionality.
+- Document backend setup in README.
+
+## Done when
+
+Wishes submitted from two different browsers appear on the same wall."
+
+# --------------------------------------------------
+# ISSUE 4
+# --------------------------------------------------
+
+create_issue \
+"New toy: Bedtime Storybook (flipbook)" \
+"enhancement,new toy" \
+"## Feature
+
+Introduce a new interactive Bedtime Storybook window.
+
+## Requirements
+
+- Create 5-8 illustrated story pages.
+- Add page-flip animations.
+- Support touch swipe.
+- Support keyboard arrow navigation.
+- Add previous and next buttons.
+- Use original stories and SVG illustrations.
+- Respect prefers-reduced-motion.
+- Match the existing pipOS design.
+
+## Done when
+
+The storybook works on desktop and mobile without external dependencies."
+
+# --------------------------------------------------
+# ISSUE 5
+# --------------------------------------------------
+
+create_issue \
+"New toy: Pip's Growth Chart" \
+"enhancement,new toy" \
+"## Feature
+
+Create an interactive nursery-style growth chart showing Pip's achievements.
+
+## Requirements
+
+- Display milestones and achievements.
+- Add smooth animations.
+- Use IntersectionObserver.
+- Support day and night themes.
+- Make the chart mobile-friendly.
+- Ensure values are accessible as text.
+
+## Done when
+
+The chart integrates naturally into the existing pipOS interface."
+
+# --------------------------------------------------
+# ISSUE 6
+# --------------------------------------------------
+
+create_issue \
+"Lullaby Lab: volume slider and more melodies" \
+"good first issue,enhancement" \
+"## Feature
+
+Improve the Lullaby Lab with additional music controls.
+
+## Tasks
+
+- Add a labelled volume slider.
+- Connect it to the master gain in js/audio.js.
+- Add two original melodies.
+- Add a melody selection interface.
+- Preserve mute functionality.
+- Persist volume preferences.
+
+## Done when
+
+Users can select melodies and control volume independently."
+
+# --------------------------------------------------
+# ISSUE 7
+# --------------------------------------------------
+
+create_issue \
+"Lighthouse performance and mobile polish pass" \
+"good first issue,performance" \
+"## Objective
+
+Improve pipOS loading speed and mobile performance.
+
+## Tasks
+
+- Run Google Lighthouse.
+- Record mobile performance scores.
+- Optimize font loading.
+- Remove unused CSS.
+- Reduce layout shifts.
+- Improve mobile tap target sizes.
+- Avoid unnecessary dependencies.
+
+## Done when
+
+A pull request includes before-and-after Lighthouse scores."
+
+# --------------------------------------------------
+# ISSUE 8
+# --------------------------------------------------
+
+create_issue \
+"Make pipOS a Progressive Web App (PWA)" \
+"enhancement" \
+"## Feature
+
+Allow users to install pipOS and use it offline.
+
+## Tasks
+
+- Add manifest.webmanifest.
+- Add application icons.
+- Implement a service worker.
+- Cache essential local assets.
+- Add offline fallback support.
+- Handle unavailable Google Fonts gracefully.
+
+## Done when
+
+Users can install pipOS and access its cached functionality offline."
+
+# --------------------------------------------------
+# ISSUE 9
+# --------------------------------------------------
+
+create_issue \
+"Unit tests for block game and audio logic" \
+"good first issue,testing" \
+"## Objective
+
+Introduce basic automated tests for core game logic.
+
+## Tasks
+
+- Extract pure logic from the block game's drop function.
+- Separate DOM operations from game calculations.
+- Use Node.js built-in node:test.
+- Test miss scenarios.
+- Test partial overlap.
+- Test perfect-drop snapping.
+- Document test execution in README.
+
+## Done when
+
+The core block game logic has automated test coverage."
+
+# --------------------------------------------------
+# ISSUE 10
+# --------------------------------------------------
+
+create_issue \
+"Dark room on touch devices: scrolling vs light dragging" \
+"bug,help wanted" \
+"## Problem
+
+The Nightlight dark room interaction may conflict with page scrolling on touch devices.
+
+## Tasks
+
+- Reproduce on iOS Safari.
+- Reproduce on Android Chrome.
+- Investigate touch-action behaviour.
+- Improve dragging interaction.
+- Consider a dedicated drag handle.
+- Preserve keyboard arrow controls.
+
+## Done when
+
+Light dragging works reliably without breaking normal page scrolling."
+
+# --------------------------------------------------
+# ISSUE 11
+# --------------------------------------------------
+
+create_issue \
+"README: screenshots, GIF demo and architecture notes" \
+"good first issue,documentation" \
+"## Objective
+
+Improve project documentation for new contributors.
+
+## Tasks
+
+- Add desktop screenshots.
+- Add day mode screenshot.
+- Add night mode screenshot.
+- Add mobile screenshot.
+- Add a short animated GIF demonstration.
+- Explain the JavaScript module structure.
+- Document the window.PIP namespace.
+- Add a Good First Issues section.
+
+## Done when
+
+README clearly explains the project and helps newcomers get started."
+
+# --------------------------------------------------
+# ISSUE 12
+# --------------------------------------------------
+
+create_issue \
+"Add Hindi and other language support" \
+"enhancement,i18n" \
+"## Feature
+
+Introduce multilingual support, starting with Hindi.
+
+## Tasks
+
+- Extract visible strings into language dictionaries.
+- Create Hindi translations.
+- Add a language selection interface.
+- Preserve the existing no-framework architecture.
+- Ensure translations work in desktop and mobile layouts.
+
+## Done when
+
+Users can switch between English and Hindi throughout the interface."
+
+# --------------------------------------------------
+# ISSUE 13
+# --------------------------------------------------
+
+create_issue \
+"Add LICENSE and CODE_OF_CONDUCT" \
+"good first issue,documentation" \
+"## Objective
+
+Prepare pipOS for open-source contributions.
+
+## Tasks
+
+- Confirm the intended project license with the maintainer.
+- Add the selected LICENSE file.
+- Add Contributor Covenant CODE_OF_CONDUCT.md.
+- Link both files from README.
+
+## Done when
+
+The repository has clear licensing and contributor conduct guidelines."
+
+# --------------------------------------------------
+# 4. Final Summary
+# --------------------------------------------------
+
+echo ""
+echo "========================================="
+echo "          EXECUTION COMPLETE"
+echo "========================================="
+
+echo "Created : $CREATED"
+echo "Skipped : $SKIPPED"
+echo "Failed  : $FAILED"
+
+echo ""
+echo "Check your issues here:"
+echo "https://github.com/$REPO/issues"
+
+echo "========================================="
+
+if [ "$FAILED" -gt 0 ]; then
+    exit 1
+fi
