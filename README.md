@@ -8,6 +8,11 @@ Open `index.html`, or `python3 -m http.server` and visit localhost:8000.
 ## Deploy (5 minutes)
 - Vercel / Netlify: drag the folder in, or import the GitHub repo (framework: "Other", no build command, output dir `.`).
 - GitHub Pages: push, then Settings > Pages > deploy from `main` / root.
+## Running Tests
+This project uses Node.js's built-in test runner.
+Run the tests using:
+cd js
+node --test
 
 ## Before you submit (do these)
 1. `git init`, commit, push to a PUBLIC repo now. History must fall inside 17-19 Oct 2026 IST. Commit as you change things; do not fake dates.
