@@ -9,10 +9,44 @@ Open `index.html`, or `python3 -m http.server` and visit localhost:8000.
 - Vercel / Netlify: drag the folder in, or import the GitHub repo (framework: "Other", no build command, output dir `.`).
 - GitHub Pages: push, then Settings > Pages > deploy from `main` / root.
 ## Running Tests
-This project uses Node.js's built-in test runner.
-Run the tests using:
+
+PipOS includes automated test suites with **zero dependencies**, using Node.js's built-in test runner.
+
+Run all tests from the repository root:
+```bash
+node --test
+```
+Or from the `js/` directory:
+```bash
 cd js
 node --test
+```
+
+### Test Suites Overview:
+- `js/maths.test.js`: Verifies block-stacking physics, overlap calculations, miss detection, and perfect drop thresholds.
+- `js/wall.test.js`: Verifies wish length validation, control character sanitization, 15-second cooldown and 10-minute rate limit ceilings, and Firebase/Supabase payload parsing.
+- `js/pwa.test.js`: Verifies W3C `manifest.webmanifest` installability compliance, application icon dimensions (192px, 512px, 180px) and PNG headers, Service Worker pre-caching manifest, offline navigation fallbacks, and Google Fonts degradation.
+
+## Progressive Web App (PWA) & Offline Support
+
+PipOS is fully installable as an offline-first Progressive Web App on mobile and desktop:
+
+- **Web App Manifest (`manifest.webmanifest`)**: Configured with `standalone` display mode, Pip OS branding, nursery theme colors (`#fff8f1`), and responsive adaptive icons.
+- **Application Icons**:
+  - `assets/icon-192.png`: 192x192 PNG launcher icon.
+  - `assets/icon-512.png`: 512x512 PNG splash and high-res icon.
+  - `assets/icon-maskable-512.png`: 512x512 PNG adaptive maskable icon with safe zone padding for Android devices.
+  - `assets/apple-touch-icon.png`: 180x180 PNG icon for iOS Safari home screen.
+- **Service Worker (`sw.js`)**:
+  - **Local Pre-caching**: Caches all essential local files on install (`index.html`, `manifest.webmanifest`, `css/style.css`, `js/*.js`, and `assets/*`).
+  - **Cache-First Offline Strategy**: Instant local loading with background revalidation.
+  - **Offline Navigation Fallback**: Returns cached `index.html` if the user opens or refreshes the app without network.
+  - **Graceful Google Fonts Degradation**: External font requests (`fonts.googleapis.com`, `fonts.gstatic.com`) degrade cleanly when offline without throwing network errors or delaying page render, seamlessly falling back to local system fonts (`Georgia`, `Trebuchet MS`, `Segoe UI`, `sans-serif`).
+
+### Installing pipOS:
+- **Chrome / Edge (Desktop)**: Click the **Install pipOS** icon in the address bar.
+- **Android (Chrome)**: Tap the menu (⋮) and select **Install app** or **Add to Home screen**.
+- **iOS (Safari)**: Tap the Share button (⎋) and select **Add to Home Screen**.
 
 ## Before you submit (do these)
 1. `git init`, commit, push to a PUBLIC repo now. History must fall inside 17-19 Oct 2026 IST. Commit as you change things; do not fake dates.
@@ -123,4 +157,4 @@ Supabase offers a free PostgreSQL database with built-in REST endpoints and Row 
 - **Graceful Fallback:** If the network is offline or the backend fails to respond within 6 seconds, wishes are stored locally, cached wishes are rendered, and the user receives a friendly offline toast while keeping the browser console clean.
 
 ## Files
-`index.html` · `css/style.css` (tokens & architecture guide: `docs/CSS.md`) · `js/{util,audio,wall,fx,pip,toys,main}.js` · `assets/`
+`index.html` · `manifest.webmanifest` · `sw.js` · `css/style.css` · `js/{util,audio,wall,fx,pip,toys,main,maths,maths.test,wall.test,pwa.test}.js` · `assets/`
