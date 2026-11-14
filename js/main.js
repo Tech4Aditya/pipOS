@@ -18,7 +18,7 @@
       html.setAttribute('data-theme', t);
       store.set('theme', t);
       if (btn) {
-        btn.setAttribute('aria-label', t === 'night' ? 'Switch to day' : 'Switch to night');
+        btn.setAttribute('aria-label', t === 'night' ? 'Night mode, switch to day mode' : 'Day mode, switch to night mode');
         btn.classList.toggle('is-night', t === 'night');
       }
       if (label) label.textContent = t === 'night' ? 'Night' : 'Day';
@@ -46,7 +46,8 @@
       var on = state === 'on';
       btn.classList.toggle('is-off', !on);
       btn.classList.toggle('is-hint', state === '');
-      btn.setAttribute('aria-label', on ? 'Turn sound off' : 'Turn sound on');
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.setAttribute('aria-label', on ? 'Sound on, turn sound off' : 'Sound off, turn sound on');
       if (label) label.textContent = on ? 'Sound on' : 'Sound off';
     }
     paint(audio.state());
@@ -98,7 +99,7 @@
     var track = $('#storyTrack');
     if (!track) return;
     var stage = $('.story-stage', track), scenes = $$('.scene', track), dots = $$('.story-dot', track), bar = $('#storyBar');
-    var n = scenes.length, cur = 0, ticking = false;
+    var n = scenes.length, cur = -1, ticking = false;
     if (!stage || !n) return;
 
     function range() { return Math.max(1, track.offsetHeight - stage.offsetHeight); }
@@ -107,7 +108,17 @@
     function setScene(i) {
       if (i === cur) return;
       cur = i;
-      scenes.forEach(function (s, k) { s.classList.toggle('is-active', k === i); });
+      scenes.forEach(function (s, k) {
+        var active = k === i;
+        s.classList.toggle('is-active', active);
+        if (active) {
+          s.removeAttribute('aria-hidden');
+          s.removeAttribute('inert');
+        } else {
+          s.setAttribute('aria-hidden', 'true');
+          s.setAttribute('inert', '');
+        }
+      });
       dots.forEach(function (d, k) {
         d.classList.toggle('is-active', k === i);
         if (k === i) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
@@ -134,6 +145,16 @@
         var top = track.getBoundingClientRect().top + window.pageYOffset - stickyTop();
         var y = top + ((i + 0.5) / n) * range();
         window.scrollTo({ top: y, behavior: reduce.matches ? 'auto' : 'smooth' });
+      });
+      d.addEventListener('keydown', function (e) {
+        var nextDot = -1;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextDot = (i + 1) % n;
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') nextDot = (i - 1 + n) % n;
+        if (nextDot >= 0) {
+          e.preventDefault();
+          dots[nextDot].focus();
+          dots[nextDot].click();
+        }
       });
     });
     update();

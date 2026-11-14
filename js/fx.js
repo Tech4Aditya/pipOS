@@ -118,7 +118,7 @@
     })();
   }
 
-  /* ---------- wish wall (stored on this device) ---------- */
+  /* ---------- wish wall (shared backend with local fallback) ---------- */
   var SEEDS = [
     { n: 'Boo-ton', w: 'Pip fixed my hiccups with one note.' },
     { n: 'Mrs. Hoot', w: 'The nightlight is still warm at 4am.' },
@@ -126,7 +126,22 @@
   ];
   var ROT = [-2.2, 1.6, -1, 2.4, -1.8, 0.8];
 
-  function loadWishes() {
+  function getBackendConfig() {
+    if (typeof window !== 'undefined' && typeof window.PIP_WALL_BACKEND === 'object' && window.PIP_WALL_BACKEND !== null) {
+      return window.PIP_WALL_BACKEND;
+    }
+    var meta = document.querySelector('meta[name="pip-wall-backend"]');
+    if (meta && meta.content) {
+      try {
+        return JSON.parse(meta.content);
+      } catch (e) {
+        return { type: 'firebase', url: meta.content };
+      }
+    }
+    return null;
+  }
+
+  function loadLocalWishes() {
     try {
       var a = JSON.parse(store.get('wall', '[]'));
       if (!Array.isArray(a)) return [];
@@ -134,53 +149,153 @@
     } catch (e) { return []; }
   }
 
+  function saveLocalWish(item) {
+    try {
+      var current = loadLocalWishes();
+      current.push(item);
+      current = current.slice(-30);
+      store.set('wall', JSON.stringify(current));
+    } catch (e) {}
+  }
+
+  function loadRateHistory() {
+    try {
+      var h = JSON.parse(store.get('wall_rate', '[]'));
+      return Array.isArray(h) ? h : [];
+    } catch (e) { return []; }
+  }
+
+  function saveRateHistory(h) {
+    try {
+      store.set('wall_rate', JSON.stringify(h.slice(-10)));
+    } catch (e) {}
+  }
+
   function initWall() {
     var form = $('#gbForm'), list = $('#gbList');
     if (!form || !list) return;
     var wish = $('#gbWish'), name = $('#gbName'), count = $('#gbCount'), err = $('#gbError');
-    var mine = loadWishes();
+    var statusEl = $('#gbFine');
+    var wall = PIP.wall;
+    var backend = getBackendConfig();
+
+    var activeWishes = loadLocalWishes();
+    var isConnected = false;
 
     function render() {
       list.textContent = '';
-      var all = mine.slice().reverse().concat(SEEDS);
+      var all = activeWishes.concat(SEEDS);
       all.forEach(function (x, i) {
         var li = document.createElement('li');
         li.className = 'note n' + (i % 4);
         li.style.setProperty('--rot', ROT[i % ROT.length] + 'deg');
         var p = document.createElement('p');
-        p.textContent = x.w;
+        p.textContent = x.w; // Strict textContent — prevents XSS
         var by = document.createElement('span');
-        by.textContent = x.n;
+        by.textContent = x.n; // Strict textContent — prevents XSS
         li.appendChild(p);
         li.appendChild(by);
         list.appendChild(li);
       });
     }
+
     render();
+
+    // If backend is configured, attempt retrieval
+    if (backend && wall) {
+      wall.fetchWishes(backend, function (remoteWishes) {
+        if (remoteWishes && Array.isArray(remoteWishes)) {
+          isConnected = true;
+          activeWishes = remoteWishes;
+          store.set('wall_remote_cache', JSON.stringify(remoteWishes));
+          if (statusEl) statusEl.textContent = 'Shared wish wall • Synchronized live across dreamers.';
+          render();
+        } else {
+          // Backend offline or unreachable: fall back to cached remote or local
+          try {
+            var cached = JSON.parse(store.get('wall_remote_cache', ''));
+            if (Array.isArray(cached) && cached.length) activeWishes = cached;
+          } catch (e) {}
+          if (statusEl) statusEl.textContent = 'Wishes are saved on this device only (offline mode).';
+          render();
+        }
+      });
+    } else {
+      if (statusEl) statusEl.textContent = 'Wishes are saved on this device only.';
+    }
 
     wish.addEventListener('input', function () {
       count.textContent = wish.value.length + ' / 120';
-      if (err.textContent) err.textContent = '';
+      count.setAttribute('aria-label', 'Character count: ' + wish.value.length + ' of 120');
+      if (err.textContent) {
+        err.textContent = '';
+        wish.removeAttribute('aria-invalid');
+      }
     });
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      var w = wish.value.trim().slice(0, 120);
-      var n = name.value.trim().slice(0, 20) || 'A sleepy visitor';
-      if (!w) {
-        err.textContent = 'Write a wish first. Even a tiny one counts.';
+
+      // Input length validation & sanitization
+      var validation = wall
+        ? wall.validateWish(wish.value, name.value)
+        : { ok: !!wish.value.trim(), wish: wish.value.trim().slice(0, 120), name: name.value.trim().slice(0, 20) || 'A sleepy visitor' };
+
+      if (!validation.ok) {
+        err.textContent = validation.error || 'Write a wish first. Even a tiny one counts.';
         wish.focus();
         return;
       }
-      mine.push({ n: n, w: w });
-      mine = mine.slice(-30);
-      store.set('wall', JSON.stringify(mine));
-      if (name.value.trim()) store.set('visitor', n);
+
+      // Rate limiting
+      var history = loadRateHistory();
+      if (wall) {
+        var check = wall.checkRateLimit(history);
+        if (!check.allowed) {
+          err.textContent = check.error;
+          return;
+        }
+        history = check.history;
+      }
+
+      // Passed validation and rate limit
+      history.push(Date.now());
+      saveRateHistory(history);
+
+      var newWish = { n: validation.name, w: validation.wish, t: Date.now() };
+      if (name.value.trim()) store.set('visitor', validation.name);
+
       wish.value = '';
       count.textContent = '0 / 120';
+      count.setAttribute('aria-label', 'Character count: 0 of 120');
       err.textContent = '';
-      render();
-      toast('Pinned to the wall. Pip yawns happily.');
+
+      // Optimistic or confirmed update
+      if (backend && isConnected && wall) {
+        wall.postWish(backend, newWish, function (success) {
+          if (success) {
+            activeWishes.unshift(newWish);
+            activeWishes = activeWishes.slice(0, 30);
+            render();
+            toast('Pinned to the wall. Pip yawns happily.');
+          } else {
+            // Failed to post remotely: fall back to local storage
+            saveLocalWish(newWish);
+            activeWishes.unshift(newWish);
+            activeWishes = activeWishes.slice(0, 30);
+            render();
+            toast('Pinned to your local wall (offline mode).');
+          }
+        });
+      } else {
+        // Local mode or fallback
+        saveLocalWish(newWish);
+        activeWishes.unshift(newWish);
+        activeWishes = activeWishes.slice(0, 30);
+        render();
+        toast('Pinned to the wall. Pip yawns happily.');
+      }
+
       if (PIP.audio.isOn()) {
         PIP.audio.note(PIP.audio.SCALE[4], { dur: 0.9, gain: 0.15 });
         PIP.audio.note(PIP.audio.SCALE[6], { dur: 1.1, gain: 0.13, when: 0.1 });
