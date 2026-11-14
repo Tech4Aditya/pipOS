@@ -150,7 +150,7 @@
         var p = document.createElement('p');
         p.textContent = x.w;
         var by = document.createElement('span');
-        by.textContent = x.n;
+        by.innerHTML = '<span class="sr-only">From: </span>' + x.n;
         li.appendChild(p);
         li.appendChild(by);
         list.appendChild(li);
@@ -160,7 +160,11 @@
 
     wish.addEventListener('input', function () {
       count.textContent = wish.value.length + ' / 120';
-      if (err.textContent) err.textContent = '';
+      count.setAttribute('aria-label', 'Character count: ' + wish.value.length + ' of 120');
+      if (err.textContent) {
+        err.textContent = '';
+        wish.removeAttribute('aria-invalid');
+      }
     });
 
     form.addEventListener('submit', function (e) {
@@ -168,16 +172,19 @@
       var w = wish.value.trim().slice(0, 120);
       var n = name.value.trim().slice(0, 20) || 'A sleepy visitor';
       if (!w) {
+        wish.setAttribute('aria-invalid', 'true');
         err.textContent = 'Write a wish first. Even a tiny one counts.';
         wish.focus();
         return;
       }
+      wish.removeAttribute('aria-invalid');
       mine.push({ n: n, w: w });
       mine = mine.slice(-30);
       store.set('wall', JSON.stringify(mine));
       if (name.value.trim()) store.set('visitor', n);
       wish.value = '';
       count.textContent = '0 / 120';
+      count.setAttribute('aria-label', 'Character count: 0 of 120');
       err.textContent = '';
       render();
       toast('Pinned to the wall. Pip yawns happily.');

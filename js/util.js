@@ -33,10 +33,13 @@
   function toast(msg, ms) {
     var el = $('#toast');
     if (!el) return;
-    el.textContent = msg;
-    el.classList.add('is-show');
+    el.textContent = '';
+    window.setTimeout(function () {
+      el.textContent = msg;
+      el.classList.add('is-show');
+    }, 15);
     window.clearTimeout(toastTimer);
-    toastTimer = window.setTimeout(function () { el.classList.remove('is-show'); }, ms || 3200);
+    toastTimer = window.setTimeout(function () { el.classList.remove('is-show'); }, (ms || 3200) + 15);
   }
 
   // Calls cb(isVisible) whenever el enters or leaves the viewport.
