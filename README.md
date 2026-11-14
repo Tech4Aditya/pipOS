@@ -123,4 +123,4 @@ Supabase offers a free PostgreSQL database with built-in REST endpoints and Row 
 - **Graceful Fallback:** If the network is offline or the backend fails to respond within 6 seconds, wishes are stored locally, cached wishes are rendered, and the user receives a friendly offline toast while keeping the browser console clean.
 
 ## Files
-`index.html` · `css/style.css` · `js/{util,audio,wall,fx,pip,toys,main}.js` · `assets/`
+`index.html` · `css/style.css` (tokens & architecture guide: `docs/CSS.md`) · `js/{util,audio,wall,fx,pip,toys,main}.js` · `assets/`
