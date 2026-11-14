@@ -195,6 +195,17 @@
     });
   }
 
+  /* ---------- service worker registration ---------- */
+  function initServiceWorker() {
+    if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function (err) {
+          if (window.console && window.console.debug) console.debug('[pip] ServiceWorker registration skipped:', err);
+        });
+      });
+    }
+  }
+
   /* ---------- go ---------- */
   safe('images', PIP.optionalImages);
   safe('pip', PIP.pip.init);
@@ -207,4 +218,5 @@
   safe('story', initStory);
   safe('navspy', initNavSpy);
   safe('trash', initTrash);
+  safe('sw', initServiceWorker);
 })();
