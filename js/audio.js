@@ -170,3 +170,8 @@
     onChange: onChange
   };
 })();
+
+// ESLint and Prettier configuration
+/* eslint-env browser */
+/* eslint-disable no-unused-vars */
+/* prettier-ignore */
