@@ -26,6 +26,23 @@ node --test
 - `js/maths.test.js`: Verifies block-stacking physics, overlap calculations, miss detection, and perfect drop thresholds.
 - `js/wall.test.js`: Verifies wish length validation, control character sanitization, 15-second cooldown and 10-minute rate limit ceilings, and Firebase/Supabase payload parsing.
 - `js/xss.test.js`: Verifies the Content Security Policy `<meta>` tag structure, audits source code for unsafe DOM sinks, runs an automated battery of 14 OWASP XSS payloads through `createNoteElement`, and validates end-to-end sanitization and safe DOM rendering.
+- `js/shortcuts.test.js`: Verifies the `keys.txt` `#shortcuts` window structure, checks presence of all required controls (1 to 8 music keys, arrows for lantern, Space for blocks, `?` key), and validates input/textarea guards.
+- `js/pwa.test.js`: Verifies PWA manifest, service worker caching, and icon assets.
+- `js/og.test.js`: Verifies social preview tags, dimensions, and WhatsApp file size limits.
+
+## Keyboard Shortcuts (`keys.txt`)
+
+PipOS features a foldable in-world cheat sheet window (`keys.txt`) that can be opened or folded from anywhere on the page by pressing the `?` key:
+
+| Key / Control | Scope | In-World Action |
+| :--- | :--- | :--- |
+| `1` to `8` | Lullaby Lab | Play pentatonic chimes across ~1.6 octaves (C to high E). |
+| `←` `↑` `→` `↓` | Nightlight Collection | Sweep the flashlight lantern beam across the darkroom. |
+| `Space` / `Enter` | Rattle & Blocks / Darkroom | Drop the swaying block onto the tower, or inspect a hidden dream. |
+| `?` | Global | Open or fold the `keys.txt` shortcuts cheat sheet (ignored while typing in the wish wall form). |
+| `Escape` | Global | Close secret dialog or fold the focused cheat sheet window. |
+
+The shortcuts window is fully accessible, reuses the `.win` and `data-foldable` components, and is also linked from the desktop shortcut icons rail on wide screens.
 
 ## Content Security Policy (CSP)
 
@@ -88,7 +105,7 @@ PipOS enforces a strict Content Security Policy delivered via `<meta http-equiv=
 ## What is in it
 - Tier 1: eyes follow cursor/touch, head tilt, blink, day/night mood (Pip falls sleepy), scroll-driven story (4 scenes, <150 words each), fully responsive, hidden Easter egg (tap the gold nightcap star 5 times).
 - Tier 2: Web Audio music box + endless generative lullaby, flashlight dark room (CSS mask), SVG dream-delivery route synced to scroll, block-stacking mini-game.
-- Side quests: sparkle trail, click sounds + mute switch, odometer counter, wish wall, responsive chaos (taskbar becomes a bottom dock on phones, desktop icons on wide screens).
+- Side quests: sparkle trail, click sounds + mute switch, odometer counter, wish wall, keys.txt foldable cheat sheet (`?` key), responsive chaos (taskbar becomes a bottom dock on phones, desktop icons on wide screens).
 - Visitor memory: Pip greets returning visitors by name and visit count (localStorage).
 
 ## Honest limits
@@ -187,4 +204,4 @@ Supabase offers a free PostgreSQL database with built-in REST endpoints and Row 
 - **Graceful Fallback:** If the network is offline or the backend fails to respond within 6 seconds, wishes are stored locally, cached wishes are rendered, and the user receives a friendly offline toast while keeping the browser console clean.
 
 ## Files
-`index.html` · `css/style.css` · `js/{util,audio,wall,fx,pip,toys,main,maths,maths.test,wall.test,xss.test}.js` · `assets/`
+`index.html` · `css/style.css` · `js/{util,audio,wall,fx,pip,toys,main,maths,maths.test,wall.test,xss.test,shortcuts.test,pwa.test,og.test}.js` · `sw.js` · `manifest.webmanifest` · `assets/` · `docs/`

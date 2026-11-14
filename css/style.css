@@ -208,6 +208,8 @@ code { font-size: 0.9em; background: var(--blush); padding: 0.05rem 0.3rem; bord
 .ic-book { background: var(--mint); }
 .ic-pin { background: var(--sky); }
 .ic-pin::after { border-radius: 50% 50% 50% 0; transform: rotate(-45deg); }
+.ic-key { background: var(--butter); }
+.ic-key::after { border-radius: 2px; }
 .ic-trash { background: var(--paper); }
 .ic-trash::after { border-radius: 2px 2px 8px 8px; }
 
@@ -324,7 +326,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 92px 16px 40px; }
 .marquee:hover .marquee-track { animation-play-state: paused; }
 
 /* ==========================================================================
-   09. About Sheet
+   09. About Sheet & Keys Cheat Sheet
    ========================================================================== */
 .sheet { display: grid; gap: 1.1rem; margin: 0; }
 .sheet > div { display: grid; grid-template-columns: 9.5rem 1fr; gap: 0.4rem 1rem; align-items: baseline; }
@@ -333,6 +335,41 @@ main { max-width: 1120px; margin: 0 auto; padding: 92px 16px 40px; }
 .chips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0; padding: 0; list-style: none; }
 .chips li { padding: 0.15rem 0.75rem; font-size: 0.92rem; background: var(--butter); border: 2px solid var(--line); border-radius: 999px; }
 .voice { display: block; margin-top: 0.4rem; font: italic 600 1.05rem var(--f-head); color: var(--berry-ink); }
+
+kbd {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  font: 600 0.85rem/1.2 var(--f-ui);
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 var(--shadow);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.w-shortcuts { margin-bottom: 2rem; }
+.keys-intro { margin: 0 0 1rem; color: var(--ink); font-size: 0.95rem; }
+.keys-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; }
+.key-card {
+  display: flex; align-items: center; gap: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  background: var(--cream); border: 2.5px solid var(--line); border-radius: 10px;
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+.key-badge { display: flex; align-items: center; gap: 0.3rem; flex-shrink: 0; font-size: 0.9rem; color: var(--ink); }
+.key-info { display: flex; flex-direction: column; gap: 0.15rem; }
+.key-info strong { font: 600 0.92rem var(--f-ui); color: var(--berry-ink); }
+.key-info span { font-size: 0.85rem; color: var(--ink); line-height: 1.25; }
+.win-hint {
+  font: 500 0.75rem var(--f-ui);
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  margin-right: 2px;
+}
 
 /* ==========================================================================
    10. Work Grid & Toys
@@ -665,6 +702,10 @@ dialog.secret::backdrop { background: rgba(40, 24, 40, 0.55); }
   .proj-head { align-items: flex-start; }
   .thumb { width: 68px; height: 68px; }
   .story-prog { width: 56px; }
+}
+@media (max-width: 480px) {
+  .keys-grid { grid-template-columns: 1fr; }
+  .win-hint { display: none; }
 }
 @media (max-width: 380px) {
   .task-nav a { padding: 0.3rem 0.35rem; font-size: 0.8rem; }
