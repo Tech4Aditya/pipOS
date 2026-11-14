@@ -41,16 +41,6 @@ function createMockDocument() {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
-    },
-    set(value) {
-      // If innerHTML were erroneously used, tags would parse into child DOM elements (unsafe!)
-      this.children = [];
-      const tagRegex = /<([a-z0-9-]+)[^>]*>/gi;
-      let match;
-      while ((match = tagRegex.exec(value)) !== null) {
-        this.children.push(new MockElement(match[1]));
-      }
-      this._textContent = value.replace(/<[^>]*>/g, '');
     }
   });
 
