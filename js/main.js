@@ -94,6 +94,63 @@
     });
   }
 
+  /* ---------- shortcuts cheat sheet (keys.txt) ---------- */
+  function initShortcuts() {
+    var win = $('#shortcuts');
+    if (!win) return;
+    var body = $('.win-body', win);
+
+    function toggleShortcuts(openOnly) {
+      var btn = $('.win-btn', win);
+      var isCurrentlyOpen = body && !body.hidden;
+      var isFocused = win.contains(document.activeElement);
+
+      if (!isCurrentlyOpen) {
+        if (btn) btn.click();
+        else if (body) body.hidden = false;
+        if (win.scrollIntoView) {
+          win.scrollIntoView({ behavior: reduce && reduce.matches ? 'auto' : 'smooth', block: 'nearest' });
+        }
+        if (btn) btn.focus();
+      } else if (openOnly) {
+        if (win.scrollIntoView) {
+          win.scrollIntoView({ behavior: reduce && reduce.matches ? 'auto' : 'smooth', block: 'nearest' });
+        }
+        if (btn) btn.focus();
+      } else if (isFocused) {
+        if (btn) btn.click();
+        else if (body) body.hidden = true;
+      } else {
+        if (win.scrollIntoView) {
+          win.scrollIntoView({ behavior: reduce && reduce.matches ? 'auto' : 'smooth', block: 'nearest' });
+        }
+        if (btn) btn.focus();
+      }
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      var t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+      if (t && t.closest && t.closest('input, textarea, select, [contenteditable]')) return;
+
+      if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
+        e.preventDefault();
+        toggleShortcuts(false);
+      } else if (e.key === 'Escape' && body && !body.hidden && win.contains(document.activeElement)) {
+        var btn = $('.win-btn', win);
+        if (btn) btn.click();
+      }
+    });
+
+    var iconLink = $('.desk-icons a[href="#shortcuts"]');
+    if (iconLink) {
+      iconLink.addEventListener('click', function () {
+        toggleShortcuts(true);
+      });
+    }
+  }
+
   /* ---------- scroll story ---------- */
   function initStory() {
     var track = $('#storyTrack');
@@ -213,6 +270,7 @@
   safe('sound', initSound);
   safe('clock', initClock);
   safe('foldable', initFoldable);
+  safe('shortcuts', initShortcuts);
   safe('fx', PIP.fx.init);
   safe('toys', PIP.toys.init);
   safe('story', initStory);
