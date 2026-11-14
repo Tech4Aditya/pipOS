@@ -25,21 +25,28 @@ node --test
 ### Test Suites Overview:
 - `js/maths.test.js`: Verifies block-stacking physics, overlap calculations, miss detection, and perfect drop thresholds.
 - `js/wall.test.js`: Verifies wish length validation, control character sanitization, 15-second cooldown and 10-minute rate limit ceilings, and Firebase/Supabase payload parsing.
-- `js/og.test.js`: Verifies Open Graph and Twitter Card metadata in `index.html`, image dimension standards (1200x630 px), PNG signature integrity, and social platform debugger constraints (WhatsApp < 300 KB limit, LinkedIn Post Inspector, and X Card Validator requirements).
+- `js/pwa.test.js`: Verifies W3C `manifest.webmanifest` installability compliance, application icon dimensions (192px, 512px, 180px) and PNG headers, Service Worker pre-caching manifest, offline navigation fallbacks, and Google Fonts degradation.
 
-## Social Sharing & Open Graph
+## Progressive Web App (PWA) & Offline Support
 
-PipOS features a rich 1200x630 Open Graph preview image (`assets/og-preview.png`) and comprehensive social meta tags configured for high-fidelity link cards across LinkedIn, X (Twitter), WhatsApp, Discord, and Slack:
+PipOS is fully installable as an offline-first Progressive Web App on mobile and desktop:
 
-- **1200x630 Image**: Depicts Pip on a fluffy cloud with glowing amber eyes and starry nightcap, accompanied by the hero headline (*"I build the dreams you fall asleep inside."*) and retro Midnight Nursery badges on a starry midnight sky.
-- **File Size**: Optimized at ~181 KB, strictly adhering to WhatsApp's 300 KB maximum preview ceiling.
-- **Twitter Card**: Configured as `summary_large_image` for edge-to-edge preview cards.
-- **Open Graph Standards**: Includes `og:title`, `og:description`, `og:type`, `og:url`, `og:image`, `og:image:width`, `og:image:height`, `og:image:alt`, `og:site_name`, and `og:locale`.
+- **Web App Manifest (`manifest.webmanifest`)**: Configured with `standalone` display mode, Pip OS branding, nursery theme colors (`#fff8f1`), and responsive adaptive icons.
+- **Application Icons**:
+  - `assets/icon-192.png`: 192x192 PNG launcher icon.
+  - `assets/icon-512.png`: 512x512 PNG splash and high-res icon.
+  - `assets/icon-maskable-512.png`: 512x512 PNG adaptive maskable icon with safe zone padding for Android devices.
+  - `assets/apple-touch-icon.png`: 180x180 PNG icon for iOS Safari home screen.
+- **Service Worker (`sw.js`)**:
+  - **Local Pre-caching**: Caches all essential local files on install (`index.html`, `manifest.webmanifest`, `css/style.css`, `js/*.js`, and `assets/*`).
+  - **Cache-First Offline Strategy**: Instant local loading with background revalidation.
+  - **Offline Navigation Fallback**: Returns cached `index.html` if the user opens or refreshes the app without network.
+  - **Graceful Google Fonts Degradation**: External font requests (`fonts.googleapis.com`, `fonts.gstatic.com`) degrade cleanly when offline without throwing network errors or delaying page render, seamlessly falling back to local system fonts (`Georgia`, `Trebuchet MS`, `Segoe UI`, `sans-serif`).
 
-### Testing with Social Debuggers:
-- **LinkedIn**: [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/) - Verifies `og:title`, `og:description`, and large banner rendering.
-- **X (Twitter)**: [Card Validator / Tweet Composer preview](https://cards-dev.twitter.com/validator) - Verifies `twitter:card` (`summary_large_image`), image aspect ratio, and typography.
-- **WhatsApp**: Previews link in WhatsApp mobile/desktop chats; confirms thumbnail generation respects the < 300 KB constraint.
+### Installing pipOS:
+- **Chrome / Edge (Desktop)**: Click the **Install pipOS** icon in the address bar.
+- **Android (Chrome)**: Tap the menu (⋮) and select **Install app** or **Add to Home screen**.
+- **iOS (Safari)**: Tap the Share button (⎋) and select **Add to Home Screen**.
 
 ## Before you submit (do these)
 1. `git init`, commit, push to a PUBLIC repo now. History must fall inside 17-19 Oct 2026 IST. Commit as you change things; do not fake dates.
@@ -150,4 +157,4 @@ Supabase offers a free PostgreSQL database with built-in REST endpoints and Row 
 - **Graceful Fallback:** If the network is offline or the backend fails to respond within 6 seconds, wishes are stored locally, cached wishes are rendered, and the user receives a friendly offline toast while keeping the browser console clean.
 
 ## Files
-`index.html` · `css/style.css` · `js/{util,audio,wall,fx,pip,toys,main,maths,maths.test,wall.test,og.test}.js` · `assets/{favicon.svg,og-preview.png}`
+`index.html` · `manifest.webmanifest` · `sw.js` · `css/style.css` · `js/{util,audio,wall,fx,pip,toys,main,maths,maths.test,wall.test,pwa.test}.js` · `assets/`
