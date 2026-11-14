@@ -62,13 +62,18 @@ h1, h2, h3 { font-family: var(--f-head); font-weight: 800; line-height: 1.08; ma
 p { margin: 0 0 1rem; }
 a { color: var(--berry-ink); }
 img, svg, canvas { max-width: 100%; }
-:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.btn-primary:focus-visible, .start:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px var(--paper);
+}
 section[id] { scroll-margin-top: 76px; }
 code { font-size: 0.9em; background: var(--blush); padding: 0.05rem 0.3rem; border-radius: 4px; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .skip { position: fixed; left: 8px; top: -60px; z-index: 100; background: var(--berry); color: #fff; padding: 0.6rem 1rem; border-radius: 10px; transition: top 0.15s; }
-.skip:focus { top: 8px; }
+.skip:focus, .skip:focus-visible { top: 8px; outline: 3px solid #fff; outline-offset: 2px; box-shadow: 0 0 0 5px var(--focus); }
 .noscript { padding: 1rem; background: var(--butter); border: 3px solid var(--line); border-radius: 12px; }
 .fine { font-size: 0.88rem; opacity: 0.85; margin: 0.9rem 0 0; }
 
@@ -194,10 +199,13 @@ main { max-width: 1120px; margin: 0 auto; padding: 92px 16px 40px; }
   background: repeating-linear-gradient(90deg, var(--berry) 0 12px, var(--berry-2) 12px 24px);
   border-bottom: 3px solid var(--line);
 }
-.win-title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.win-title, h2.win-title, h3.win-title {
+  flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  font-family: inherit; font-size: 1rem; font-weight: 600; color: inherit; line-height: inherit; margin: 0;
+}
 .win-dots i { display: inline-block; width: 12px; height: 12px; margin-left: 5px; border: 2px solid #fff; border-radius: 50%; }
 .win-btn {
-  display: grid; place-items: center; flex: none; width: 32px; height: 32px;
+  display: grid; place-items: center; flex: none; min-width: 36px; min-height: 36px; width: 36px; height: 36px;
   font: 700 1.2rem/1 var(--f-ui); color: var(--ink);
   background: var(--cream); border: 2.5px solid var(--line); border-radius: 9px; cursor: pointer;
 }
@@ -260,10 +268,11 @@ main { max-width: 1120px; margin: 0 auto; padding: 92px 16px 40px; }
 .pip-svg .p-brim, .pip-svg .p-pom { fill: #fff1da; stroke: #5c4033; stroke-width: 5; stroke-linejoin: round; }
 .pip-svg .p-capstar { fill: #fff1da; }
 .pip-svg .p-bow path, .pip-svg .p-bow circle { fill: #ff7fa8; stroke: #5c4033; stroke-width: 3.5; stroke-linejoin: round; }
-.pip-svg #egg { cursor: pointer; outline: none; }
+.pip-svg #egg { cursor: pointer; }
+.pip-svg #egg:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; border-radius: 50%; }
 .pip-svg .egg-star { fill: #ffc83d; stroke: #5c4033; stroke-width: 1.3; stroke-linejoin: round; transform-box: fill-box; transform-origin: center; transition: filter 0.15s; }
 .pip-svg #egg:hover .egg-star { filter: drop-shadow(0 0 5px #ffd98a); }
-.pip-svg #egg:focus-visible .egg-star { filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 4px #a34063); }
+.pip-svg #egg:focus-visible .egg-star { filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 6px var(--focus)); }
 .pip-svg .egg-star.is-wiggle { animation: wiggle 0.45s ease-in-out; }
 .pip-svg .p-zzz text { font-family: var(--f-head); font-weight: 800; fill: #ffe9d2; opacity: 0; transition: opacity 0.5s; }
 .pip-svg.is-night .p-zzz text { opacity: 1; animation: zzz 3s ease-in-out infinite; }
@@ -378,13 +387,18 @@ main { max-width: 1120px; margin: 0 auto; padding: 92px 16px 40px; }
 .scene-text p { max-width: 44ch; margin: 0; font-size: clamp(1.02rem, 1.9vw, 1.2rem); }
 .story-dots { display: flex; justify-content: center; gap: 0.2rem; padding: 0 0 0.5rem; }
 .story-dot { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; background: none; border: 0; cursor: pointer; }
+.story-dot:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 50%; }
 .story-dot::before { content: ""; width: 15px; height: 15px; border-radius: 50%; background: var(--paper); border: 3px solid var(--line); transition: background 0.2s, transform 0.2s; }
 .story-dot.is-active::before { background: var(--berry); transform: scale(1.25); }
 
 html.js .story-track { height: calc(var(--n) * 90vh); height: calc(var(--n) * 90svh); }
 html.js .story-stage { position: sticky; top: var(--stick); height: calc(100vh - var(--stick) - 16px); height: calc(100svh - var(--stick) - 16px); }
-html.js .scene { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
-html.js .scene.is-active { opacity: 1; pointer-events: auto; }
+html.js .scene {
+  position: absolute; inset: 0; opacity: 0; pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.5s, visibility 0.5s;
+}
+html.js .scene.is-active { opacity: 1; pointer-events: auto; visibility: visible; }
 html:not(.js) .scene { border-bottom: 3px solid var(--line); }
 
 .s-sky { fill: var(--sky); stroke: var(--line); stroke-width: 3; }
@@ -418,10 +432,23 @@ html:not(.js) .scene { border-bottom: 3px solid var(--line); }
 .wall .win { margin: 0; }
 .gb-form label { display: block; margin-bottom: 0.25rem; font-weight: 600; }
 .opt { font-weight: 400; opacity: 0.8; }
+.req { color: var(--berry-ink); font-weight: 700; margin-left: 0.2rem; }
 .gb-form input, .gb-form textarea {
   display: block; width: 100%; margin-bottom: 0.8rem; padding: 0.6rem 0.75rem;
   font: 400 1rem var(--f-ui); color: var(--ink);
   background: var(--paper); border: 3px solid var(--line); border-radius: 10px;
+}
+.gb-form input[aria-invalid="true"], .gb-form textarea[aria-invalid="true"] {
+  border-color: var(--berry-ink);
+  outline: 2px solid var(--berry-ink);
+}
+::placeholder {
+  color: #785949;
+  opacity: 1;
+}
+[data-theme="night"] ::placeholder {
+  color: #c9b4a4;
+  opacity: 1;
 }
 .gb-form textarea { resize: vertical; min-height: 5.2rem; }
 .gb-form .row-between { margin-top: 0; }

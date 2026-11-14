@@ -68,12 +68,14 @@
       timers = [];
       playing = false;
       wind.textContent = 'Wind the box';
+      wind.setAttribute('aria-pressed', 'false');
     }
     function playTune() {
       if (!audio.request()) return;
       if (audio.isEndless()) stopEndlessUi();
       playing = true;
       wind.textContent = 'Stop the box';
+      wind.setAttribute('aria-pressed', 'true');
       TUNE.forEach(function (n, step) {
         timers.push(window.setTimeout(function () {
           if (n >= 0) press(n);
@@ -86,6 +88,7 @@
     function stopEndlessUi() {
       audio.stopEndless();
       endless.textContent = 'Endless lullaby';
+      endless.setAttribute('aria-pressed', 'false');
       endless.classList.remove('is-on');
     }
     endless.addEventListener('click', function () {
@@ -94,6 +97,7 @@
       if (playing) stopTune();
       audio.startEndless(flash);
       endless.textContent = 'Stop lullaby';
+      endless.setAttribute('aria-pressed', 'true');
       endless.classList.add('is-on');
     });
 
@@ -139,16 +143,29 @@
       b.type = 'button';
       b.className = 'lantern';
       b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', i === 0 ? 'true' : 'false');
+      b.setAttribute('aria-label', l.name + ' lantern');
+      b.tabIndex = i === 0 ? 0 : -1;
       b.style.setProperty('--c', l.glow);
       b.innerHTML = '<i aria-hidden="true"></i><span>' + l.name + '</span>';
       b.addEventListener('click', function () { setLantern(i); });
       b.addEventListener('keydown', function (e) {
         var d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
-        if (!d) return;
-        e.preventDefault();
-        var n = (cur + d + LANTERNS.length) % LANTERNS.length;
-        setLantern(n);
-        $$('.lantern', lanternsEl)[n].focus();
+        var radios = $$('.lantern', lanternsEl);
+        if (d !== 0) {
+          e.preventDefault();
+          var n = (cur + d + LANTERNS.length) % LANTERNS.length;
+          setLantern(n);
+          radios[n].focus();
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          setLantern(0);
+          radios[0].focus();
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          setLantern(LANTERNS.length - 1);
+          radios[LANTERNS.length - 1].focus();
+        }
       });
       lanternsEl.appendChild(b);
     });
@@ -357,7 +374,7 @@
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         if (st.over) {
-          ctx.fillStyle = 'rgba(40,24,40,.55)';
+          ctx.fillStyle = 'rgba(20, 10, 24, 0.8)';
           ctx.fillRect(0, 0, W, H);
           ctx.fillStyle = '#fff8f1';
           ctx.font = '600 26px Fredoka, system-ui, sans-serif';
@@ -365,7 +382,8 @@
           ctx.font = '500 16px Fredoka, system-ui, sans-serif';
           ctx.fillText('Tap to build again', W / 2, H / 2 + 20);
         } else {
-          ctx.fillStyle = 'rgba(92,64,51,.7)';
+          var isNight = document.documentElement.getAttribute('data-theme') === 'night';
+          ctx.fillStyle = isNight ? '#ffe9d2' : '#5c4033';
           ctx.font = '500 15px Fredoka, system-ui, sans-serif';
           ctx.fillText('Tap to drop the block', W / 2, 40);
         }

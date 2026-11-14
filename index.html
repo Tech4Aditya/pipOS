@@ -37,11 +37,11 @@
       <a href="#wall">Wall</a>
     </nav>
     <div class="task-right">
-      <button class="tb-btn" id="soundBtn" type="button" data-silent aria-label="Turn sound on">
+      <button class="tb-btn" id="soundBtn" type="button" data-silent aria-pressed="false" aria-label="Sound off, turn sound on">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M3 9v6h4l5 4V5L7 9H3z"/><path class="waves" d="M16 8c1.5 1.2 1.5 6.8 0 8M19 5c3 3 3 11 0 14"/><path class="slash" d="M16 9l6 6M22 9l-6 6"/></svg>
         <span id="soundLabel">Sound off</span>
       </button>
-      <button class="tb-btn" id="themeBtn" type="button" aria-label="Switch to night">
+      <button class="tb-btn" id="themeBtn" type="button" aria-label="Day mode, switch to night mode">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle class="sun" cx="12" cy="12" r="4.5"/><path class="rays" d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/><path class="moon" d="M20 14.5A8 8 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
         <span id="themeLabel">Day</span>
       </button>
@@ -54,7 +54,7 @@
     <a href="#work"><span class="ic ic-box" aria-hidden="true"></span>My Toys</a>
     <a href="#story"><span class="ic ic-book" aria-hidden="true"></span>bedtime.exe</a>
     <a href="#wall"><span class="ic ic-pin" aria-hidden="true"></span>wish wall</a>
-    <button type="button" id="trashBtn"><span class="ic ic-trash" aria-hidden="true"></span>Nightmares</button>
+    <button type="button" id="trashBtn" aria-label="Nightmares trash can"><span class="ic ic-trash" aria-hidden="true"></span>Nightmares</button>
   </nav>
 
   <main id="main">
@@ -76,7 +76,7 @@
         <div class="pip-wrap">
           <p class="bubble" id="greeting">Hi! I'm Pip.</p>
           <div class="pip-float">
-            <svg id="pipSvg" class="pip-svg" viewBox="0 0 420 440" role="img" aria-labelledby="pipT pipD">
+            <svg id="pipSvg" class="pip-svg" viewBox="0 0 420 440" role="group" aria-label="Pip, the skull baby">
               <title id="pipT">Pip, the skull baby</title>
               <desc id="pipD">A cute baby with a round skull face, glowing amber eyes, a tiny crooked smile and a starry nightcap with a pink bow, floating on a cloud and waving.</desc>
               <defs>
@@ -152,7 +152,7 @@
                   <path d="M112 152C142 128 150 170 118 162Z"/>
                   <circle cx="112" cy="156" r="7"/>
                 </g>
-                <g id="egg" role="button" tabindex="0" aria-label="A tiny gold star on Pip's nightcap">
+                <g id="egg" role="button" tabindex="0" aria-label="A tiny gold star on Pip's nightcap. Tap five times to wake Pip." aria-description="Interactive easter egg">
                   <circle cx="156" cy="96" r="26" fill="transparent"/>
                   <use class="egg-star" href="#star" x="140" y="80" width="32" height="32"/>
                 </g>
@@ -177,7 +177,7 @@
 
     <!-- ABOUT -->
     <section id="about" class="win" data-foldable aria-labelledby="aboutTitle">
-      <div class="win-bar"><span class="win-title" id="aboutTitle">character-sheet.txt</span></div>
+      <div class="win-bar"><h2 class="win-title" id="aboutTitle">character-sheet.txt</h2></div>
       <div class="win-body">
         <dl class="sheet">
           <div><dt>What Pip is</dt><dd>A baby with a smooth round skull face, huge soft eye sockets with warm amber pinpricks, a tiny crooked smile and a starry nightcap with a pink bow.</dd></div>
@@ -197,7 +197,7 @@
       <div class="work">
         <!-- Lullaby Lab -->
         <article id="lab" class="win w-lab" data-foldable aria-labelledby="labTitle">
-          <div class="win-bar"><span class="win-title" id="labTitle">lullaby-lab.exe</span></div>
+          <div class="win-bar"><h3 class="win-title" id="labTitle">lullaby-lab.exe</h3></div>
           <div class="win-body">
             <div class="proj-head">
               <div class="thumb" hidden><img loading="lazy" decoding="async" data-optional data-src="assets/pip_lullaby_box.png" alt="" width="84" height="84"></div>
@@ -206,21 +206,21 @@
             <div class="mb-stage" id="mbStage" aria-hidden="true"></div>
             <div class="keys" id="keys" role="group" aria-label="Music box keys"></div>
             <div class="row">
-              <button class="btn btn-primary" id="windBtn" type="button" data-silent>Wind the box</button>
-              <button class="btn" id="endlessBtn" type="button" data-silent>Endless lullaby</button>
+              <button class="btn btn-primary" id="windBtn" type="button" data-silent aria-pressed="false">Wind the box</button>
+              <button class="btn" id="endlessBtn" type="button" data-silent aria-pressed="false">Endless lullaby</button>
             </div>
           </div>
         </article>
 
         <!-- Nightlights -->
         <article id="lights" class="win w-lights" data-foldable aria-labelledby="lightsTitle">
-          <div class="win-bar"><span class="win-title" id="lightsTitle">nightlight-collection.exe</span></div>
+          <div class="win-bar"><h3 class="win-title" id="lightsTitle">nightlight-collection.exe</h3></div>
           <div class="win-body">
             <div class="proj-head">
               <div class="thumb" hidden><img loading="lazy" decoding="async" data-optional data-src="assets/pip_dream_lantern.png" alt="" width="84" height="84"></div>
               <p>Pick a lantern, then sweep it across the dark nursery. Five small dreams are hiding in there.</p>
             </div>
-            <div class="darkroom" id="darkroom" tabindex="0" aria-label="Dark nursery. Move your pointer, or use the arrow keys, to shine the lantern.">
+            <div class="darkroom" id="darkroom" tabindex="0" role="region" aria-label="Dark nursery. Move your pointer, or use the arrow keys, to shine the lantern.">
               <div class="dr-hidden" id="drHidden" aria-hidden="true">
                 <svg class="dr-item" data-item viewBox="-10 -10 20 20" style="left:12%;top:24%"><use href="#star"/></svg>
                 <svg class="dr-item" data-item viewBox="-10 -10 20 20" style="left:78%;top:18%"><use href="#star"/></svg>
@@ -234,27 +234,27 @@
             </div>
             <div class="row row-between">
               <div class="lanterns" id="lanterns" role="radiogroup" aria-label="Choose a lantern"></div>
-              <p class="tray" id="tray" aria-live="polite"><span class="tray-n" id="trayN">0 of 5 dreams found</span></p>
+              <p class="tray" id="tray" aria-live="polite" aria-atomic="true"><span class="tray-n" id="trayN">0 of 5 dreams found</span></p>
             </div>
           </div>
         </article>
 
         <!-- Blocks -->
         <article id="blocks" class="win w-blocks" data-foldable aria-labelledby="blocksTitle">
-          <div class="win-bar"><span class="win-title" id="blocksTitle">rattle-and-blocks.exe</span></div>
+          <div class="win-bar"><h3 class="win-title" id="blocksTitle">rattle-and-blocks.exe</h3></div>
           <div class="win-body">
             <p>Stack the blocks as high as Pip's bedtime. Tap, click or press Space to drop.</p>
             <canvas id="blockCanvas" class="block-canvas" tabindex="0" aria-label="Block stacking game. Press Space or Enter to drop the moving block."></canvas>
             <div class="row row-between">
               <button class="btn btn-primary" id="blockDrop" type="button" data-silent>Drop block</button>
-              <p class="score" id="blockScore">Height 0, best 0</p>
+              <p class="score" id="blockScore" aria-live="polite" aria-atomic="true">Height 0, best 0</p>
             </div>
           </div>
         </article>
 
         <!-- Route -->
         <article id="route" class="win w-route" data-foldable aria-labelledby="routeTitle">
-          <div class="win-bar"><span class="win-title" id="routeTitle">dream-delivery.exe</span></div>
+          <div class="win-bar"><h3 class="win-title" id="routeTitle">dream-delivery.exe</h3></div>
           <div class="win-body">
             <p>Scroll to fly Pip across the rooftops, or press the button and watch.</p>
             <svg id="routeSvg" class="route-svg" viewBox="0 0 600 290" role="img" aria-label="A map of seven rooftops with a dashed flight route and Pip flying along it on a cloud.">
@@ -284,8 +284,8 @@
               </g>
             </svg>
             <div class="row row-between">
-              <button class="btn btn-primary" id="flyBtn" type="button">Fly the route</button>
-              <p class="score" id="routeLabel">Waiting at the nursery window</p>
+              <button class="btn btn-primary" id="flyBtn" type="button" aria-controls="routeSvg routeLabel">Fly the route</button>
+              <p class="score" id="routeLabel" aria-live="polite" aria-atomic="true">Waiting at the nursery window</p>
             </div>
           </div>
         </article>
@@ -298,7 +298,7 @@
       <div class="story-track" id="storyTrack" style="--n:4">
         <div class="win story-stage">
           <div class="win-bar">
-            <span class="win-title">bedtime.exe</span>
+            <h3 class="win-title">bedtime.exe</h3>
             <span class="story-prog" aria-hidden="true"><i id="storyBar"></i></span>
           </div>
           <div class="scenes">
@@ -317,7 +317,7 @@
               </div>
               <div class="scene-text"><h3 id="sc1">The hiccup</h3><p>Nobody knows exactly where Pip came from. The night nurse found a laundry basket on the nursery step, a nightcap two sizes too big, and one very loud hiccup. Inside the basket: Pip, giggling at the moon.</p></div>
             </article>
-            <article class="scene" aria-labelledby="sc2">
+            <article class="scene" aria-labelledby="sc2" aria-hidden="true">
               <div class="scene-art">
                 <svg viewBox="0 0 320 200" aria-hidden="true">
                   <rect class="s-sky" width="320" height="200" rx="10"/>
@@ -330,7 +330,7 @@
               </div>
               <div class="scene-text"><h3 id="sc2">No silence allowed</h3><p>The Midnight Nursery had one rule: every little ghost falls asleep to something. Humming, rain, a rusty fan. Pip took one look at all that waiting quiet and decided silence was a problem to be engineered.</p></div>
             </article>
-            <article class="scene" aria-labelledby="sc3">
+            <article class="scene" aria-labelledby="sc3" aria-hidden="true">
               <div class="scene-art">
                 <svg viewBox="0 0 320 200" aria-hidden="true">
                   <rect class="s-sky" width="320" height="200" rx="10"/>
@@ -342,7 +342,7 @@
               </div>
               <div class="scene-text"><h3 id="sc3">The first lullaby</h3><p>Pip wound a dusty music box and turned the key the wrong way. Out came five notes, slightly crooked, just like Pip's smile. Eleven ghosts yawned at once. Nobody has stayed up past midnight since.</p></div>
             </article>
-            <article class="scene" aria-labelledby="sc4">
+            <article class="scene" aria-labelledby="sc4" aria-hidden="true">
               <div class="scene-art">
                 <svg viewBox="0 0 320 200" aria-hidden="true">
                   <rect class="s-sky" width="320" height="200" rx="10"/>
@@ -359,7 +359,7 @@
             </article>
           </div>
           <div class="story-dots" role="group" aria-label="Jump to a scene">
-            <button type="button" class="story-dot is-active" aria-label="Scene 1, The hiccup"></button>
+            <button type="button" class="story-dot is-active" aria-label="Scene 1, The hiccup" aria-current="true"></button>
             <button type="button" class="story-dot" aria-label="Scene 2, No silence allowed"></button>
             <button type="button" class="story-dot" aria-label="Scene 3, The first lullaby"></button>
             <button type="button" class="story-dot" aria-label="Scene 4, The night shift"></button>
@@ -376,18 +376,18 @@
       </div>
       <div class="wall">
         <article class="win w-wish" data-foldable aria-labelledby="wishTitle">
-          <div class="win-bar"><span class="win-title" id="wishTitle">wish-wall.gb</span></div>
+          <div class="win-bar"><h3 class="win-title" id="wishTitle">wish-wall.gb</h3></div>
           <div class="win-body">
             <form id="gbForm" class="gb-form" novalidate>
               <label for="gbName">Your name <span class="opt">(optional)</span></label>
               <input id="gbName" name="name" type="text" maxlength="20" autocomplete="nickname" placeholder="A sleepy visitor">
-              <label for="gbWish">Your wish</label>
-              <textarea id="gbWish" name="wish" rows="3" maxlength="120" placeholder="I wish for soft rain and soup dreams"></textarea>
+              <label for="gbWish">Your wish <span class="req" aria-hidden="true">*</span></label>
+              <textarea id="gbWish" name="wish" rows="3" maxlength="120" required aria-required="true" aria-describedby="gbError gbCount" placeholder="I wish for soft rain and soup dreams"></textarea>
               <div class="row row-between">
                 <button class="btn btn-primary" type="submit">Pin my wish</button>
-                <span class="count" id="gbCount" aria-hidden="true">0 / 120</span>
+                <span class="count" id="gbCount" aria-label="Character count">0 / 120</span>
               </div>
-              <p class="err" id="gbError" role="alert"></p>
+              <p class="err" id="gbError" role="alert" aria-live="assertive"></p>
             </form>
             <ul class="notes" id="gbList"></ul>
             <p class="fine" id="gbFine">Wishes are saved on this device only.</p>
@@ -395,7 +395,7 @@
         </article>
 
         <article class="win w-counter" data-foldable aria-labelledby="ctrTitle">
-          <div class="win-bar"><span class="win-title" id="ctrTitle">dream-counter.exe</span></div>
+          <div class="win-bar"><h3 class="win-title" id="ctrTitle">dream-counter.exe</h3></div>
           <div class="win-body">
             <p class="ctr-label">Dreams delivered tonight</p>
             <div class="odo" id="odo" role="img" aria-label="Dreams delivered tonight"></div>
@@ -428,16 +428,16 @@
     </div>
   </footer>
 
-  <dialog id="secret" class="secret win" aria-labelledby="secretTitle">
-    <div class="win-bar"><span class="win-title" id="secretTitle">secret-lullaby.exe</span><button class="win-btn" id="secretClose" type="button" aria-label="Close secret message">×</button></div>
-    <div class="win-body">
+  <dialog id="secret" class="secret win" aria-labelledby="secretTitle" aria-describedby="secretBody">
+    <div class="win-bar"><h3 class="win-title" id="secretTitle">secret-lullaby.exe</h3><button class="win-btn" id="secretClose" type="button" aria-label="Close secret message">×</button></div>
+    <div class="win-body" id="secretBody">
       <p class="secret-big">You woke Pip!</p>
       <p>You found the gold star on the nightcap. Pip says: "shh... the best dreams are the ones you say out loud. sweet dreams, curious one."</p>
     </div>
   </dialog>
 
   <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <script src="js/util.js" defer></script>
   <script src="js/audio.js" defer></script>

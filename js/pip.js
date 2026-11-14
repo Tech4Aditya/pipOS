@@ -104,7 +104,8 @@
     void star.getBoundingClientRect(); // restart the wiggle animation
     star.classList.add('is-wiggle');
     if (PIP.audio.isOn()) PIP.audio.note(PIP.audio.SCALE[Math.min(taps + 1, 7)], { dur: 0.7, gain: 0.14 });
-    if (taps === 3) PIP.toast('Pip stirs in their sleep...');
+    if (taps === 1) PIP.toast('Pip stirred slightly...');
+    else if (taps === 3) PIP.toast('Pip stirs in their sleep...');
     if (taps >= 5) {
       taps = 0;
       wake(5200);

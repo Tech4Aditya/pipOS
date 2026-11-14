@@ -226,7 +226,11 @@
 
     wish.addEventListener('input', function () {
       count.textContent = wish.value.length + ' / 120';
-      if (err.textContent) err.textContent = '';
+      count.setAttribute('aria-label', 'Character count: ' + wish.value.length + ' of 120');
+      if (err.textContent) {
+        err.textContent = '';
+        wish.removeAttribute('aria-invalid');
+      }
     });
 
     form.addEventListener('submit', function (e) {
@@ -263,6 +267,7 @@
 
       wish.value = '';
       count.textContent = '0 / 120';
+      count.setAttribute('aria-label', 'Character count: 0 of 120');
       err.textContent = '';
 
       // Optimistic or confirmed update
