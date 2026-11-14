@@ -155,6 +155,24 @@
     pop();
   });
 
+  // Print stylesheet for a clean one-page Pip profile
+  function printProfile() {
+    var printWindow = window.open('', '_blank', 'width=600,height=800');
+    printWindow.document.write('<html><head><title>Pip Profile</title>');
+    printWindow.document.write('<style>');
+    printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
+    printWindow.document.write('h1 { color: #333; }');
+    printWindow.document.write('p { font-size: 14px; line-height: 1.6; }');
+    printWindow.document.write('</style></head><body>');
+    printWindow.document.write('<h1>Pip Profile</h1>');
+    printWindow.document.write('<p>Sound state: ' + state + '</p>');
+    printWindow.document.write('<p>Available scales: ' + SCALE.join(', ') + '</p>');
+    printWindow.document.write('<p>Available bass notes: ' + BASS.join(', ') + '</p>');
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+  }
+
   PIP.audio = {
     SCALE: SCALE,
     isOn: isOn,
@@ -167,6 +185,7 @@
     startEndless: startEndless,
     stopEndless: stopEndless,
     isEndless: isEndless,
-    onChange: onChange
+    onChange: onChange,
+    printProfile: printProfile // Expose printProfile function
   };
 })();
