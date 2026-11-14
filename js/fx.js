@@ -1,8 +1,12 @@
 /* fx.js: sparkle trail, confetti, dream odometer, wish wall. */
 (function () {
   'use strict';
-  var PIP = window.PIP;
-  var $ = PIP.$, $$ = PIP.$$, store = PIP.store, toast = PIP.toast, reduce = PIP.reduceMotion;
+  var PIP = (typeof window !== 'undefined' && window.PIP) ? window.PIP : {};
+  var $ = PIP.$ || function () { return null; };
+  var $$ = PIP.$$ || function () { return []; };
+  var store = PIP.store || { get: function () { return ''; }, set: function () {} };
+  var toast = PIP.toast || function () {};
+  var reduce = PIP.reduceMotion || { matches: false };
 
   /* ---------- sparkle trail (mouse and pen only, off for reduced motion) ---------- */
   var GLYPHS = ['✦', '★', '✧', '·'];
@@ -171,6 +175,24 @@
     } catch (e) {}
   }
 
+  // Create a note DOM element strictly using textContent to prevent HTML injection (XSS)
+  function createNoteElement(x, i, doc) {
+    var d = doc || (typeof document !== 'undefined' ? document : null);
+    if (!d || typeof d.createElement !== 'function') return null;
+    var li = d.createElement('li');
+    li.className = 'note n' + ((i || 0) % 4);
+    if (li.style && typeof li.style.setProperty === 'function') {
+      li.style.setProperty('--rot', ROT[(i || 0) % ROT.length] + 'deg');
+    }
+    var p = d.createElement('p');
+    p.textContent = (x && typeof x.w === 'string') ? x.w : ''; // Strict textContent — prevents XSS
+    var by = d.createElement('span');
+    by.textContent = (x && typeof x.n === 'string') ? x.n : 'A sleepy visitor'; // Strict textContent — prevents XSS
+    li.appendChild(p);
+    li.appendChild(by);
+    return li;
+  }
+
   function initWall() {
     var form = $('#gbForm'), list = $('#gbList');
     if (!form || !list) return;
@@ -186,16 +208,8 @@
       list.textContent = '';
       var all = activeWishes.concat(SEEDS);
       all.forEach(function (x, i) {
-        var li = document.createElement('li');
-        li.className = 'note n' + (i % 4);
-        li.style.setProperty('--rot', ROT[i % ROT.length] + 'deg');
-        var p = document.createElement('p');
-        p.textContent = x.w; // Strict textContent — prevents XSS
-        var by = document.createElement('span');
-        by.textContent = x.n; // Strict textContent — prevents XSS
-        li.appendChild(p);
-        li.appendChild(by);
-        list.appendChild(li);
+        var note = createNoteElement(x, i, document);
+        if (note) list.appendChild(note);
       });
     }
 
@@ -305,6 +319,15 @@
 
   PIP.fx = {
     confetti: confetti,
+    createNoteElement: createNoteElement,
     init: function () { initSparkles(); initOdometer(); initWall(); }
   };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      createNoteElement: createNoteElement,
+      ROT: ROT,
+      SEEDS: SEEDS
+    };
+  }
 })();
