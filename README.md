@@ -9,10 +9,74 @@ Open `index.html`, or `python3 -m http.server` and visit localhost:8000.
 - Vercel / Netlify: drag the folder in, or import the GitHub repo (framework: "Other", no build command, output dir `.`).
 - GitHub Pages: push, then Settings > Pages > deploy from `main` / root.
 ## Running Tests
-This project uses Node.js's built-in test runner.
-Run the tests using:
+
+PipOS includes automated test suites with **zero dependencies**, using Node.js's built-in test runner.
+
+Run all tests from the repository root:
+```bash
+node --test
+```
+Or from the `js/` directory:
+```bash
 cd js
 node --test
+```
+
+### Test Suites Overview:
+- `js/maths.test.js`: Verifies block-stacking physics, overlap calculations, miss detection, and perfect drop thresholds.
+- `js/wall.test.js`: Verifies wish length validation, control character sanitization, 15-second cooldown and 10-minute rate limit ceilings, and Firebase/Supabase payload parsing.
+- `js/xss.test.js`: Verifies the Content Security Policy `<meta>` tag structure, audits source code for unsafe DOM sinks, runs an automated battery of 14 OWASP XSS payloads through `createNoteElement`, and validates end-to-end sanitization and safe DOM rendering.
+
+## Content Security Policy (CSP)
+
+PipOS enforces a strict Content Security Policy delivered via `<meta http-equiv="Content-Security-Policy">` in `index.html`. It is specifically tailored for plain HTML/CSS/JS with zero build steps while maintaining compatibility with Google Fonts, inline styles, SVGs, and optional shared backends:
+
+```html
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self'; connect-src 'self' https://*.firebaseio.com https://*.supabase.co; object-src 'none'; base-uri 'self';">
+```
+
+### Directive Breakdown:
+| Directive | Value | Purpose |
+| :--- | :--- | :--- |
+| `default-src` | `'self'` | Base fallback restricting all unlisted resource types strictly to the site's own origin. |
+| `script-src` | `'self' 'unsafe-inline'` | Permits local scripts (`js/*.js`), the synchronous `<head>` script (`classList.add('js')`), and optional inline `PIP_WALL_BACKEND` configuration. |
+| `style-src` | `'self' 'unsafe-inline' https://fonts.googleapis.com` | Permits local `css/style.css`, Google Fonts stylesheets, and dynamic CSS custom properties (`--rot`, `--dx`, `--dy`, `--scene`). |
+| `font-src` | `'self' https://fonts.gstatic.com` | Permits Fraunces and Fredoka web fonts downloaded from Google Fonts' CDN and any local font files. |
+| `img-src` | `'self' data: blob:` | Permits local images (`assets/*.svg`, `assets/*.png`), embedded SVGs, and data/blob URIs. |
+| `media-src` | `'self'` | Disallows third-party media loading (all audio is synthesized locally using the Web Audio API). |
+| `connect-src` | `'self' https://*.firebaseio.com https://*.supabase.co` | Authorizes `fetch()` calls to optional shared wish wall backends (Firebase Realtime Database and Supabase REST API) while preventing unauthorized data exfiltration. |
+| `object-src` | `'none'` | Strictly disables execution of plugins (`<object>`, `<embed>`, `<applet>`). |
+| `base-uri` | `'self'` | Prevents unauthorized base-tag URL manipulation (`<base href="...">`). |
+
+> [!NOTE]
+> Directives disallowed by the W3C specification in `<meta>` tags (such as `frame-ancestors`, `report-uri`, and `sandbox`) are deliberately excluded to prevent browser console warnings.
+
+## Manual Testing & Verification Steps
+
+### 1. Verify Zero CSP Violations
+1. Open `index.html` in any modern desktop browser (Chrome, Firefox, Safari, Edge) or serve it locally (`python -m http.server 8000`).
+2. Open Browser Developer Tools (`F12` or `Ctrl+Shift+I` / `Cmd+Option+I`).
+3. Click on the **Console** tab.
+4. Refresh the page (`Ctrl+R` / `Cmd+R`).
+5. **Expected result:** The console displays **0 errors** and **0 CSP violation warnings**. Google Fonts and local scripts load cleanly.
+
+### 2. Manual Wish Wall XSS Injection Test
+1. Navigate to the **The wish wall** section (`#wall`).
+2. In the **Your name** input field, enter an XSS attack vector:
+   ```html
+   <img src=x onerror=alert(1)>
+   ```
+3. In the **Your wish** textarea, enter a script injection attack vector:
+   ```html
+   <script>alert('XSS')</script>
+   ```
+4. Click **Pin my wish**.
+5. **Verify Security Defenses:**
+   - **No execution:** No alert dialog or script execution occurs.
+   - **Literal text rendering:** The newly created wish note appears at the top of the wall displaying the literal text string `<script>alert('XSS')</script>`.
+   - **Safe length truncation:** The author name displays as `<img src=x onerror=a` (strictly truncated to the 20-character limit).
+   - **Inspect DOM:** Right-click the new note and select **Inspect Element**. Confirm that `<p>` and `<span>` contain plain text nodes (`#text`) and that no child `<script>` or `<img>` elements were created.
+   - **Console check:** DevTools Console remains completely clean with zero error logs and zero CSP violations.
 
 ## Before you submit (do these)
 1. `git init`, commit, push to a PUBLIC repo now. History must fall inside 17-19 Oct 2026 IST. Commit as you change things; do not fake dates.
@@ -123,4 +187,4 @@ Supabase offers a free PostgreSQL database with built-in REST endpoints and Row 
 - **Graceful Fallback:** If the network is offline or the backend fails to respond within 6 seconds, wishes are stored locally, cached wishes are rendered, and the user receives a friendly offline toast while keeping the browser console clean.
 
 ## Files
-`index.html` · `css/style.css` · `js/{util,audio,wall,fx,pip,toys,main}.js` · `assets/`
+`index.html` · `css/style.css` · `js/{util,audio,wall,fx,pip,toys,main,maths,maths.test,wall.test,xss.test}.js` · `assets/`
