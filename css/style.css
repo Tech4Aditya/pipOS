@@ -339,6 +339,55 @@ main { max-width: 1120px; margin: 0 auto; padding: 92px 16px 40px; }
 .dr-moon { position: absolute; right: 26%; top: 12%; width: 42px; height: 42px; border-radius: 50%; box-shadow: inset -13px -4px 0 0 #ffe9ae; }
 .dr-glow { position: absolute; inset: 0; pointer-events: none; opacity: 0.55; mix-blend-mode: screen; background: radial-gradient(circle var(--r) at var(--x) var(--y), var(--glow) 0%, transparent 100%); }
 .darkroom.is-done .dr-glow { opacity: 0.6; }
+.dr-handle {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 54px;
+  min-height: 54px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 248, 241, 0.94);
+  border: 2.5px solid var(--line);
+  box-shadow: 0 0 16px var(--glow), 0 3px 8px rgba(0, 0, 0, 0.45);
+  color: var(--ink);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 10;
+  transition: transform 0.08s, box-shadow 0.15s, background 0.15s;
+}
+.dr-handle:active, .dr-handle.is-dragging {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.12);
+  box-shadow: 0 0 24px var(--glow), 0 5px 14px rgba(0, 0, 0, 0.55);
+  background: #ffffff;
+}
+.dr-handle-icon {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: var(--line);
+}
+.dr-handle-text {
+  font: 600 0.72rem/1 var(--f-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--line);
+}
+@media (pointer: fine) {
+  .dr-handle {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
 .lanterns { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .lantern {
   display: inline-flex; align-items: center; gap: 0.4rem; min-height: 40px; padding: 0.2rem 0.8rem 0.2rem 0.4rem;
