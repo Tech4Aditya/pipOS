@@ -188,4 +188,9 @@
     onChange: onChange,
     printProfile: printProfile // Expose printProfile function
   };
+
+  // Assign the issue for merging
+  if (typeof PIP.issue !== 'undefined' && typeof PIP.issue.assign === 'function') {
+    PIP.issue.assign('your-github-username'); // Replace with your GitHub username
+  }
 })();
