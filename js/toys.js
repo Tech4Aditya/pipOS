@@ -165,10 +165,72 @@
       lastMove = performance.now();
       paint();
     }
-    room.addEventListener('pointermove', toLocal);
+    var handle = $('#drHandle');
+    var isDraggingHandle = false;
+
+    if (handle) {
+      handle.addEventListener('pointerdown', function (e) {
+        isDraggingHandle = true;
+        handle.classList.add('is-dragging');
+        if (handle.setPointerCapture) {
+          try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+        }
+        toLocal(e);
+        tryFind();
+        e.stopPropagation();
+      });
+
+      handle.addEventListener('pointermove', function (e) {
+        if (!isDraggingHandle) return;
+        toLocal(e);
+        tryFind();
+      });
+
+      function endHandleDrag(e) {
+        if (!isDraggingHandle) return;
+        isDraggingHandle = false;
+        handle.classList.remove('is-dragging');
+        if (handle.releasePointerCapture && e.pointerId) {
+          try { handle.releasePointerCapture(e.pointerId); } catch (err) {}
+        }
+      }
+
+      handle.addEventListener('pointerup', endHandleDrag);
+      handle.addEventListener('pointercancel', endHandleDrag);
+    }
+
+    var roomTouchStart = null;
+
     room.addEventListener('pointerdown', function (e) {
-      toLocal(e);
-      tryFind();
+      if (e.pointerType === 'mouse') {
+        toLocal(e);
+        tryFind();
+        return;
+      }
+      roomTouchStart = { x: e.clientX, y: e.clientY, time: performance.now() };
+    });
+
+    room.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'mouse') {
+        toLocal(e);
+      }
+    });
+
+    room.addEventListener('pointerup', function (e) {
+      if (e.pointerType !== 'mouse' && roomTouchStart) {
+        var dx = Math.abs(e.clientX - roomTouchStart.x);
+        var dy = Math.abs(e.clientY - roomTouchStart.y);
+        var dt = performance.now() - roomTouchStart.time;
+        if (dx < 12 && dy < 12 && dt < 400) {
+          toLocal(e);
+          tryFind();
+        }
+        roomTouchStart = null;
+      }
+    });
+
+    room.addEventListener('pointercancel', function () {
+      roomTouchStart = null;
     });
     room.addEventListener('keydown', function (e) {
       var b = room.getBoundingClientRect(), step = 28;
