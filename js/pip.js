@@ -1,8 +1,11 @@
 /* pip.js: Pip's eyes, blinks, moods, greeting and the hidden gold star. */
 (function () {
   'use strict';
-  var PIP = window.PIP;
-  var $ = PIP.$, store = PIP.store, clamp = PIP.clamp, reduce = PIP.reduceMotion;
+  var PIP = (typeof window !== 'undefined' && window.PIP) ? window.PIP : (typeof globalThis !== 'undefined' && globalThis.PIP ? globalThis.PIP : {});
+  var $ = PIP.$ || function () { return null; };
+  var store = PIP.store || { get: function () { return ''; }, set: function () {} };
+  var clamp = PIP.clamp || function (v, min, max) { return Math.max(min, Math.min(max, v)); };
+  var reduce = PIP.reduceMotion || { matches: false };
 
   var svg, head, egg, bubble, secret;
   var eyes = [];
@@ -10,9 +13,17 @@
   var mood = 'day';
   var awakeTimer = 0;
   var MAX_X = 14, MAX_Y = 18;
+  var glanceTimer = 0;
+  var lastGlance = 0;
 
   /* ---------- eyes follow the pointer (touch drags count too) ---------- */
   function look(x, y) {
+    if (!head || !eyes.length || !eyes[0].sock) return;
+    if (typeof x === 'object' && x && typeof x.getBoundingClientRect === 'function') {
+      var rect = x.getBoundingClientRect();
+      y = rect.top + Math.min(rect.height * 0.35, 200);
+      x = rect.left + rect.width / 2;
+    }
     for (var i = 0; i < eyes.length; i++) {
       var r = eyes[i].sock.getBoundingClientRect();
       var dx = x - (r.left + r.width / 2), dy = y - (r.top + r.height / 2);
@@ -20,9 +31,35 @@
       var k = Math.min(d / 170, 1);
       eyes[i].el.style.transform = 'translate(' + ((dx / d) * k * MAX_X).toFixed(1) + 'px,' + ((dy / d) * k * MAX_Y).toFixed(1) + 'px)';
     }
-    // head tilts a touch toward the pointer
-    var vx = (x / window.innerWidth - 0.5) * 2, vy = (y / window.innerHeight - 0.5) * 2;
+    // head tilts a touch toward the pointer or target
+    var winW = (typeof window !== 'undefined' && window.innerWidth) ? window.innerWidth : 1000;
+    var winH = (typeof window !== 'undefined' && window.innerHeight) ? window.innerHeight : 800;
+    var vx = clamp((x / winW - 0.5) * 2, -1, 1);
+    var vy = clamp((y / winH - 0.5) * 2, -1, 1);
     head.style.transform = 'translate(' + (vx * 5).toFixed(1) + 'px,' + (vy * 3).toFixed(1) + 'px) rotate(' + (vx * 3.5).toFixed(2) + 'deg)';
+  }
+
+  /* ---------- brief glance toward a target section or coordinates ---------- */
+  function glance(target, y, duration) {
+    if (reduce && reduce.matches) return;
+    var gx = target, gy = y;
+    if (typeof target === 'object' && target && typeof target.getBoundingClientRect === 'function') {
+      var rect = target.getBoundingClientRect();
+      gx = rect.left + rect.width / 2;
+      gy = rect.top + Math.min(rect.height * 0.35, 200);
+    }
+    if (typeof gx !== 'number' || typeof gy !== 'number') return;
+    window.clearTimeout(glanceTimer);
+    lastGlance = performance.now();
+    look(gx, gy);
+    var glanceTime = lastGlance;
+    glanceTimer = window.setTimeout(function () {
+      // Return smoothly to neutral if the visitor has not moved their pointer during the glance
+      if (lastPointer < glanceTime && svg) {
+        var r = svg.getBoundingClientRect();
+        look(r.left + r.width / 2, r.top + r.height / 2 + 25);
+      }
+    }, typeof duration === 'number' ? duration : 1000);
   }
 
   var pending = null, raf = 0;
@@ -38,7 +75,7 @@
   // when nobody is moving, Pip looks around by itself
   function idleLoop() {
     window.setTimeout(function () {
-      if (performance.now() - lastPointer > 3500 && !document.hidden) {
+      if (performance.now() - lastPointer > 3500 && performance.now() - lastGlance > 2500 && !document.hidden) {
         var r = svg.getBoundingClientRect();
         var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
         look(cx + (Math.random() - 0.5) * 520, cy + (Math.random() - 0.5) * 360);
@@ -164,5 +201,16 @@
     }
   }
 
-  PIP.pip = { init: init, setMood: setMood, wake: wake, getMood: function () { return mood; } };
+  PIP.pip = {
+    init: init,
+    look: look,
+    glance: glance,
+    setMood: setMood,
+    wake: wake,
+    getMood: function () { return mood; }
+  };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = PIP.pip;
+  }
 })();

@@ -257,12 +257,26 @@
     var links = $$('.task-nav a');
     var map = {};
     links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+    var currentSection = null;
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (!e.isIntersecting) return;
         links.forEach(function (a) { a.removeAttribute('aria-current'); });
         var a = map[e.target.id];
         if (a) a.setAttribute('aria-current', 'true');
+
+        // When scrolling to a new section, Pip glances toward it with a tiny head nudge
+        if (currentSection && currentSection !== e.target.id) {
+          if (PIP.pip && (!reduce || !reduce.matches)) {
+            if (typeof PIP.pip.glance === 'function') {
+              PIP.pip.glance(e.target);
+            } else if (typeof PIP.pip.look === 'function') {
+              var r = e.target.getBoundingClientRect();
+              PIP.pip.look(r.left + r.width / 2, r.top + Math.min(r.height * 0.35, 200));
+            }
+          }
+        }
+        currentSection = e.target.id;
       });
     }, { rootMargin: '-40% 0px -55% 0px' });
     Object.keys(map).forEach(function (id) {

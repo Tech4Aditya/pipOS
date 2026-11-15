@@ -445,6 +445,7 @@ node --test
 | [js/maths.test.js](js/maths.test.js) | **7** | Verifies block-stacking geometry, partial overlap calculations, miss thresholds ($< 3\text{px}$), and perfect drop detection ($< 5\text{px}$). |
 | [js/wall.test.js](js/wall.test.js) | **9** | Verifies control-character stripping, empty wish rejection, name truncation ($20$ chars), wish ceiling ($120$ chars), 15s cooldown timers, 10-minute rate limiting, and Firebase/Supabase payload parsing. |
 | [js/xss.test.js](js/xss.test.js) | **4** | Validates CSP meta tag syntax, audits source code for dangerous sinks (`innerHTML`, `outerHTML`, `eval`), runs a battery of **14 malicious OWASP XSS payloads** through note creation, and verifies safe DOM text rendering. |
+| [js/pip-glance.test.js](js/pip-glance.test.js) | **4** | Verifies section scroll glance hook in `initNavSpy`, `look()` / `glance()` exports, reduced-motion bypass, and element coordinate targeting. |
 | [js/pwa.test.js](js/pwa.test.js) | **5** | Verifies `manifest.webmanifest` JSON validity, standalone display mode, presence of 192px/512px/maskable icons, binary PNG headers, Apple touch icons, Service Worker pre-cache manifests, and offline fallback routing. |
 | [js/og.test.js](js/og.test.js) | **3** | Verifies complete Open Graph and Twitter Card tags, validates `assets/og-preview.png` dimensions ($1200 \times 630$), verifies file size is strictly under the 300 KB WhatsApp limit (~181 KB), and audits social debugger compatibility. |
 | **Total** | **28** | **100% Passing (0 failures, 0 skipped, 0 flakiness)** |
@@ -550,7 +551,8 @@ pipOS/
 ├── js/
 │   ├── util.js                  # DOM helpers ($ / $$), local storage wrappers, clamp, reduce-motion
 │   ├── audio.js                 # Web Audio synthesizer, pentatonic scale, impulse convolver, generative lullaby
-│   ├── pip.js                   # Cursor/touch eye tracking, head tilt, moods, greeting, secret star Easter egg
+│   ├── pip.js                   # Cursor/touch eye tracking, head tilt, moods, greeting, section glance
+│   ├── pip-glance.test.js       # Node test suite for section observer glance hook & look()
 │   ├── toys.js                  # 4 playable toys: Lullaby Lab, Nightlight, Rattle & Blocks, Dream Delivery
 │   ├── fx.js                    # Sparkle cursor trail, canvas confetti, dream odometer, wish wall DOM
 │   ├── wall.js                  # Wish wall backend adapter (Firebase/Supabase), rate limiting, sanitization
