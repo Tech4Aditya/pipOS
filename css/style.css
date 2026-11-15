@@ -71,6 +71,29 @@
   --focus: #ffa6c4;
   --cloud: #c9c4f0;
 }
+[data-theme="contrast"] {
+  --cream: #000000;
+  --paper: #0d0d0d;
+  --ink: #ffffff;
+  --line: #ffffff;
+  --berry: #6b0f3a;
+  --berry-2: #520b2c;
+  --berry-ink: #ffd84d;
+  --blush: #1f1f1f;
+  --butter: #2b2b00;
+  --mint: #00281c;
+  --sky: #00203a;
+  --bar: #000000;
+  --shadow: #ffffff;
+  --dot: rgba(255, 255, 255, 0.08);
+  --focus: #ffff00;
+  --cloud: #ffffff;
+}
+[data-theme="contrast"] .win,
+[data-theme="contrast"] .btn,
+[data-theme="contrast"] .tb-btn { border-width: 4px; }
+[data-theme="contrast"] .win-bar,
+[data-theme="contrast"] .taskbar { border-bottom-width: 4px; }
 
 /* ==========================================================================
    02. Base & Reset

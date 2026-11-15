@@ -5,43 +5,64 @@
   var PIP = window.PIP;
   var $ = PIP.$, $$ = PIP.$$, store = PIP.store, clamp = PIP.clamp, reduce = PIP.reduceMotion;
   var audio = PIP.audio;
-  var tr = function (text) { return PIP.i18n ? PIP.i18n.t(text) : text; };
+  var tr = function (text) { return PIP.i18n && typeof PIP.i18n.t === 'function' ? PIP.i18n.t(text) : text; };
   var toast = function (text, ms) { PIP.toast(tr(text), ms); };
 
   function safe(name, fn) {
     try { fn(); } catch (e) { if (window.console) console.error('[pip] ' + name + ' failed:', e); }
   }
 
-  /* ---------- day / night ---------- */
+  /* ---------- day / night / high contrast ---------- */
   function initTheme() {
     var html = document.documentElement, btn = $('#themeBtn'), label = $('#themeLabel');
+    var cBtn = $('#contrastBtn');
     var meta = document.querySelector('meta[name="theme-color"]');
+    var base = 'day';
+    var contrast = store.get('contrast', '') === 'on';
+
     function apply(t) {
-      html.setAttribute('data-theme', t);
+      base = t;
       store.set('theme', t);
+      html.setAttribute('data-theme', contrast ? 'contrast' : t);
       if (btn) {
-        btn.setAttribute('aria-label', tr(t === 'night' ? 'Switch to day' : 'Switch to night'));
         btn.setAttribute('aria-label', t === 'night' ? 'Night mode, switch to day mode' : 'Day mode, switch to night mode');
         btn.classList.toggle('is-night', t === 'night');
       }
       if (label) label.textContent = tr(t === 'night' ? 'Night' : 'Day');
-      if (meta) meta.setAttribute('content', t === 'night' ? '#1b1430' : '#fff8f1');
+      if (meta) meta.setAttribute('content', contrast ? '#000000' : (t === 'night' ? '#1b1430' : '#fff8f1'));
       if (PIP.pip) PIP.pip.setMood(t === 'night' ? 'night' : 'day');
     }
-    document.addEventListener('pip-language-change', function () { apply(html.getAttribute('data-theme') || 'day'); });
+
+    function paintContrast() {
+      if (!cBtn) return;
+      cBtn.setAttribute('aria-pressed', contrast ? 'true' : 'false');
+      cBtn.setAttribute('aria-label', contrast ? 'High contrast on, turn it off' : 'High contrast off, turn it on');
+    }
+
+    document.addEventListener('pip-language-change', function () { apply(base); });
     var saved = store.get('theme', '');
+    if (saved !== 'day' && saved !== 'night') saved = '';
     var prefersDark = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-color-scheme: dark)').matches;
     apply(saved || (prefersDark ? 'night' : 'day'));
+    paintContrast();
+
     if (btn) btn.addEventListener('click', function () {
-      var next = html.getAttribute('data-theme') === 'night' ? 'day' : 'night';
+      var next = base === 'night' ? 'day' : 'night';
+      if (contrast) { contrast = false; store.set('contrast', 'off'); paintContrast(); }
       apply(next);
       if (audio.isOn()) {
         audio.note(audio.SCALE[next === 'night' ? 2 : 5], { dur: 1.1, gain: 0.14 });
         audio.note(audio.SCALE[next === 'night' ? 0 : 7], { dur: 1.3, gain: 0.12, when: 0.14 });
       }
     });
-  }
 
+    if (cBtn) cBtn.addEventListener('click', function () {
+      contrast = !contrast;
+      store.set('contrast', contrast ? 'on' : 'off');
+      apply(base);
+      paintContrast();
+    });
+  }
   /* ---------- sound switch ---------- */
   function initSound() {
     var btn = $('#soundBtn'), label = $('#soundLabel');
