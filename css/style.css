@@ -245,8 +245,6 @@ code { font-size: 0.9em; background: var(--blush); padding: 0.05rem 0.3rem; bord
 .ic-pin::after { border-radius: 50% 50% 50% 0; transform: rotate(-45deg); }
 .ic-key { background: var(--butter); }
 .ic-key::after { border-radius: 2px; }
-.ic-star { background: var(--butter); }
-.ic-star::after { border-radius: 50%; border-style: dotted; }
 .ic-trash { background: var(--paper); }
 .ic-trash::after { border-radius: 2px 2px 8px 8px; }
 
@@ -498,105 +496,12 @@ html.js .growth-chart.is-visible .growth-fill { width: calc(var(--progress, 0) *
   touch-action: manipulation;
   transition: transform 0.1s, background 0.15s, box-shadow 0.15s;
 }
-
-/* --- 10.2 Nightlight Collection (Darkroom) --- */
-.dr-rooms {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-.dr-room-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  background: var(--paper);
-  border: 2.5px solid var(--line);
-  border-radius: 999px;
-  font: 600 0.85rem var(--f-ui);
-  color: var(--ink);
-  cursor: pointer;
-  box-shadow: 2px 2px 0 var(--shadow);
-  touch-action: manipulation;
-  transition: transform 0.1s, background 0.15s, box-shadow 0.15s;
-}
 .dr-room-btn:hover {
   transform: translateY(-1px);
 }
 .dr-room-btn.is-active {
   background: var(--butter);
   box-shadow: 0 0 0 1px var(--line), 2px 2px 0 var(--shadow);
-}
-[data-theme="night"] .dr-room-btn.is-active {
-  background: var(--berry);
-  color: #fff;
-}
-.dr-room-badge {
-  font-size: 0.74rem;
-  opacity: 0.85;
-  background: rgba(0, 0, 0, 0.08);
-  padding: 1px 6px;
-  border-radius: 999px;
-}
-[data-theme="night"] .dr-room-badge {
-  background: rgba(255, 255, 255, 0.15);
-}
-.darkroom {
-  --x: 50%;
-  --y: 50%;
-  --r: 92px;
-  --glow: #cfe3ff;
-  position: relative;
-  aspect-ratio: 16 / 10;
-  min-height: 190px;
-  background: #120d24;
-  border: 3px solid var(--line);
-  border-radius: 12px;
-  overflow: hidden;
-  touch-action: pan-y;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.darkroom[data-current-room="attic"] { background: #1c131d; }
-.darkroom[data-current-room="garden"] { background: #0c1813; }
-.darkroom[data-current-room="nursery"] { background: #120d24; }
-.dr-room {
-  position: absolute;
-  inset: 0;
-}
-.dr-room[hidden] {
-  display: none !important;
-}
-.dr-attic-window {
-  position: absolute; right: 22%; top: 10%; width: 38px; height: 48px;
-  border: 2px solid rgba(255, 233, 174, 0.5); border-radius: 19px 19px 0 0;
-  box-shadow: inset 0 0 12px rgba(255, 200, 102, 0.25);
-}
-.dr-attic-window::after {
-  content: ""; position: absolute; inset: 0;
-  background: repeating-linear-gradient(0deg, transparent, transparent 15px, rgba(255, 233, 174, 0.3) 15px, rgba(255, 233, 174, 0.3) 17px);
-}
-.dr-firefly-glow {
-  position: absolute; right: 24%; top: 16%; width: 50px; height: 50px;
-  border-radius: 50%; background: radial-gradient(circle, rgba(159, 240, 208, 0.45) 0%, transparent 70%);
-}
-.dr-reset-room-btn {
-  padding: 4px 10px;
-  font-size: 0.78rem;
-  min-height: 32px;
-  border-radius: 999px;
-  opacity: 0.85;
-}
-.dr-reset-room-btn:hover {
-  opacity: 1;
-}
-
-
-@media (pointer: fine) {
-  .darkroom {
-    cursor: none;
-  }
 }
 [data-theme="night"] .dr-room-btn.is-active {
   background: var(--berry);
@@ -1371,116 +1276,9 @@ html.js .growth-chart.is-visible .growth-fill { width: calc(var(--progress, 0) *
   touch-action: manipulation;
   transition: transform 0.08s, box-shadow 0.08s;
 }
-
-
-.wall-actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin: 0.85rem 0 0.2rem;
-}
-.btn-tool {
-  min-height: 36px;
-  padding: 0.35rem 0.95rem;
-  font: 600 0.85rem var(--f-ui);
-  color: var(--ink);
-  background: var(--paper);
-  border: 2px solid var(--line);
-  border-radius: 999px;
-  box-shadow: 0 3px 0 var(--shadow);
-  cursor: pointer;
-  touch-action: manipulation;
-  transition: transform 0.08s, box-shadow 0.08s;
-}
-.btn-tool:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 0 var(--shadow);
-}
-.btn-tool:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--shadow);
-}
-.btn-tool:focus-visible {
-  outline: 3px solid var(--berry);
-  outline-offset: 2px;
-}
-
-.note-del {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 3px;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1;
-  color: #7a5040;
-  cursor: pointer;
-  touch-action: manipulation;
-  transition: background 0.1s, color 0.1s, border-color 0.1s;
-}
-.note-del:hover, .note-del:focus-visible {
-  background: rgba(163, 64, 99, 0.18);
-  color: var(--berry-ink, #80183b);
-  border-color: #a34063;
-  outline: 2px solid var(--berry, #a34063);
-  outline-offset: 1px;
-}
-
-.note-confirm {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px;
-  background: rgba(255, 253, 249, 0.96);
-  border-radius: inherit;
-  z-index: 2;
-  text-align: center;
-}
-.note-confirm-txt {
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: var(--ink);
-  margin: 0;
-}
-.note-confirm-btns {
-  display: flex;
-  gap: 6px;
-}
-.btn-confirm-yes, .btn-confirm-no {
-  min-height: 28px;
-  padding: 2px 10px;
-  font: 600 0.74rem var(--f-ui);
-  border-radius: 999px;
-  cursor: pointer;
-  touch-action: manipulation;
-}
 .btn-confirm-yes {
-  background: var(--berry);
+  background: var(--berry, #a34063);
   color: #fff;
-  border: 1.5px solid var(--line);
-}
-.btn-confirm-no {
-  background: var(--paper);
-  color: var(--ink);
-  border: 1.5px solid var(--line);
-}
-.tape {
-  height: 14px;
-  background: repeating-linear-gradient(45deg, #ffe9ae 0 14px, #5c4033 14px 28px);
-  border-bottom: 3px solid var(--line);
 }
 .btn-confirm-yes:hover, .btn-confirm-yes:focus-visible {
   background: var(--berry-ink, #80183b);
@@ -1556,110 +1354,16 @@ dialog.secret::backdrop { background: rgba(40, 24, 40, 0.55); }
 /* ==========================================================================
    15. Keyframe Animations
    ========================================================================== */
-@keyframes bob {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
-}
-@media (max-width: 960px) {
-  .work { grid-template-columns: 1fr; }
-  .w-lab, .w-lights, .w-blocks, .w-route, .w-growth, .w-stickers { grid-column: auto; }
-  .wall { grid-template-columns: 1fr; }
-  .task-nav a { padding: 0.4rem 0.6rem; }
-}
-
-@keyframes wave-big {
-
-  0%,
-  100% {
-    transform: rotate(8deg);
-  }
-
-  50% {
-    transform: rotate(-24deg);
-  }
-}
-
-@keyframes wiggle {
-
-  0%,
-  100% {
-    transform: rotate(0) scale(1);
-  }
-
-  25% {
-    transform: rotate(-22deg) scale(1.25);
-  }
-
-  75% {
-    transform: rotate(18deg) scale(1.25);
-  }
-}
-
-@keyframes zzz {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-@keyframes twinkle {
-  from {
-    opacity: 0.55;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes marq {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes rise {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(0.8);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -48px) scale(1.4);
-  }
-}
-
-@keyframes spark {
-  to {
-    opacity: 0;
-    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.3);
-  }
-}
-
-@keyframes ring {
-
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(163, 64, 99, 0.55);
-  }
-
-  60% {
-    box-shadow: 0 0 0 10px rgba(163, 64, 99, 0);
-  }
-}
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes wave { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-9deg); } }
+@keyframes wave-big { 0%, 100% { transform: rotate(8deg); } 50% { transform: rotate(-24deg); } }
+@keyframes wiggle { 0%, 100% { transform: rotate(0) scale(1); } 25% { transform: rotate(-22deg) scale(1.25); } 75% { transform: rotate(18deg) scale(1.25); } }
+@keyframes zzz { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes twinkle { from { opacity: 0.55; } to { opacity: 1; } }
+@keyframes marq { to { transform: translateX(-50%); } }
+@keyframes rise { 0% { opacity: 1; transform: translate(-50%, 0) scale(0.8); } 100% { opacity: 0; transform: translate(-50%, -48px) scale(1.4); } }
+@keyframes spark { to { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.3); } }
+@keyframes ring { 0%, 100% { box-shadow: 0 0 0 0 rgba(163, 64, 99, 0.55); } 60% { box-shadow: 0 0 0 10px rgba(163, 64, 99, 0); } }
 
 /* ==========================================================================
    16. Responsive Breakpoints
