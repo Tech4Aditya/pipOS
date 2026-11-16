@@ -96,6 +96,7 @@ test('sw.js service worker pre-caches all essential local assets and exists on d
     'js/audio.js',
     'js/wall.js',
     'js/fx.js',
+    'js/i18n.js',
     'js/pip.js',
     'js/toys.js',
     'js/main.js',
@@ -113,6 +114,10 @@ test('sw.js service worker pre-caches all essential local assets and exists on d
       assert.ok(fs.existsSync(assetPath), `Pre-cached asset file ${asset} must exist on disk`);
     }
   });
+
+  // Verify ignoreSearch is used for robust cache matching with query parameters
+  assert.match(swCode, /caches\.match\([^)]*\{\s*ignoreSearch:\s*true\s*\}\)/,
+    'sw.js must use { ignoreSearch: true } with caches.match for offline query parameter resilience');
 
   // Verify install and activate lifecycle handlers
   assert.match(swCode, /addEventListener\(['"]install['"]/, 'sw.js must have install listener');
@@ -139,4 +144,11 @@ test('js/main.js registers service worker safely', () => {
     'js/main.js must register sw.js');
   assert.match(mainJs, /'serviceWorker'\s+in\s+navigator/,
     'ServiceWorker registration must be feature-detected');
+});
+
+test('index.html script tags reference cached clean assets without query strings', () => {
+  const html = fs.readFileSync(HTML_PATH, 'utf8');
+  assert.match(html, /<script[^>]*src=["']js\/i18n\.js["']/, 'index.html must load js/i18n.js');
+  assert.match(html, /<script[^>]*src=["']js\/main\.js["']/, 'index.html must load js/main.js without query strings');
+  assert.doesNotMatch(html, /<script[^>]*src=["']js\/main\.js\?[^"']*["']/, 'js/main.js must not include cache-busting query strings');
 });

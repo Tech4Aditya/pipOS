@@ -2,7 +2,7 @@
    Provides offline functionality, pre-caches essential local assets,
    serves cached offline fallbacks, and handles Google Fonts degradation. */
 
-var CACHE_NAME = 'pipos-v1';
+var CACHE_NAME = 'pipos-v2';
 
 var PRECACHE_ASSETS = [
   './',
@@ -13,6 +13,7 @@ var PRECACHE_ASSETS = [
   'js/audio.js',
   'js/wall.js',
   'js/fx.js',
+  'js/i18n.js',
   'js/pip.js',
   'js/toys.js',
   'js/main.js',
@@ -85,7 +86,7 @@ if (typeof swScope.addEventListener === 'function') {
 
     // Cache-first strategy for local assets with network fallback and background refresh
     event.respondWith(
-      caches.match(event.request).then(function (cachedResponse) {
+      caches.match(event.request, { ignoreSearch: true }).then(function (cachedResponse) {
         if (cachedResponse) {
           // Fetch in background to update cache if online
           fetch(event.request).then(function (networkResponse) {
@@ -112,8 +113,8 @@ if (typeof swScope.addEventListener === 'function') {
         }).catch(function (err) {
           // Offline navigation fallback: serve cached index.html
           if (event.request.mode === 'navigate') {
-            return caches.match('index.html').then(function (fallback) {
-              return fallback || caches.match('./');
+            return caches.match('index.html', { ignoreSearch: true }).then(function (fallback) {
+              return fallback || caches.match('./', { ignoreSearch: true });
             });
           }
           throw err;
