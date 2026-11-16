@@ -87,6 +87,7 @@
     <a href="#about"><span class="ic ic-note" aria-hidden="true"></span>about.txt</a>
     <a href="#shortcuts"><span class="ic ic-key" aria-hidden="true"></span>keys.txt</a>
     <a href="#work"><span class="ic ic-box" aria-hidden="true"></span>My Toys</a>
+    <a href="#stickers"><span class="ic ic-star" aria-hidden="true"></span>stickers.exe</a>
     <a href="#story"><span class="ic ic-book" aria-hidden="true"></span>bedtime.exe</a>
     <a href="#wall"><span class="ic ic-pin" aria-hidden="true"></span>wish wall</a>
     <button type="button" id="trashBtn" aria-label="Nightmares trash can"><span class="ic ic-trash" aria-hidden="true"></span>Nightmares</button>
@@ -646,6 +647,151 @@
             </ol>
           </div>
         </article>
+
+        <!-- Sticker book -->
+        <article id="stickers" class="win w-stickers" data-foldable aria-labelledby="stickersTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="stickersTitle">sticker-book.exe</h3>
+            <span class="win-hint" aria-hidden="true">5 achievements</span>
+          </div>
+          <div class="win-body" id="stickersBody">
+            <div class="proj-head sticker-head">
+              <div class="sticker-intro">
+                <p>Track your nursery achievements as you play. Every earned sticker persists across visits.</p>
+              </div>
+              <div class="sticker-actions">
+                <p class="score" id="stickerCount" aria-live="polite" aria-atomic="true">0 of 5 stickers collected</p>
+                <button class="btn" id="resetStickersBtn" type="button" aria-label="Reset all collected stickers">Reset stickers</button>
+              </div>
+            </div>
+
+            <div class="stickers-grid" id="stickersGrid" role="list" aria-label="Achievements sticker collection">
+              <!-- 1. Nightlight Keeper -->
+              <div class="sticker-card is-locked" data-sticker="dreams5" role="listitem" aria-label="Nightlight Keeper sticker: Locked. Found all 5 dreams hiding in the dark nursery.">
+                <div class="sticker-badge-wrap">
+                  <div class="sticker-badge st-bg-lantern">
+                    <svg class="st-icon" viewBox="0 0 48 48" aria-hidden="true">
+                      <circle cx="24" cy="24" r="20" fill="#1b1430" stroke="var(--line)" stroke-width="2"/>
+                      <circle cx="24" cy="24" r="14" fill="#ffc866" opacity="0.4"/>
+                      <path d="M24 10v4M18 14h12l-2 18h-8z" fill="#ffe9ae" stroke="var(--line)" stroke-width="1.8"/>
+                      <circle cx="24" cy="23" r="4" fill="#fff"/>
+                      <circle cx="33" cy="14" r="2" fill="#fff"/>
+                    </svg>
+                    <div class="st-lock" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 0-4 4v3H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a4 4 0 0 0-4-4zm-2 7V6a2 2 0 1 1 4 0v3z"/></svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="sticker-info">
+                  <h4 class="sticker-name">Nightlight Keeper</h4>
+                  <p class="sticker-desc">Found all 5 dreams hiding in the dark nursery.</p>
+                  <div class="sticker-meta">
+                    <span class="st-status is-locked">Locked</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Tower Stacker -->
+              <div class="sticker-card is-locked" data-sticker="blocks10" role="listitem" aria-label="Tower Stacker sticker: Locked. Stacked a wobbly tower 10 blocks high.">
+                <div class="sticker-badge-wrap">
+                  <div class="sticker-badge st-bg-blocks">
+                    <svg class="st-icon" viewBox="0 0 48 48" aria-hidden="true">
+                      <circle cx="24" cy="24" r="20" fill="#fff8f1" stroke="var(--line)" stroke-width="2"/>
+                      <rect x="12" y="27" width="24" height="12" rx="3" fill="#ff9fb4" stroke="var(--line)" stroke-width="1.8"/>
+                      <text x="24" y="36" font-size="9" font-weight="700" text-anchor="middle" fill="#5c4033" font-family="var(--f-ui)">10</text>
+                      <rect x="15" y="15" width="18" height="12" rx="3" fill="#9fd8c4" stroke="var(--line)" stroke-width="1.8"/>
+                      <text x="24" y="24" font-size="9" font-weight="700" text-anchor="middle" fill="#5c4033" font-family="var(--f-ui)">✦</text>
+                    </svg>
+                    <div class="st-lock" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 0-4 4v3H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a4 4 0 0 0-4-4zm-2 7V6a2 2 0 1 1 4 0v3z"/></svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="sticker-info">
+                  <h4 class="sticker-name">Tower Stacker</h4>
+                  <p class="sticker-desc">Stacked a wobbly tower 10 blocks high.</p>
+                  <div class="sticker-meta">
+                    <span class="st-status is-locked">Locked</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Cloud Courier -->
+              <div class="sticker-card is-locked" data-sticker="route7" role="listitem" aria-label="Cloud Courier sticker: Locked. Delivered all 7 dreams on the rooftop route.">
+                <div class="sticker-badge-wrap">
+                  <div class="sticker-badge st-bg-route">
+                    <svg class="st-icon" viewBox="0 0 48 48" aria-hidden="true">
+                      <circle cx="24" cy="24" r="20" fill="#d6e6f5" stroke="var(--line)" stroke-width="2"/>
+                      <ellipse cx="24" cy="28" rx="14" ry="7" fill="#fff" stroke="var(--line)" stroke-width="1.8"/>
+                      <circle cx="24" cy="18" r="7" fill="#fff" stroke="var(--line)" stroke-width="1.8"/>
+                      <circle cx="22" cy="18" r="1.5" fill="#5c4033"/>
+                      <circle cx="26" cy="18" r="1.5" fill="#5c4033"/>
+                      <path d="M19 14c2-9 14-8 10 0z" fill="#a34063"/>
+                      <circle cx="29" cy="6" r="2" fill="#ffe9ae"/>
+                    </svg>
+                    <div class="st-lock" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 0-4 4v3H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a4 4 0 0 0-4-4zm-2 7V6a2 2 0 1 1 4 0v3z"/></svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="sticker-info">
+                  <h4 class="sticker-name">Cloud Courier</h4>
+                  <p class="sticker-desc">Delivered all 7 dreams on the rooftop route.</p>
+                  <div class="sticker-meta">
+                    <span class="st-status is-locked">Locked</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. Star Detective -->
+              <div class="sticker-card is-locked" data-sticker="star" role="listitem" aria-label="Star Detective sticker: Locked. Woke Pip by finding the gold star.">
+                <div class="sticker-badge-wrap">
+                  <div class="sticker-badge st-bg-star">
+                    <svg class="st-icon" viewBox="0 0 48 48" aria-hidden="true">
+                      <circle cx="24" cy="24" r="20" fill="#fff8f1" stroke="var(--line)" stroke-width="2"/>
+                      <path d="M24 10l3.8 8.4 9.2 0.8-6.8 6 2 9-8.2-4.8-8.2 4.8 2-9-6.8-6 9.2-0.8z" fill="#ffd27a" stroke="var(--line)" stroke-width="1.8"/>
+                      <circle cx="24" cy="23" r="3" fill="#fff"/>
+                    </svg>
+                    <div class="st-lock" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 0-4 4v3H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a4 4 0 0 0-4-4zm-2 7V6a2 2 0 1 1 4 0v3z"/></svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="sticker-info">
+                  <h4 class="sticker-name">Star Detective</h4>
+                  <p class="sticker-desc">Woke Pip by finding the gold star.</p>
+                  <div class="sticker-meta">
+                    <span class="st-status is-locked">Locked</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5. Midnight Wisher -->
+              <div class="sticker-card is-locked" data-sticker="wish" role="listitem" aria-label="Midnight Wisher sticker: Locked. Left a bedtime wish on the wish wall.">
+                <div class="sticker-badge-wrap">
+                  <div class="sticker-badge st-bg-wish">
+                    <svg class="st-icon" viewBox="0 0 48 48" aria-hidden="true">
+                      <circle cx="24" cy="24" r="20" fill="#f7dfe4" stroke="var(--line)" stroke-width="2"/>
+                      <rect x="13" y="14" width="22" height="22" rx="2" fill="#ffe9ae" stroke="var(--line)" stroke-width="1.8" transform="rotate(-4 24 25)"/>
+                      <circle cx="24" cy="14" r="3.2" fill="#a34063" stroke="var(--line)" stroke-width="1.5"/>
+                      <path d="M19 23h10M19 27h7" stroke="var(--line)" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <div class="st-lock" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 0-4 4v3H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a4 4 0 0 0-4-4zm-2 7V6a2 2 0 1 1 4 0v3z"/></svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="sticker-info">
+                  <h4 class="sticker-name">Midnight Wisher</h4>
+                  <p class="sticker-desc">Left a bedtime wish on the wish wall.</p>
+                  <div class="sticker-meta">
+                    <span class="st-status is-locked">Locked</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -837,6 +983,7 @@
   <script src="js/wall.js" defer></script>
   <script src="js/fx.js" defer></script>
   <script src="js/i18n.js" defer></script>
+  <script src="js/stickers.js" defer></script>
   <script src="js/pip.js" defer></script>
   <script src="js/toys.js" defer></script>
   <script src="js/main.js" defer></script>

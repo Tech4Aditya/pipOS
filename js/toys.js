@@ -519,13 +519,7 @@
             toast('All five dreams found in the ' + curName + '! Pip is very proud.');
             room.classList.add('is-done');
             if (audio.isOn()) audio.giggle();
-
-            var totalAll = foundByRoom.nursery.length + foundByRoom.attic.length + foundByRoom.garden.length;
-            if (totalAll >= 15) {
-              window.setTimeout(function () {
-                toast('All fifteen dreams found across every room! Pip is overjoyed.');
-              }, 1800);
-            }
+            if (PIP.stickers) PIP.stickers.unlock('dreams5');
           }
         }
       });
@@ -675,6 +669,7 @@
       }
       st.stack.push({ x: nx, w: nw, i: c.i });
       st.score += 1;
+      if (st.score >= 10 && PIP.stickers) PIP.stickers.unlock('blocks10');
       if (audio.isOn()) {
         var f = audio.SCALE[st.score % 5] * (st.score % 10 < 5 ? 1 : 1.5);
         audio.note(f, { dur: perfect ? 1.4 : 0.8, gain: perfect ? 0.22 : 0.15 });
@@ -922,12 +917,13 @@ var col = theme.pal[idx % theme.pal.length];
           h.classList.remove('is-lit');
         }
       });
-      if (!activeHouse) {
-        if (p <= 0.01) label.textContent = 'Waiting at the nursery window';
-        else if (p >= 0.995) label.textContent = 'All seven dreams delivered — click a house to read its story';
-        else if (passed >= 0) label.textContent = 'Delivered to ' + houses[passed].getAttribute('data-name');
-        else label.textContent = 'Taking off...';
+      if (p <= 0.01) label.textContent = 'Waiting at the nursery window';
+      else if (p >= 0.995) {
+        label.textContent = 'All seven dreams delivered';
+        if (PIP.stickers) PIP.stickers.unlock('route7');
       }
+      else if (passed >= 0) label.textContent = 'Delivered to ' + houses[passed].getAttribute('data-name');
+      else label.textContent = 'Taking off...';
     }
 
     function fromScroll() {

@@ -475,6 +475,7 @@
 
       var newWish = { n: validation.name, w: validation.wish, t: Date.now() };
       if (name.value.trim()) store.set('visitor', validation.name);
+      if (PIP.stickers) PIP.stickers.unlock('wish');
 
       wish.value = '';
       count.textContent = '0 / 120';

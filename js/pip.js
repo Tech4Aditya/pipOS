@@ -147,6 +147,7 @@
       taps = 0;
       wake(5200);
       PIP.fx.confetti(170);
+      if (PIP.stickers) PIP.stickers.unlock('star');
       if (PIP.audio.isOn()) {
         PIP.audio.giggle();
         [0, 2, 4, 5, 7].forEach(function (n, i) {
