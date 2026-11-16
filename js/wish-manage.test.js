@@ -168,19 +168,68 @@ test('exportWishes returns exported text and creates download element', () => {
 /* =========================================================================
    2. Local Storage Management (pip:wall) Tests
    ========================================================================= */
-test('deleteLocalWish removes wish by index and keeps others intact', () => {
-  // Test deletion math / array slicing logic directly
-  const list = [
-    { n: 'A', w: 'Wish 1' },
-    { n: 'B', w: 'Wish 2' },
-    { n: 'C', w: 'Wish 3' }
-  ];
+test('saveLocalWish and loadLocalWishes maintain newest-first LIFO display order across reloads', () => {
+  const memoryStore = {};
+  global.PIP = {
+    store: {
+      get: (k, def) => (k in memoryStore ? memoryStore[k] : def),
+      set: (k, v) => { memoryStore[k] = String(v); }
+    }
+  };
 
-  // Deleting index 1 should leave index 0 and 2
-  const updated = list.filter((_, idx) => idx !== 1);
-  assert.strictEqual(updated.length, 2);
-  assert.strictEqual(updated[0].n, 'A');
-  assert.strictEqual(updated[1].n, 'C');
+  // Submit Wish A, then submit Wish B
+  const wishA = { n: 'Visitor', w: 'Wish A', t: 100000 };
+  const wishB = { n: 'Visitor', w: 'Wish B', t: 200000 };
+
+  fx.saveLocalWish(wishA);
+  fx.saveLocalWish(wishB);
+
+  // Simulate page reload
+  const loaded = fx.loadLocalWishes();
+  assert.strictEqual(loaded.length, 2, 'Must load both wishes');
+  assert.strictEqual(loaded[0].w, 'Wish B', 'Newly submitted Wish B must be at the top (index 0)');
+  assert.strictEqual(loaded[1].w, 'Wish A', 'Older Wish A must follow below Wish B (index 1)');
+});
+
+test('loadLocalWishes normalizes legacy FIFO stored wishes to newest-first order', () => {
+  const legacyData = [
+    { n: 'First', w: 'Wish 1', t: 1000 },
+    { n: 'Second', w: 'Wish 2', t: 2000 },
+    { n: 'Third', w: 'Wish 3', t: 3000 }
+  ];
+  const memoryStore = { wall: JSON.stringify(legacyData) };
+  global.PIP = {
+    store: {
+      get: (k, def) => (k in memoryStore ? memoryStore[k] : def),
+      set: (k, v) => { memoryStore[k] = String(v); }
+    }
+  };
+
+  const loaded = fx.loadLocalWishes();
+  assert.strictEqual(loaded[0].w, 'Wish 3', 'Most recent wish (highest timestamp) must be first');
+  assert.strictEqual(loaded[1].w, 'Wish 2');
+  assert.strictEqual(loaded[2].w, 'Wish 1', 'Oldest wish must be last');
+});
+
+test('deleteLocalWish removes wish by index and keeps others intact', () => {
+  const memoryStore = {
+    wall: JSON.stringify([
+      { n: 'B', w: 'Wish 2', t: 2000 },
+      { n: 'A', w: 'Wish 1', t: 1000 }
+    ])
+  };
+  global.PIP = {
+    store: {
+      get: (k, def) => (k in memoryStore ? memoryStore[k] : def),
+      set: (k, v) => { memoryStore[k] = String(v); }
+    }
+  };
+
+  // Deleting index 0 (Wish 2) should leave Wish 1
+  const updated = fx.deleteLocalWish(0);
+  assert.strictEqual(updated.length, 1);
+  assert.strictEqual(updated[0].w, 'Wish 1');
+  assert.strictEqual(JSON.parse(memoryStore.wall)[0].w, 'Wish 1');
 });
 
 /* =========================================================================

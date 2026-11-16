@@ -148,11 +148,25 @@
     return null;
   }
 
+  function getStore() {
+    if (typeof window !== 'undefined' && window.PIP && window.PIP.store) return window.PIP.store;
+    if (typeof global !== 'undefined' && global.PIP && global.PIP.store) return global.PIP.store;
+    return (PIP && PIP.store) ? PIP.store : store;
+  }
+
   function loadLocalWishes() {
     try {
-      var a = JSON.parse(store.get('wall', '[]'));
+      var s = getStore();
+      var a = JSON.parse(s.get('wall', '[]'));
       if (!Array.isArray(a)) return [];
-      return a.filter(function (x) { return x && typeof x.n === 'string' && typeof x.w === 'string'; }).slice(0, 30);
+      var valid = a.filter(function (x) { return x && typeof x.n === 'string' && typeof x.w === 'string'; });
+      // Guarantee reverse chronological order (newest first).
+      // If timestamps exist, sort descending so newest wishes stay at the top across reloads.
+      var hasTimestamps = valid.some(function (x) { return typeof x.t === 'number'; });
+      if (hasTimestamps) {
+        valid.sort(function (x, y) { return (y.t || 0) - (x.t || 0); });
+      }
+      return valid.slice(0, 30);
     } catch (e) { return []; }
   }
 
@@ -160,8 +174,12 @@
     try {
       var current = loadLocalWishes();
       current.unshift(item);
+      if (item && typeof item.t === 'number') {
+        current.sort(function (x, y) { return (y.t || 0) - (x.t || 0); });
+      }
       current = current.slice(0, 30);
-      store.set('wall', JSON.stringify(current));
+      var s = getStore();
+      s.set('wall', JSON.stringify(current));
     } catch (e) {}
   }
 
@@ -170,7 +188,8 @@
       var current = loadLocalWishes();
       if (typeof idx === 'number' && idx >= 0 && idx < current.length) {
         current.splice(idx, 1);
-        store.set('wall', JSON.stringify(current));
+        var s = getStore();
+        s.set('wall', JSON.stringify(current));
       }
       return current;
     } catch (e) { return []; }
@@ -387,8 +406,8 @@
 
     function deleteWish(idx) {
       if (typeof idx !== 'number' || idx < 0 || idx >= activeWishes.length) return;
-      activeWishes.splice(idx, 1);
-      store.set('wall', JSON.stringify(activeWishes));
+      deleteLocalWish(idx);
+      activeWishes = loadLocalWishes();
       render();
       toast('Wish deleted.');
       if (PIP.audio && typeof PIP.audio.isOn === 'function' && PIP.audio.isOn()) {
@@ -484,17 +503,15 @@
       // Optimistic or confirmed update
       if (backend && isConnected && wall) {
         wall.postWish(backend, newWish, function (success) {
-          activeWishes.unshift(newWish);
-          activeWishes = activeWishes.slice(0, 30);
-          store.set('wall', JSON.stringify(activeWishes));
+          saveLocalWish(newWish);
+          activeWishes = loadLocalWishes();
           render();
           toast(success ? 'Pinned to the wall. Pip yawns happily.' : 'Pinned to your local wall (offline mode).');
         });
       } else {
         // Local mode or fallback
-        activeWishes.unshift(newWish);
-        activeWishes = activeWishes.slice(0, 30);
-        store.set('wall', JSON.stringify(activeWishes));
+        saveLocalWish(newWish);
+        activeWishes = loadLocalWishes();
         render();
         toast('Pinned to the wall. Pip yawns happily.');
       }
