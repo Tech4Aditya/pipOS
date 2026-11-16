@@ -13,6 +13,7 @@ var PRECACHE_ASSETS = [
   'js/audio.js',
   'js/wall.js',
   'js/fx.js',
+  'js/stickers.js',
   'js/pip.js',
   'js/toys.js',
   'js/main.js',

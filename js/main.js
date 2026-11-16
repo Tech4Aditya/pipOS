@@ -199,6 +199,21 @@
         toggleShortcuts(true);
       });
     }
+
+    var stickerLink = $('.desk-icons a[href="#stickers"]');
+    if (stickerLink) {
+      stickerLink.addEventListener('click', function () {
+        var win = $('#stickers');
+        if (win) {
+          var body = $('.win-body', win);
+          if (body && body.hidden) {
+            var btn = $('.win-btn', win);
+            if (btn) btn.click();
+            else body.hidden = false;
+          }
+        }
+      });
+    }
   }
 
   /* ---------- bedtime storybook ---------- */
@@ -343,6 +358,7 @@
   safe('clock', initClock);
   safe('foldable', initFoldable);
   safe('shortcuts', initShortcuts);
+  safe('stickers', PIP.stickers && PIP.stickers.init);
   safe('fx', PIP.fx.init);
   safe('toys', PIP.toys.init);
   safe('story', initStory);
