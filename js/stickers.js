@@ -177,6 +177,9 @@
     var raw = store.get('stickers', null);
     if (raw === null) {
       try {
+        var totalFound = parseInt(store.get('dr_total_found', '0'), 10) || parseInt(store.get('nightlight_found', '0'), 10) || 0;
+        if (totalFound >= 5) unlock('dreams5', true);
+
         var best = parseInt(store.get('best', '0'), 10) || 0;
         if (best >= 10) unlock('blocks10', true);
 

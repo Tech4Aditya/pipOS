@@ -170,6 +170,12 @@ test('Desktop navigation rail and service worker integrate stickers', () => {
     'sw.js PRECACHE_ASSETS must include "js/stickers.js"');
 });
 
+test('stickers init auto-detects Nightlight Keeper achievement when dr_total_found >= 5', () => {
+  const stickersSrc = fs.readFileSync(STICKERS_JS_PATH, 'utf8');
+  assert.match(stickersSrc, /dr_total_found/, 'stickers.js must check dr_total_found in auto-detection');
+  assert.match(stickersSrc, /unlock\(['"]dreams5['"],\s*true\)/, 'stickers.js must unlock dreams5 during auto-detection');
+});
+
 test('stickers render updates DOM classes and accessible labels', () => {
   const stickers = require(STICKERS_JS_PATH);
 
