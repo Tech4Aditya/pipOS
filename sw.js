@@ -20,6 +20,7 @@ var PRECACHE_ASSETS = [
   'js/terminal.js',
   'js/taskbar.js',
   'js/monitor.js',
+  'js/notes.js',
   'js/main.js',
   'assets/favicon.svg',
   'assets/icon-192.png',
@@ -134,3 +135,4 @@ if (typeof module !== 'undefined' && module.exports) {
     PRECACHE_ASSETS: PRECACHE_ASSETS
   };
 }
+

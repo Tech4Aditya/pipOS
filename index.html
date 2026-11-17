@@ -174,7 +174,8 @@
     <a href="#work"><span class="ic ic-box" aria-hidden="true"></span>My Toys</a>
     <a href="#terminal"><span class="ic ic-term" aria-hidden="true"></span>terminal.exe</a>
     <a href="#monitor"><span class="ic ic-gauge" aria-hidden="true"></span>monitor.exe</a>
-    <a href="#stickers"><span class="ic ic-star" aria-hidden="true"></span>stickers.exe</a>
+
+    <a href="#notes"><span class="ic ic-pad" aria-hidden="true"></span>notes.exe</a>    <a href="#stickers"><span class="ic ic-star" aria-hidden="true"></span>stickers.exe</a>
     <a href="#story"><span class="ic ic-book" aria-hidden="true"></span>bedtime.exe</a>
     <a href="#wall"><span class="ic ic-pin" aria-hidden="true"></span>wish wall</a>
     <button type="button" id="trashBtn" aria-label="Nightmares trash can"><span class="ic ic-trash"
@@ -661,10 +662,47 @@
               </ol>
             </div>
             <div class="block-leaderboard" id="blockLeaderboardSecondary">
+            <div class="block-leaderboard" id="blockScores">
               <span class="block-leaderboard-title">Top 5 Scores</span>
               <ol class="block-leaderboard-list" id="blockLeaderboardList">
                 <li class="block-leaderboard-empty">No scores yet &mdash; start stacking!</li>
               </ol>
+            </div>
+
+            <!-- Interactive Playable Baby Rattle -->
+            <div id="rattleToy" class="rattle-toy-box" role="region" aria-label="Interactive Baby Rattle Toy">
+              <div class="rattle-head-row">
+                <span class="rattle-label">🍼 Pip's Spring Rattle</span>
+                <span class="rattle-tip" aria-hidden="true">Drag or press Space to jingle</span>
+              </div>
+              <div class="rattle-stage">
+                <svg id="rattleSvg" class="rattle-svg" viewBox="-60 -110 120 200" width="110" height="160" tabindex="0" role="button" aria-label="Pip's baby rattle. Click, drag or press Space to shake and jingle.">
+                  <!-- Rattle Handle -->
+                  <rect x="-6" y="20" width="12" height="60" rx="6" fill="#e2e8f0" stroke="var(--line)" stroke-width="2.5"/>
+                  <circle cx="0" cy="85" r="9" fill="#ffd27a" stroke="var(--line)" stroke-width="2.5"/>
+                  <circle cx="0" cy="85" r="3.5" fill="#fb923c"/>
+                  
+                  <!-- Rattle Ring Collar -->
+                  <ellipse cx="0" cy="20" rx="16" ry="6" fill="#fb7185" stroke="var(--line)" stroke-width="2"/>
+                  
+                  <!-- Rattle Head (Hollow Bell with star cutout) -->
+                  <circle cx="0" cy="-35" r="38" fill="#bae6fd" stroke="var(--line)" stroke-width="2.8"/>
+                  <ellipse cx="-14" cy="-45" rx="9" ry="14" fill="rgba(255,255,255,0.65)"/>
+                  
+                  <!-- Beads inside rattle -->
+                  <circle class="rattle-bead b1" cx="-10" cy="-28" r="6.5" fill="#f43f5e" stroke="var(--line)" stroke-width="1.5"/>
+                  <circle class="rattle-bead b2" cx="12" cy="-25" r="7.5" fill="#facc15" stroke="var(--line)" stroke-width="1.5"/>
+                  <circle class="rattle-bead b3" cx="0" cy="-40" r="7" fill="#a855f7" stroke="var(--line)" stroke-width="1.5"/>
+                  
+                  <!-- Star cutout on rattle center -->
+                  <use href="#star" x="-8" y="-43" width="16" height="16" fill="#ffffff" opacity="0.9"/>
+                </svg>
+              </div>
+              <div class="rattle-controls">
+                <button type="button" id="rattleShakeBtn" class="btn btn-sm" aria-label="Shake the rattle">Shake Rattle 🔔</button>
+                <button type="button" id="rattleSensorToggle" class="btn btn-sm btn-ghost" aria-pressed="false" aria-label="Toggle device shake sensor">Enable Shake Sensor</button>
+                <span id="rattleSensorStatus" class="rattle-sensor-status" aria-live="polite">Sensor: Off</span>
+              </div>
             </div>
           </div>
         </article>
@@ -933,6 +971,12 @@
                   Pause</button>
                 <button class="btn" id="storyStopBtn" type="button" aria-label="Stop narration" hidden>⏹ Stop</button>
               </div>
+            <!-- Added speech narration controls -->
+            <div class="book-speech" role="group" aria-label="Story narration controls">
+              <button class="btn" id="storySpeechBtn" type="button" aria-label="Read this scene aloud">🔊 Read</button>
+              <button class="btn" id="storyPauseBtn" type="button" aria-label="Pause narration" hidden>⏸ Pause</button>
+              <button class="btn" id="storyStopBtn" type="button" aria-label="Stop narration" hidden>⏹ Stop</button>
+            </div>
               <p class="score" id="bookInd" aria-live="polite" aria-atomic="true">Page 1 of 6</p>
             </div>
           </div>
@@ -959,6 +1003,8 @@
               <canvas id="starsCanvas" width="300" height="380" aria-label="Catch the Falling Stars canvas game"
                 tabindex="0"></canvas>
               <div id="starsGameOver" class="stars-overlay hidden" aria-hidden="true">
+              <canvas id="starsCanvas" width="300" height="380" aria-label="Catch the Falling Stars canvas game" tabindex="0"></canvas>
+              <div id="starsGameOver" class="stars-overlay hidden" hidden>
                 <div class="stars-modal">
                   <div class="stars-modal-icon" aria-hidden="true">🌙</div>
                   <h4 class="stars-modal-title">Dawn has arrived</h4>
@@ -1319,6 +1365,49 @@
             </div>
           </div>
         </article>
+
+        <!-- Markdown & Dream Notes -->
+        <article id="notes" class="win w-notes" data-foldable aria-labelledby="notesTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="notesTitle">pip-pad.exe</h3>
+            <span class="win-hint" aria-hidden="true">[autosave: on]</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's midnight journal. Write dream logs and lullaby lyrics in Markdown with live preview and local storage export.</p>
+            </div>
+            <div class="notes-toolbar">
+              <div class="notes-tabs" role="tablist" aria-label="Editor modes">
+                <button type="button" class="tab-btn is-active" id="tabWrite" role="tab" aria-selected="true">Write</button>
+                <button type="button" class="tab-btn" id="tabPreview" role="tab" aria-selected="false">Preview</button>
+              </div>
+              <div class="notes-actions">
+                <label for="notesTemplateSelect" class="sr-only">Templates</label>
+                <select id="notesTemplateSelect" class="notes-select" aria-label="Load a note template">
+                  <option value="">Choose a Template...</option>
+                  <option value="journal">Midnight Dream Log</option>
+                  <option value="recipe">Starlight Tea Recipe</option>
+                  <option value="checklist">Nightly Checklist</option>
+                </select>
+                <button type="button" class="btn btn-tiny" id="notesExportBtn">Export .md</button>
+                <button type="button" class="btn btn-tiny" id="notesClearBtn">Clear</button>
+              </div>
+            </div>
+            <div class="notes-pane">
+              <textarea id="notesEditor" class="notes-editor" rows="12" spellcheck="false" aria-label="Markdown dream notes editor"></textarea>
+              <div id="notesPreview" class="notes-preview" hidden aria-label="Formatted dream notes preview" tabindex="0"></div>
+            </div>
+            <div class="notes-footer">
+              <div class="notes-stats">
+                <span id="notesWordCount">0 words</span>
+                <span class="notes-sep">•</span>
+                <span id="notesCharCount">0 chars</span>
+              </div>
+              <div class="notes-status" id="notesSaveStatus" aria-live="polite">Saved to storage</div>
+            </div>
+          </div>
+        </article>
+
       </div>
     </section>
 
@@ -1599,10 +1688,12 @@
   <script src="js/stickers.js" defer></script>
   <script src="js/pip.js" defer></script>
   <script src="js/toys.js" defer></script>
+  <script src="js/rattle.js" defer></script>
   <script src="js/terminal.js" defer></script>
   <script src="js/stars.js" defer></script>
   <script src="js/taskbar.js" defer></script>
   <script src="js/monitor.js" defer></script>
+  <script src="js/notes.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
