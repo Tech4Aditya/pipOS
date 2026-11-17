@@ -2116,8 +2116,16 @@ dialog.secret::backdrop { background: rgba(40, 24, 40, 0.55); }
   color: #ffda79;
 }
 
-.term-input {
+.term-input-wrap {
+  position: relative;
   flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.term-input {
+  width: 100%;
   background: transparent;
   border: none;
   color: #ffffff;
@@ -2125,11 +2133,99 @@ dialog.secret::backdrop { background: rgba(40, 24, 40, 0.55); }
   font-size: 0.88rem;
   outline: none;
   padding: 4px 0;
+  position: relative;
+  z-index: 2;
 }
 
 .term-input::placeholder {
   color: rgba(255, 255, 255, 0.35);
   font-style: italic;
+}
+
+.term-ghost {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  font-family: monospace;
+  font-size: 0.88rem;
+  padding: 4px 0;
+  pointer-events: none;
+  z-index: 1;
+  white-space: pre;
+  overflow: hidden;
+  user-select: none;
+}
+
+.term-ghost-typed {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.term-ghost-rest {
+  color: rgba(164, 244, 198, 0.45);
+}
+
+[data-theme="night"] .term-ghost-rest {
+  color: rgba(255, 218, 121, 0.45);
+}
+
+.term-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 14px 10px;
+  background: #110e1a;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.term-suggestions:empty,
+.term-suggestions:not(.has-pills) {
+  display: none;
+}
+
+.term-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  color: #a4f4c6;
+  font-family: monospace;
+  font-size: 0.78rem;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  line-height: 1.4;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+[data-theme="night"] .term-pill {
+  color: #ffda79;
+  border-color: rgba(255, 218, 121, 0.25);
+}
+
+.term-pill:hover,
+.term-pill:focus-visible {
+  background: rgba(164, 244, 198, 0.15);
+  border-color: #a4f4c6;
+  color: #ffffff;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+[data-theme="night"] .term-pill:hover,
+[data-theme="night"] .term-pill:focus-visible {
+  background: rgba(255, 218, 121, 0.2);
+  border-color: #ffda79;
+}
+
+.term-pill-desc {
+  opacity: 0.65;
+  font-size: 0.72rem;
 }
 
 /* ===================================================================   22. Responsive Taskbar & Pip Start Menu (.start-menu)

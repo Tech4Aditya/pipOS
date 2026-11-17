@@ -51,7 +51,14 @@
 
     function press(i) {
       flash(i);
-      if (audio.request()) audio.note(audio.SCALE[i], { dur: 1.6, gain: 0.24 });
+      if (audio.request()) {
+        audio.note(audio.SCALE[i], {
+          dur: 1.6,
+          gain: 0.24,
+          adsr: { a: 0.005, d: 0.15, s: 0.25, r: 0.9 },
+          bell: true
+        });
+      }
     }
 
     // number keys 1-8 while the lab is on screen (and you're not typing)
@@ -152,7 +159,7 @@
       endless.classList.add('is-on');
     });
 
-    var rainBtn = $('#ambientRainBtn'), cricketsBtn = $('#ambientCricketsBtn');
+    var rainBtn = $('#ambientRainBtn'), cricketsBtn = $('#ambientCricketsBtn'), windBtn = $('#ambientWindBtn');
     var ambSlider = $('#ambientSlider'), ambValue = $('#ambientValue');
 
     if (rainBtn) {
@@ -185,6 +192,21 @@
       });
     }
 
+    if (windBtn) {
+      windBtn.addEventListener('click', function () {
+        if (audio.isWindActive && audio.isWindActive()) {
+          audio.stopWind();
+          windBtn.setAttribute('aria-pressed', 'false');
+          windBtn.classList.remove('is-on');
+        } else {
+          if (!audio.request()) return;
+          audio.startWind();
+          windBtn.setAttribute('aria-pressed', 'true');
+          windBtn.classList.add('is-on');
+        }
+      });
+    }
+
     if (ambSlider && audio.getAmbientLevel) {
       var initialAmb = audio.getAmbientLevel();
       ambSlider.value = initialAmb;
@@ -206,6 +228,7 @@
         stopEndlessUi();
         if (rainBtn) { rainBtn.setAttribute('aria-pressed', 'false'); rainBtn.classList.remove('is-on'); }
         if (cricketsBtn) { cricketsBtn.setAttribute('aria-pressed', 'false'); cricketsBtn.classList.remove('is-on'); }
+        if (windBtn) { windBtn.setAttribute('aria-pressed', 'false'); windBtn.classList.remove('is-on'); }
       }
     });
   }
@@ -969,7 +992,16 @@ var col = theme.pal[idx % theme.pal.length];
       }
 
       if (audio && typeof audio.isOn === 'function' && audio.isOn()) {
-        audio.note(audio.SCALE[(idx + 2) % audio.SCALE.length], { dur: 0.6, gain: 0.12 });
+        if (audio.pad) {
+          audio.pad(audio.SCALE[(idx + 2) % audio.SCALE.length], { dur: 1.8, gain: 0.12 });
+        } else {
+          audio.note(audio.SCALE[(idx + 2) % audio.SCALE.length], {
+            dur: 1.8,
+            gain: 0.12,
+            adsr: { a: 0.4, d: 0.3, s: 0.6, r: 0.8 },
+            bell: false
+          });
+        }
       }
     }
 
@@ -1081,7 +1113,17 @@ var col = theme.pal[idx % theme.pal.length];
       })(t0);
       if (audio.isOn()) {
         [0, 2, 4, 3, 5, 4, 7].forEach(function (n, k) {
-          audio.note(audio.SCALE[n], { dur: 1.2, gain: 0.12, when: 0.4 + k * 0.7 });
+          if (audio.pad) {
+            audio.pad(audio.SCALE[n], { dur: 2.0, gain: 0.1, when: 0.4 + k * 0.7 });
+          } else {
+            audio.note(audio.SCALE[n], {
+              dur: 2.0,
+              gain: 0.1,
+              when: 0.4 + k * 0.7,
+              adsr: { a: 0.5, d: 0.4, s: 0.6, r: 0.9 },
+              bell: false
+            });
+          }
         });
       }
     });

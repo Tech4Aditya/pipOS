@@ -5,8 +5,23 @@
   'use strict';
 
   var PIP = (typeof window !== 'undefined' && window.PIP) ? window.PIP : {};
-  var $ = PIP.$ || function () { return null; };
-  var $$ = PIP.$$ || function () { return []; };
+  function $(sel, root) {
+    if (typeof window !== 'undefined' && window.PIP && window.PIP.$) return window.PIP.$(sel, root);
+    if (typeof document !== 'undefined') {
+      if (sel.indexOf('#') === 0 && sel.indexOf(' ') === -1 && sel.indexOf('.') === -1) {
+        return document.getElementById(sel.slice(1));
+      }
+      return (root || document).querySelector(sel);
+    }
+    return null;
+  }
+  function $$(sel, root) {
+    if (typeof window !== 'undefined' && window.PIP && window.PIP.$$) return window.PIP.$$(sel, root);
+    if (typeof document !== 'undefined') {
+      return Array.prototype.slice.call((root || document).querySelectorAll(sel));
+    }
+    return [];
+  }
   var store = PIP.store || { get: function () { return ''; }, set: function () {} };
   var audio = PIP.audio || { isOn: function () { return false; }, toggle: function () {}, note: function () {}, pop: function () {}, SCALE: [523, 659, 784] };
   var toast = PIP.toast || function () {};
@@ -141,10 +156,19 @@
 
       case 'play':
         if (audio.isOn()) {
-          audio.note(audio.SCALE[0], { dur: 0.6, gain: 0.2 });
-          audio.note(audio.SCALE[2], { dur: 0.8, gain: 0.18, when: 0.12 });
-          audio.note(audio.SCALE[4], { dur: 1.0, gain: 0.16, when: 0.24 });
-          out = "♪ Playing C-pentatonic starlight chime...";
+          var tuneType = (args[0] || '').toLowerCase();
+          if (tuneType === 'lullaby') {
+            audio.note(audio.SCALE[0], { dur: 1.2, gain: 0.18 });
+            audio.note(audio.SCALE[2], { dur: 1.2, gain: 0.16, when: 0.25 });
+            audio.note(audio.SCALE[4], { dur: 1.4, gain: 0.15, when: 0.5 });
+            audio.note(audio.SCALE[3], { dur: 1.6, gain: 0.14, when: 0.75 });
+            out = "♪ Playing gentle nursery lullaby melody...";
+          } else {
+            audio.note(audio.SCALE[0], { dur: 0.6, gain: 0.2 });
+            audio.note(audio.SCALE[2], { dur: 0.8, gain: 0.18, when: 0.12 });
+            audio.note(audio.SCALE[4], { dur: 1.0, gain: 0.16, when: 0.24 });
+            out = "♪ Playing C-pentatonic starlight chime...";
+          }
         } else {
           out = "Sound is currently muted. Type 'sound on' or click speaker up top.";
         }
@@ -212,9 +236,59 @@
     return { ok: true, output: out };
   }
 
+  var PARAM_HINTS = {
+    theme: {
+      params: ['day', 'night', 'contrast'],
+      hint: ' [day|night|contrast]',
+      pills: ['theme day', 'theme night', 'theme contrast']
+    },
+    sound: {
+      params: ['on', 'off', 'toggle'],
+      hint: ' [on|off|toggle]',
+      pills: ['sound on', 'sound off', 'sound toggle']
+    },
+    play: {
+      params: ['chime', 'lullaby'],
+      hint: ' [chime|lullaby]',
+      pills: ['play chime', 'play lullaby']
+    },
+    calc: {
+      params: ['24 * 7', '12 * 8', '100 / 4', '2 ^ 8'],
+      hint: ' <expr> (e.g. 24 * 7)',
+      pills: ['calc 24 * 7', 'calc 12 * 8', 'calc 100 / 4', 'calc 2 ^ 8']
+    },
+    wish: {
+      params: ['Sweet dreams Pip', 'Good night nursery'],
+      hint: ' <your wish>',
+      pills: ['wish Sweet dreams Pip', 'wish Good night nursery']
+    },
+    quiet: {
+      params: ['on', 'off'],
+      hint: ' [on|off]',
+      pills: ['quiet on', 'quiet off']
+    }
+  };
+
   function autocomplete(prefix) {
     if (!prefix) return [];
     var p = prefix.toLowerCase();
+    var trimmed = prefix.trim();
+    var parts = trimmed.split(/\s+/);
+
+    if (parts.length > 1 || (prefix.indexOf(' ') !== -1 && trimmed)) {
+      var cmd = parts[0].toLowerCase();
+      var argPrefix = parts.slice(1).join(' ').toLowerCase();
+      if (PARAM_HINTS[cmd]) {
+        var subMatches = PARAM_HINTS[cmd].params.filter(function (param) {
+          return !argPrefix || param.toLowerCase().indexOf(argPrefix) === 0;
+        });
+        return subMatches.map(function (param) {
+          return cmd + ' ' + param;
+        });
+      }
+      return [];
+    }
+
     return COMMANDS.filter(function (c) {
       return c.indexOf(p) === 0;
     });
@@ -226,7 +300,27 @@
 
     var screen = $('#termScreen');
     var input = $('#termInput');
+    var ghost = $('#termGhost');
+    var suggestions = $('#termSuggestions');
     if (!screen || !input) return;
+
+    var tabMatches = [];
+    var tabIndex = -1;
+    var lastTabVal = '';
+
+    function resetTabCycle() {
+      tabMatches = [];
+      tabIndex = -1;
+      lastTabVal = '';
+    }
+
+    function setCursorEnd(el) {
+      if (!el) return;
+      var len = el.value ? el.value.length : 0;
+      if (typeof el.setSelectionRange === 'function') {
+        el.setSelectionRange(len, len);
+      }
+    }
 
     function appendLine(text, isCmd) {
       var line = document.createElement('div');
@@ -236,7 +330,160 @@
       screen.scrollTop = screen.scrollHeight;
     }
 
+    function renderSuggestions(pills) {
+      if (!suggestions) return;
+      suggestions.innerHTML = '';
+      if (!pills || pills.length === 0) {
+        suggestions.classList.remove('has-pills');
+        return;
+      }
+
+      suggestions.classList.add('has-pills');
+      pills.forEach(function (pill) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'term-pill';
+        btn.setAttribute('data-cmd', pill.text);
+        btn.setAttribute('aria-label', 'Autocomplete command ' + pill.text);
+
+        var txtSpan = document.createElement('span');
+        txtSpan.className = 'term-pill-text';
+        txtSpan.textContent = pill.text;
+        btn.appendChild(txtSpan);
+
+        if (pill.desc) {
+          var descSpan = document.createElement('span');
+          descSpan.className = 'term-pill-desc';
+          descSpan.textContent = ' ' + pill.desc;
+          btn.appendChild(descSpan);
+        }
+
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          input.value = pill.text + (PARAM_HINTS[pill.text] ? ' ' : '');
+          input.focus();
+          setCursorEnd(input);
+          resetTabCycle();
+          updateGhostAndSuggestions();
+        });
+
+        suggestions.appendChild(btn);
+      });
+    }
+
+    function updateGhostAndSuggestions() {
+      var val = input.value;
+      var trimmed = val.trim();
+
+      if (!trimmed) {
+        if (ghost) ghost.innerHTML = '';
+        renderSuggestions([
+          { text: 'help', desc: 'manual' },
+          { text: 'theme night', desc: 'theme' },
+          { text: 'sound toggle', desc: 'audio' },
+          { text: 'play chime', desc: 'melody' },
+          { text: 'calc 24 * 7', desc: 'math' },
+          { text: 'whoami', desc: 'profile' }
+        ]);
+        return;
+      }
+
+      var parts = trimmed.split(/\s+/);
+      var cmd = parts[0].toLowerCase();
+      var hasSpace = val.indexOf(' ') !== -1;
+      var ghostHtml = '';
+      var pills = [];
+
+      if (!hasSpace) {
+        var matches = COMMANDS.filter(function (c) {
+          return c.indexOf(cmd) === 0;
+        });
+
+        if (matches.length > 0) {
+          var bestMatch = matches[0];
+          var remainder = bestMatch.slice(cmd.length);
+          var hintSuffix = PARAM_HINTS[bestMatch] ? PARAM_HINTS[bestMatch].hint : '';
+          ghostHtml = '<span class="term-ghost-typed">' + sanitize(val) + '</span><span class="term-ghost-rest">' + sanitize(remainder + hintSuffix) + '</span>';
+
+          if (matches.length === 1 && matches[0] === cmd && PARAM_HINTS[cmd]) {
+            pills = PARAM_HINTS[cmd].pills.map(function (p) { return { text: p, desc: '' }; });
+          } else {
+            pills = matches.map(function (m) {
+              return { text: m, desc: PARAM_HINTS[m] ? PARAM_HINTS[m].hint.trim() : '' };
+            });
+          }
+        }
+      } else {
+        if (PARAM_HINTS[cmd]) {
+          var argPrefix = parts.slice(1).join(' ').toLowerCase();
+          var subMatches = PARAM_HINTS[cmd].params.filter(function (p) {
+            return !argPrefix || p.toLowerCase().indexOf(argPrefix) === 0;
+          });
+
+          if (subMatches.length > 0) {
+            var firstSub = subMatches[0];
+            var typedArg = parts.slice(1).join(' ');
+            var subRemainder = firstSub.slice(typedArg.length);
+            ghostHtml = '<span class="term-ghost-typed">' + sanitize(val) + '</span><span class="term-ghost-rest">' + sanitize(subRemainder) + '</span>';
+
+            pills = subMatches.map(function (s) {
+              return { text: cmd + ' ' + s, desc: '' };
+            });
+          }
+        }
+      }
+
+      if (ghost) ghost.innerHTML = ghostHtml;
+      renderSuggestions(pills);
+    }
+
+    input.addEventListener('input', function () {
+      resetTabCycle();
+      updateGhostAndSuggestions();
+    });
+
     input.addEventListener('keydown', function (e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        var rawVal = input.value;
+
+        if (tabMatches.length > 0 && rawVal === lastTabVal) {
+          if (e.shiftKey) {
+            tabIndex = (tabIndex - 1 + tabMatches.length) % tabMatches.length;
+          } else {
+            tabIndex = (tabIndex + 1) % tabMatches.length;
+          }
+        } else {
+          var trimmedVal = rawVal.trim();
+          if (!trimmedVal) {
+            tabMatches = COMMANDS.slice();
+          } else {
+            var m = autocomplete(rawVal);
+            if (m.length === 1 && m[0] === trimmedVal && PARAM_HINTS[trimmedVal.toLowerCase()]) {
+              tabMatches = PARAM_HINTS[trimmedVal.toLowerCase()].pills.slice();
+            } else if (m.length > 0) {
+              tabMatches = m;
+            } else {
+              tabMatches = [];
+            }
+          }
+          tabIndex = e.shiftKey ? (tabMatches.length - 1) : 0;
+        }
+
+        if (tabMatches.length > 0) {
+          var chosen = tabMatches[tabIndex];
+          input.value = chosen;
+          lastTabVal = chosen;
+          setCursorEnd(input);
+          updateGhostAndSuggestions();
+        }
+        return;
+      }
+
+      if (e.key !== 'Shift') {
+        resetTabCycle();
+      }
+
       if (e.key === 'Enter') {
         e.preventDefault();
         var val = input.value;
@@ -245,6 +492,8 @@
         appendLine('pip@midnight:~$ ' + val, true);
         var res = executeCommand(val);
         input.value = '';
+        resetTabCycle();
+        updateGhostAndSuggestions();
 
         if (res.clear) {
           screen.innerHTML = '';
@@ -258,28 +507,27 @@
         if (history.length > 0 && historyIndex > 0) {
           historyIndex--;
           input.value = history[historyIndex];
+          setCursorEnd(input);
+          updateGhostAndSuggestions();
         }
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
         if (historyIndex < history.length - 1) {
           historyIndex++;
           input.value = history[historyIndex];
+          setCursorEnd(input);
+          updateGhostAndSuggestions();
         } else {
           historyIndex = history.length;
           input.value = '';
-        }
-      } else if (e.key === 'Tab') {
-        e.preventDefault();
-        var val = input.value.trim();
-        var matches = autocomplete(val);
-        if (matches.length === 1) {
-          input.value = matches[0] + ' ';
-        } else if (matches.length > 1) {
-          appendLine('pip@midnight:~$ ' + val, true);
-          appendLine(matches.join('  '), false);
+          setCursorEnd(input);
+          updateGhostAndSuggestions();
         }
       }
     });
+
+    // Initial render of suggestions on boot
+    updateGhostAndSuggestions();
 
     // Clicking anywhere in the terminal focuses the input prompt
     screen.parentElement.addEventListener('click', function () {
@@ -300,7 +548,8 @@
     executeCommand: executeCommand,
     autocomplete: autocomplete,
     getHistory: function () { return history; },
-    COMMANDS: COMMANDS
+    COMMANDS: COMMANDS,
+    PARAM_HINTS: PARAM_HINTS
   };
 
   PIP.terminal = terminalAPI;

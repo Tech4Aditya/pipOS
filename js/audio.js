@@ -22,6 +22,8 @@
   var rainSource = null, rainFilter = null;
   var cricketTimer = 0;
   var rainActive = false, cricketsActive = false;
+  var windSource = null, windFilter = null, windLfo = null, windLfoGain = null;
+  var windActive = false;
   var ambientLevel = parseFloat(store.get('ambientLevel', '0.5'));
   if (isNaN(ambientLevel) || ambientLevel < 0 || ambientLevel > 1) ambientLevel = 0.5;
 
@@ -72,7 +74,8 @@
     return true;
   }
 
-  // One music-box tine: a soft fundamental plus a quick inharmonic "ting".
+  // One music-box tine or configurable ADSR instrument voice.
+  // When opts.adsr is provided: shapes amplitude across Attack, Decay, Sustain, Release.
   function note(freq, opts) {
     if (!isOn() || !ensure()) return;
     opts = opts || {};
@@ -82,9 +85,6 @@
     var t = Math.max(now, now + (when || 0));
 
     var g = ctx.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.linearRampToValueAtTime(gain, t + 0.008);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     g.connect(master);
     g.connect(reverbIn);
 
@@ -92,22 +92,80 @@
     o.type = type;
     o.frequency.value = freq;
     o.connect(g);
-    o.start(t);
-    o.stop(t + dur + 0.05);
 
-    if (bell) {
-      var g2 = ctx.createGain();
-      g2.gain.setValueAtTime(0.0001, t);
-      g2.gain.linearRampToValueAtTime(gain * 0.35, t + 0.004);
-      g2.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.28);
-      g2.connect(master);
-      var o2 = ctx.createOscillator();
-      o2.type = 'sine';
-      o2.frequency.value = freq * 2.76;
-      o2.connect(g2);
-      o2.start(t);
-      o2.stop(t + dur * 0.3 + 0.05);
+    if (opts.adsr) {
+      var adsr = opts.adsr;
+      var a = typeof adsr.a === 'number' ? Math.max(0.001, adsr.a) : 0.008;
+      var d = typeof adsr.d === 'number' ? Math.max(0.001, adsr.d) : 0.08;
+      var sRatio = typeof adsr.s === 'number' ? clamp(adsr.s, 0, 1) : 0.7;
+      var r = typeof adsr.r === 'number' ? Math.max(0.001, adsr.r) : 0.3;
+      var sGain = Math.max(0.0001, gain * sRatio);
+
+      var hold = Math.max(0, dur - a - d - r);
+      var tPeak = t + a;
+      var tSustain = tPeak + d;
+      var tReleaseStart = tSustain + hold;
+      var tEnd = tReleaseStart + r;
+
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(gain, tPeak);
+      g.gain.linearRampToValueAtTime(sGain, tSustain);
+      if (hold > 0) {
+        g.gain.setValueAtTime(sGain, tReleaseStart);
+      }
+      g.gain.exponentialRampToValueAtTime(0.0001, tEnd);
+
+      o.start(t);
+      o.stop(tEnd + 0.05);
+
+      if (bell) {
+        var g2 = ctx.createGain();
+        g2.gain.setValueAtTime(0.0001, t);
+        g2.gain.linearRampToValueAtTime(gain * 0.35, t + Math.min(a, 0.004));
+        g2.gain.exponentialRampToValueAtTime(0.0001, t + Math.min(tEnd - t, dur * 0.28));
+        g2.connect(master);
+        var o2 = ctx.createOscillator();
+        o2.type = 'sine';
+        o2.frequency.value = freq * 2.76;
+        o2.connect(g2);
+        o2.start(t);
+        o2.stop(t + Math.min(tEnd - t, dur * 0.3) + 0.05);
+      }
+    } else {
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(gain, t + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+      o.start(t);
+      o.stop(t + dur + 0.05);
+
+      if (bell) {
+        var g2 = ctx.createGain();
+        g2.gain.setValueAtTime(0.0001, t);
+        g2.gain.linearRampToValueAtTime(gain * 0.35, t + 0.004);
+        g2.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.28);
+        g2.connect(master);
+        var o2 = ctx.createOscillator();
+        o2.type = 'sine';
+        o2.frequency.value = freq * 2.76;
+        o2.connect(g2);
+        o2.start(t);
+        o2.stop(t + dur * 0.3 + 0.05);
+      }
     }
+  }
+
+  // Soft ambient pad chord voice with gentle attack and long release
+  function pad(freq, opts) {
+    opts = opts || {};
+    note(freq, {
+      dur: opts.dur || 2.4,
+      gain: opts.gain || 0.12,
+      when: opts.when || 0,
+      type: opts.type || 'sine',
+      bell: false,
+      adsr: opts.adsr || { a: 0.6, d: 0.4, s: 0.7, r: 1.0 }
+    });
   }
 
   // soft "pop" for ordinary clicks
@@ -292,9 +350,78 @@
     return cricketsActive;
   }
 
+  function startWind(opts) {
+    if (windSource || !isOn() || !ensure()) return false;
+    var g = ensureAmbientGain();
+    if (!g) return false;
+    try {
+      opts = opts || {};
+      var lfoFreq = typeof opts.lfoFreq === 'number' ? opts.lfoFreq : 0.22;
+      var noiseBuf = makeNoiseBuffer(ctx, 4);
+      windSource = ctx.createBufferSource();
+      windSource.buffer = noiseBuf;
+      windSource.loop = true;
+
+      windFilter = ctx.createBiquadFilter();
+      windFilter.type = 'lowpass';
+      windFilter.frequency.setValueAtTime(320, ctx.currentTime);
+      windFilter.Q.setValueAtTime(3.2, ctx.currentTime);
+
+      // Low-Frequency Oscillator (~0.15 - 0.35 Hz) sweeps the cutoff to simulate rising and fading wind gusts
+      windLfo = ctx.createOscillator();
+      windLfo.type = 'sine';
+      windLfo.frequency.setValueAtTime(lfoFreq, ctx.currentTime);
+
+      windLfoGain = ctx.createGain();
+      windLfoGain.gain.setValueAtTime(170, ctx.currentTime);
+
+      windLfo.connect(windLfoGain);
+      windLfoGain.connect(windFilter.frequency);
+
+      var windGain = ctx.createGain();
+      windGain.gain.setValueAtTime(0.35, ctx.currentTime);
+
+      windSource.connect(windFilter);
+      windFilter.connect(windGain);
+      windGain.connect(g);
+
+      windLfo.start();
+      windSource.start();
+      windActive = true;
+      return true;
+    } catch (e) {
+      windSource = null;
+      windLfo = null;
+      windLfoGain = null;
+      windActive = false;
+      return false;
+    }
+  }
+
+  function stopWind() {
+    if (windSource) {
+      try { windSource.stop(); windSource.disconnect(); } catch (e) {}
+      windSource = null;
+    }
+    if (windLfo) {
+      try { windLfo.stop(); windLfo.disconnect(); } catch (e) {}
+      windLfo = null;
+    }
+    if (windLfoGain) {
+      try { windLfoGain.disconnect(); } catch (e) {}
+      windLfoGain = null;
+    }
+    windActive = false;
+  }
+
+  function isWindActive() {
+    return windActive;
+  }
+
   function stopAmbient() {
     stopRain();
     stopCrickets();
+    stopWind();
   }
 
   if (typeof document !== 'undefined') {
@@ -346,6 +473,7 @@
     toggle: toggle,
     request: request,
     note: note,
+    pad: pad,
     pop: pop,
     giggle: giggle,
     startEndless: startEndless,
@@ -360,6 +488,9 @@
     startCrickets: startCrickets,
     stopCrickets: stopCrickets,
     isCricketsActive: isCricketsActive,
+    startWind: startWind,
+    stopWind: stopWind,
+    isWindActive: isWindActive,
     stopAmbient: stopAmbient,
     setAmbientLevel: setAmbientLevel,
     getAmbientLevel: getAmbientLevel
@@ -373,7 +504,12 @@
       getVolume: getVolume,
       setAmbientLevel: setAmbientLevel,
       getAmbientLevel: getAmbientLevel,
-      makeNoiseBuffer: makeNoiseBuffer
+      makeNoiseBuffer: makeNoiseBuffer,
+      startWind: startWind,
+      stopWind: stopWind,
+      isWindActive: isWindActive,
+      note: note,
+      pad: pad
     };
   }
 })();

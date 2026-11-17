@@ -477,6 +477,9 @@
                   aria-label="Crickets sound generator">
                   <span aria-hidden="true">🦗</span> Crickets
                 </button>
+                <button class="btn btn-ambient" id="ambientWindBtn" type="button" data-silent aria-pressed="false" aria-label="Night breeze wind generator">
+                  <span aria-hidden="true">🍃</span> Breeze
+                </button>
               </div>
               <div class="ambient-wrap">
                 <label for="ambientSlider" class="lab-label"><span aria-hidden="true">🎚️</span> Level</label>
@@ -663,6 +666,7 @@
             </div>
             <div class="block-leaderboard" id="blockLeaderboardSecondary">
             <div class="block-leaderboard" id="blockScores">
+            <div class="block-leaderboard">
               <span class="block-leaderboard-title">Top 5 Scores</span>
               <ol class="block-leaderboard-list" id="blockLeaderboardList">
                 <li class="block-leaderboard-empty">No scores yet &mdash; start stacking!</li>
@@ -971,7 +975,7 @@
                   Pause</button>
                 <button class="btn" id="storyStopBtn" type="button" aria-label="Stop narration" hidden>⏹ Stop</button>
               </div>
-            <!-- Added speech narration controls -->
+
             <div class="book-speech" role="group" aria-label="Story narration controls">
               <button class="btn" id="storySpeechBtn" type="button" aria-label="Read this scene aloud">🔊 Read</button>
               <button class="btn" id="storyPauseBtn" type="button" aria-label="Pause narration" hidden>⏸ Pause</button>
@@ -1279,7 +1283,12 @@
                 <span class="term-prompt-label" aria-hidden="true">pip@midnight:~$</span>
                 <input type="text" id="termInput" class="term-input" autocomplete="off" spellcheck="false"
                   aria-label="Terminal command input prompt" placeholder="type a command...">
+                <div class="term-input-wrap">
+                  <input type="text" id="termInput" class="term-input" autocomplete="off" spellcheck="false" aria-label="Terminal command input prompt" placeholder="type a command...">
+                  <span id="termGhost" class="term-ghost" aria-hidden="true"></span>
+                </div>
               </div>
+              <div id="termSuggestions" class="term-suggestions" aria-label="Command suggestions"></div>
             </div>
           </div>
         </article>
