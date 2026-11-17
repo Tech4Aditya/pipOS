@@ -52,6 +52,45 @@ test('tab autocompletion returns matching command candidates', () => {
   assert.deepStrictEqual(emptyMatches, []);
 });
 
+test('terminal theme command guards against toggle button inversion when target matches current', () => {
+  const term = require(TERM_JS_PATH);
+
+  let clicked = false;
+  const mockBtn = {
+    click() { clicked = true; }
+  };
+  const mockDoc = {
+    getElementById(id) {
+      if (id === 'themeBtn') return mockBtn;
+      return null;
+    },
+    documentElement: {
+      getAttribute(attr) {
+        if (attr === 'data-theme') return 'night';
+        return null;
+      },
+      setAttribute() {}
+    }
+  };
+
+  global.document = mockDoc;
+  try {
+    // When current is 'night' and user enters 'theme night', themeBtn.click must NOT be called
+    clicked = false;
+    const resSame = term.executeCommand('theme night');
+    assert.strictEqual(clicked, false, 'themeBtn must not be clicked if theme already matches target');
+    assert.match(resSame.output, /Theme switched to night mode/);
+
+    // When current is 'night' and user enters 'theme day', themeBtn.click MUST be called
+    clicked = false;
+    const resDiff = term.executeCommand('theme day');
+    assert.strictEqual(clicked, true, 'themeBtn must be clicked to toggle when target is different');
+    assert.match(resDiff.output, /Theme switched to day mode/);
+  } finally {
+    delete global.document;
+  }
+});
+
 test('index.html contains #terminal article window in #work section with CRT screen and prompt', () => {
   assert.ok(fs.existsSync(HTML_PATH), 'index.html must exist');
   const html = fs.readFileSync(HTML_PATH, 'utf8');

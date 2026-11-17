@@ -95,10 +95,15 @@
         } else {
           var target = args[0].toLowerCase();
           if (['day', 'night'].includes(target)) {
-            var themeBtn = document.getElementById('themeBtn');
+            var themeBtn = typeof document !== 'undefined' ? document.getElementById('themeBtn') : null;
+            var current = (typeof document !== 'undefined' && document.documentElement)
+              ? (document.documentElement.getAttribute('data-theme') || store.get('theme', 'day'))
+              : store.get('theme', 'day');
             store.set('theme', target);
-            document.documentElement.setAttribute('data-theme', target);
-            if (themeBtn) themeBtn.click();
+            if (typeof document !== 'undefined' && document.documentElement) {
+              document.documentElement.setAttribute('data-theme', target);
+            }
+            if (current !== target && themeBtn) themeBtn.click();
             out = "Theme switched to " + target + " mode 🌙";
           } else if (target === 'contrast') {
             var cBtn = document.getElementById('contrastBtn');
