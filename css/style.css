@@ -1252,6 +1252,11 @@ html.js .growth-chart.is-visible .growth-fill { width: calc(var(--progress, 0) *
   margin-top: 1rem;
 }
 
+#storySpeechBtn {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
 .book-nav {
   display: flex;
   gap: 0.6rem;

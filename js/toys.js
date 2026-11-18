@@ -1415,6 +1415,39 @@
   /* =====================================================================
      5. BEDTIME STORYBOOK (flipbook)
      ===================================================================== */
+  function narrateStoryPage(target, synth) {
+    var s = synth || (typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null);
+    if (!s) return null;
+    var pageText = '';
+    if (typeof target === 'string') {
+      pageText = target.trim();
+    } else if (target && typeof target.querySelector === 'function') {
+      var titleEl = target.querySelector('h4');
+      var pEl = target.querySelector('p');
+      var title = titleEl ? titleEl.textContent.trim() : '';
+      var body = pEl ? pEl.textContent.trim() : '';
+      pageText = (title ? title + '. ' : '') + body;
+    } else if (target && target.textContent) {
+      pageText = target.textContent.trim();
+    }
+    if (!pageText) return null;
+
+    if (typeof s.cancel === 'function') {
+      s.cancel();
+    }
+    var Utterance = (typeof window !== 'undefined' && window.SpeechSynthesisUtterance) ||
+      (typeof SpeechSynthesisUtterance !== 'undefined' ? SpeechSynthesisUtterance : null);
+    if (!Utterance) return null;
+
+    var utterance = new Utterance(pageText);
+    utterance.rate = 0.82;
+    utterance.pitch = 1.1;
+    if (typeof s.speak === 'function') {
+      s.speak(utterance);
+    }
+    return utterance;
+  }
+
   function initStorybook() {
     var book = $('#book'), prevBtn = $('#bookPrev'), nextBtn = $('#bookNext'), ind = $('#bookInd');
     if (!book || !prevBtn || !nextBtn || !ind) return;
@@ -1423,48 +1456,33 @@
     var current = 0;
 
     var speechBtn = document.getElementById('storySpeechBtn');
-    var pauseBtn = document.getElementById('storyPauseBtn');
-    var stopBtn = document.getElementById('storyStopBtn');
 
     function stopSpeech() {
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-      if (speechBtn) speechBtn.hidden = false;
-      if (pauseBtn) { pauseBtn.hidden = true; pauseBtn.textContent = '⏸ Pause'; }
-      if (stopBtn) stopBtn.hidden = true;
-    }
-
-    if (speechBtn && 'speechSynthesis' in window) {
-      speechBtn.addEventListener('click', function () {
-        var activePage = pages[current];
-        if (!activePage) return;
-        var textToRead = (activePage.querySelector('h4')?.textContent || '') + '. ' + (activePage.querySelector('p')?.textContent || '');
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        var utterance = new SpeechSynthesisUtterance(textToRead);
-        utterance.rate = 0.9;
-        utterance.onstart = function () {
-          speechBtn.hidden = true;
-          if (pauseBtn) pauseBtn.hidden = false;
-          if (stopBtn) stopBtn.hidden = false;
-        };
-        utterance.onend = stopSpeech;
-        window.speechSynthesis.speak(utterance);
-      });
-    } else if (speechBtn) {
-      speechBtn.style.display = 'none';
+      }
     }
 
-    if (pauseBtn) {
-      pauseBtn.addEventListener('click', function () {
-        if (window.speechSynthesis.paused) {
-          window.speechSynthesis.resume();
-          pauseBtn.textContent = '⏸ Pause';
-        } else if (window.speechSynthesis.speaking) {
-          window.speechSynthesis.pause();
-          pauseBtn.textContent = '▶ Resume';
-        }
-      });
+    if (speechBtn) {
+      if (typeof window !== 'undefined' && !('speechSynthesis' in window)) {
+        speechBtn.hidden = true;
+      } else {
+        speechBtn.addEventListener('click', function () {
+          var activePage = pages[current];
+          if (!activePage) return;
+          var titleEl = activePage.querySelector('h4');
+          var pEl = activePage.querySelector('p');
+          var pageText = (titleEl ? titleEl.textContent.trim() + '. ' : '') + (pEl ? pEl.textContent.trim() : '');
+          if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            var utterance = new SpeechSynthesisUtterance(pageText);
+            utterance.rate = 0.82;
+            utterance.pitch = 1.1;
+            window.speechSynthesis.speak(utterance);
+          }
+        });
+      }
     }
-    if (stopBtn) stopBtn.addEventListener('click', stopSpeech);
 
     function renderPage(idx) {
       stopSpeech(); 
@@ -1695,6 +1713,7 @@
     importScores: importScores,
     updateRouteTrail: updateRouteTrail,
     renderRouteTrail: renderRouteTrail,
+    narrateStoryPage: narrateStoryPage,
     init: function () {
       initLab();
       initLights();
@@ -1714,7 +1733,8 @@
       exportScores: exportScores,
       importScores: importScores,
       updateRouteTrail: updateRouteTrail,
-      renderRouteTrail: renderRouteTrail
+      renderRouteTrail: renderRouteTrail,
+      narrateStoryPage: narrateStoryPage
     };
   }
 })();

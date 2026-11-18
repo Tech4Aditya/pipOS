@@ -866,6 +866,7 @@
         <article id="storybook" class="win w-flipbook" data-foldable aria-labelledby="bookTitle">
           <div class="win-bar">
             <h3 class="win-title" id="bookTitle">storybook.exe</h3>
+            <button type="button" class="btn btn-tiny" id="storySpeechBtn" aria-label="Read story aloud">🎙️ Read to Me</button>
           </div>
           <div class="win-body">
             <div class="proj-head">
@@ -1011,13 +1012,6 @@
               <div class="book-nav">
                 <button class="btn" id="bookPrev" type="button" aria-label="Previous storybook page">← Back</button>
                 <button class="btn btn-primary" id="bookNext" type="button" aria-label="Next storybook page">Next →</button>
-              </div>
-
-              <!-- Added speech narration controls -->
-              <div class="book-speech" role="group" aria-label="Story narration controls">
-                <button class="btn" id="storySpeechBtn" type="button" aria-label="Read this scene aloud">🔊 Read</button>
-                <button class="btn" id="storyPauseBtn" type="button" aria-label="Pause narration" hidden>⏸ Pause</button>
-                <button class="btn" id="storyStopBtn" type="button" aria-label="Stop narration" hidden>⏹ Stop</button>
               </div>
               <p class="score" id="bookInd" aria-live="polite" aria-atomic="true">Page 1 of 6</p>
             </div>
