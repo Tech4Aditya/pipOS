@@ -1663,6 +1663,14 @@
     </div>
   </dialog>
 
+  <!-- Desktop Right-Click Context Menu -->
+  <menu id="desktopContextMenu" class="desktop-context-menu" hidden role="menu" aria-label="Desktop Context Menu" tabindex="-1">
+    <li role="none"><button type="button" id="cmArrange" class="cm-item" role="menuitem">📐 Arrange Icons to Grid</button></li>
+    <li role="none"><button type="button" id="cmTheme" class="cm-item" role="menuitem">🌓 Toggle Day/Night Theme</button></li>
+    <li role="none"><button type="button" id="cmTerminal" class="cm-item" role="menuitem">💻 Open Terminal</button></li>
+    <li role="none"><button type="button" id="cmSound" class="cm-item" role="menuitem">🎵 Mute/Unmute Sounds</button></li>
+  </menu>
+
   <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
@@ -1680,6 +1688,7 @@
   <script src="js/taskbar.js" defer></script>
   <script src="js/monitor.js" defer></script>
   <script src="js/notes.js" defer></script>
+  <script src="js/desktop.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 

@@ -2990,3 +2990,67 @@ dialog.secret::backdrop { background: rgba(40, 24, 40, 0.55); }
 [data-theme="night"] .notes-status.is-saved {
   color: #5ce68b;
 }
+
+/* ==========================================================================
+   Desktop Right-Click Context Menu
+   ========================================================================== */
+.desktop-context-menu {
+  position: fixed;
+  z-index: 9999;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  min-width: 200px;
+  background: var(--paper, #fff);
+  border: 2px solid var(--line, #222);
+  border-radius: 8px;
+  box-shadow: 4px 4px 0 var(--shadow, rgba(0, 0, 0, 0.25));
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.desktop-context-menu[hidden] {
+  display: none !important;
+}
+
+[data-theme="night"] .desktop-context-menu {
+  background: #1e1636;
+  border-color: var(--gold, #f3b562);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.6);
+}
+
+.cm-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 7px 10px;
+  font-family: var(--f-sans, sans-serif);
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--ink, #222);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.1s ease;
+}
+
+.cm-item:hover,
+.cm-item:focus-visible {
+  background: var(--gold, #f3b562);
+  color: #1e1636;
+  outline: none;
+}
+
+[data-theme="night"] .cm-item {
+  color: #fff;
+}
+
+[data-theme="night"] .cm-item:hover,
+[data-theme="night"] .cm-item:focus-visible {
+  background: var(--gold, #f3b562);
+  color: #1e1636;
+}
+

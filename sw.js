@@ -21,6 +21,7 @@ var PRECACHE_ASSETS = [
   'js/taskbar.js',
   'js/monitor.js',
   'js/notes.js',
+  'js/desktop.js',
   'js/main.js',
   'assets/favicon.svg',
   'assets/icon-192.png',
