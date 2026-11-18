@@ -1607,6 +1607,8 @@ html.js .growth-chart.is-visible .growth-fill { width: calc(var(--progress, 0) *
   transition: opacity 0.25s, transform 0.25s;
 }
 .toast.is-show { opacity: 1; transform: translate(-50%, 0); }
+.pip-fx-canvas { position: fixed; inset: 0; z-index: 70; width: 100%; height: 100%; pointer-events: none; }
+[data-quiet="on"] .pip-fx-canvas { display: none; }
 .confetti { position: fixed; inset: 0; z-index: 80; width: 100%; height: 100%; pointer-events: none; display: none; }
 .sparkle {
   position: fixed; z-index: 70; pointer-events: none; line-height: 1;
