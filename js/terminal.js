@@ -28,7 +28,7 @@
 
   var COMMANDS = [
     'help', 'whoami', 'time', 'date', 'theme', 'sound', 'quiet',
-    'play', 'wish', 'fortune', 'dream', 'calc', 'clear', 'history'
+    'play', 'wish', 'fortune', 'dream', 'calc', 'blocks', 'clear', 'history'
   ];
 
   var FORTUNES = [
@@ -90,6 +90,7 @@
           "  wish <text>        - Post a wish to the wish wall",
           "  fortune / dream    - Read a midnight prophecy",
           "  calc <expr>        - Quick arithmetic evaluator (e.g., calc 24 * 7)",
+          "  blocks [stats|export] - View or export Rattle & Blocks tower records",
           "  history            - Display recent command history",
           "  clear              - Wipe terminal screen"
         ].join('\n');
@@ -222,6 +223,65 @@
         }
         break;
 
+      case 'blocks':
+        var sub = args[0] ? args[0].toLowerCase() : 'stats';
+        var pipObj = getPIP();
+        if (sub === 'export') {
+          var exporter = (pipObj.toys && typeof pipObj.toys.exportScores === 'function')
+            ? pipObj.toys.exportScores
+            : (typeof require !== 'undefined' ? (function () {
+                try { return require('./toys.js').exportScores; } catch (e) { return null; }
+              })() : null);
+          if (typeof exporter === 'function') {
+            out = exporter();
+          } else {
+            out = "pip-blocks: Score export not available.";
+          }
+        } else if (sub === 'stats') {
+          var curStore = (pipObj && pipObj.store) ? pipObj.store : store;
+          var curBest = curStore.get('best', '0');
+          var topScores = [];
+          try {
+            var raw = curStore.get('blockTopScores', '[]');
+            topScores = JSON.parse(raw);
+          } catch (e) {}
+          if (!Array.isArray(topScores)) topScores = [];
+
+          var lines = [
+            "🧱 Rattle & Blocks Stacking Statistics:",
+            "  Personal Best: " + curBest + " blocks"
+          ];
+          if (topScores.length > 0) {
+            lines.push("  Top Leaderboard Records:");
+            topScores.forEach(function (score, idx) {
+              lines.push("    #" + (idx + 1) + " — " + score + " pts");
+            });
+          } else {
+            lines.push("  Top Leaderboard Records: None recorded yet.");
+          }
+          out = lines.join('\n');
+        } else if (sub === 'import') {
+          var jsonStr = args.slice(1).join(' ');
+          if (!jsonStr) {
+            out = "Usage: blocks import <json>";
+          } else {
+            var importer = (pipObj.toys && typeof pipObj.toys.importScores === 'function')
+              ? pipObj.toys.importScores
+              : (typeof require !== 'undefined' ? (function () {
+                  try { return require('./toys.js').importScores; } catch (e) { return null; }
+                })() : null);
+            if (typeof importer === 'function') {
+              var ok = importer(jsonStr);
+              out = ok ? "✨ Stacking records imported successfully!" : "pip-blocks: Invalid score data.";
+            } else {
+              out = "pip-blocks: Score import not available.";
+            }
+          }
+        } else {
+          out = "Usage: blocks [stats|export]";
+        }
+        break;
+
       case 'history':
         out = history.map(function (h, i) { return (i + 1) + '  ' + h; }).join('\n');
         break;
@@ -237,6 +297,11 @@
   }
 
   var PARAM_HINTS = {
+    blocks: {
+      params: ['stats', 'export'],
+      hint: ' [stats|export]',
+      pills: ['blocks stats', 'blocks export']
+    },
     theme: {
       params: ['day', 'night', 'contrast'],
       hint: ' [day|night|contrast]',

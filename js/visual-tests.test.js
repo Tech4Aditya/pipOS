@@ -8,6 +8,7 @@ test('Visual Regression: Root directory remains strictly build-free', () => {
   if (fs.existsSync(pkgPath)) {
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
     assert.strictEqual(pkg.dependencies, undefined, 'Root application must stay build-free with zero runtime dependencies');
+    assert.strictEqual(pkg.dependencies, undefined, 'Root package.json must have zero runtime dependencies (build-free)');
   }
   assert.strictEqual(fs.existsSync(path.join(__dirname, '..', 'node_modules')), false,
     'Root directory must NOT contain node_modules');

@@ -181,24 +181,118 @@
     }
   }
 
-  /* ---------- fold-up windows ---------- */
+  /* ---------- fold-up & minimized windows ---------- */
   function initFoldable() {
+    var minDock = $('#taskbarMinimized');
+    var maxZ = 10;
+
+    function bringToFront(win) {
+      if (!win) return;
+      maxZ++;
+      win.style.zIndex = maxZ;
+      $$('.win').forEach(function (w) { w.classList.remove('win-active'); });
+      win.classList.add('win-active');
+    }
+
     $$('.win[data-foldable]').forEach(function (win, n) {
       var bar = $('.win-bar', win), body = $('.win-body', win), title = $('.win-title', win);
       if (!bar || !body) return;
       if (!body.id) body.id = 'winbody' + n;
+      var b = $('.win-btn', bar);
+      if (!b) {
+        b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'win-btn';
+        b.setAttribute('aria-controls', body.id);
+        b.setAttribute('data-silent', '');
+        bar.appendChild(b);
+      }
+
+      win.addEventListener('pointerdown', function () { bringToFront(win); });
+      win.addEventListener('focusin', function () { bringToFront(win); });
+
+      var titleText = title ? title.textContent.trim() : 'window ' + n;
+      var minId = 'tb-min-' + (win.id || n);
+
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'win-btn';
       b.setAttribute('aria-controls', body.id);
       b.setAttribute('data-silent', '');
-      function paint() {
-        var open = !body.hidden;
-        b.setAttribute('aria-expanded', open ? 'true' : 'false');
-        b.setAttribute('aria-label', (open ? 'Fold up ' : 'Open ') + (title ? title.textContent : 'window'));
-        b.textContent = open ? '−' : '+';
+
+      function updateTaskbarDock(open) {
+        if (!minDock) return;
+        var existing = $('#' + minId, minDock);
+        if (!open) {
+          if (!existing) {
+            var minBtn = document.createElement('button');
+            minBtn.type = 'button';
+            minBtn.id = minId;
+            minBtn.className = 'tb-min-btn';
+            minBtn.setAttribute('aria-label', 'Restore ' + titleText);
+            var iconSpan = document.createElement('span');
+            iconSpan.className = 'tb-min-icon';
+            iconSpan.setAttribute('aria-hidden', 'true');
+            iconSpan.textContent = '🪟';
+            var titleSpan = document.createElement('span');
+            titleSpan.className = 'tb-min-title';
+            titleSpan.textContent = titleText;
+            minBtn.appendChild(iconSpan);
+            minBtn.appendChild(titleSpan);
+            minBtn.addEventListener('click', function () {
+              body.hidden = false;
+              win.classList.remove('is-folded');
+              paint();
+              bringToFront(win);
+              win.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              b.focus();
+            });
+            minDock.appendChild(minBtn);
+          }
+        } else {
+          if (existing) existing.remove();
+        }
       }
-      b.addEventListener('click', function () { body.hidden = !body.hidden; paint(); });
+
+      function paint() {
+        var open = !body.hidden && !win.classList.contains('is-minimized');
+        b.setAttribute('aria-expanded', open ? 'true' : 'false');
+        b.setAttribute('aria-label', (open ? 'Minimize ' : 'Restore ') + (title ? title.textContent : 'window'));
+        b.setAttribute('aria-label', (open ? 'Fold up ' : 'Open ') + titleText);
+        b.textContent = open ? '−' : '+';
+        win.classList.toggle('is-folded', !open);
+        updateTaskbarDock(open);
+      }
+      b.addEventListener('click', function (e) {
+        if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        var open = !body.hidden && !win.classList.contains('is-minimized');
+        if (open) {
+          if (PIP.taskbar && typeof PIP.taskbar.minimizeWindow === 'function') {
+            PIP.taskbar.minimizeWindow(win);
+          } else {
+            body.hidden = true;
+            win.classList.add('is-minimized');
+            paint();
+          }
+        } else {
+          if (PIP.taskbar && typeof PIP.taskbar.restoreWindow === 'function') {
+            PIP.taskbar.restoreWindow(win);
+          } else {
+            body.hidden = false;
+            win.classList.remove('is-minimized');
+            paint();
+          }
+        }
+      });
+
+      b.addEventListener('click', function () {
+        body.hidden = !body.hidden;
+        paint();
+        if (!body.hidden) {
+          bringToFront(win);
+        }
+      });
+
       bar.appendChild(b);
       paint();
     });
@@ -247,6 +341,10 @@
       if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
         e.preventDefault();
         toggleShortcuts(false);
+      } else if (e.key === 'f' || e.key === 'F') {
+        if (PIP.flashlight && typeof PIP.flashlight.toggle === 'function') {
+          PIP.flashlight.toggle();
+        }
       } else if (e.key === 'Escape' && body && !body.hidden && win.contains(document.activeElement)) {
         var btn = $('.win-btn', win);
         if (btn) btn.click();
@@ -428,8 +526,13 @@
   safe('toys', PIP.toys.init);
   safe('stars', PIP.stars && PIP.stars.init);
   safe('rattle', PIP.rattle && PIP.rattle.init);
+  safe('drag', PIP.drag && PIP.drag.init);
+  safe('haptics', PIP.haptics && PIP.haptics.init);
+  safe('recorder', PIP.recorder && PIP.recorder.init);
   safe('story', initStory);
+  safe('dressup', PIP.dressup ? PIP.dressup.init : function () {});
   safe('navspy', initNavSpy);
+  safe('flashlight', PIP.flashlight ? PIP.flashlight.init : function () {});
   safe('trash', initTrash);
   safe('sw', initServiceWorker);
 })();

@@ -255,6 +255,54 @@
     } catch (e) {}
   }
 
+  /* ---------- Starlight Reactions (pip:wish_reactions) ---------- */
+  var REACTIONS_KEY = 'wish_reactions';
+
+  function loadReactions() {
+    try {
+      var s = getStore();
+      var raw = s.get(REACTIONS_KEY, null);
+      if (raw === null || raw === undefined) {
+        raw = s.get('pip:' + REACTIONS_KEY, '{}');
+      }
+      var parsed = JSON.parse(raw);
+      return (parsed && typeof parsed === 'object') ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveReactions(map) {
+    try {
+      var s = getStore();
+      var data = JSON.stringify(map);
+      s.set(REACTIONS_KEY, data);
+      s.set('pip:' + REACTIONS_KEY, data);
+    } catch (e) {}
+  }
+
+  function getWishReactionKey(item, index) {
+    if (item && typeof item.t === 'number') return 'wish_' + item.t;
+    if (item && typeof item.w === 'string') return 'wish_' + item.w.slice(0, 30).replace(/\s+/g, '_');
+    return 'wish_' + (index || 0);
+  }
+
+  function getReactionCount(item, index) {
+    var map = loadReactions();
+    var key = getWishReactionKey(item, index);
+    return (typeof map[key] === 'number') ? map[key] : 0;
+  }
+
+  function incrementReactionCount(item, index) {
+    var map = loadReactions();
+    var key = getWishReactionKey(item, index);
+    var current = (typeof map[key] === 'number') ? map[key] : 0;
+    var next = current + 1;
+    map[key] = next;
+    saveReactions(map);
+    return next;
+  }
+
   function formatWishesText(wishes) {
     var list = Array.isArray(wishes) ? wishes : [];
     var lines = [
@@ -334,6 +382,34 @@
     li.appendChild(by);
 
     if (isOwn) {
+      var reactBtn = d.createElement('button');
+      reactBtn.type = 'button';
+      reactBtn.className = 'note-react';
+      var initialCount = getReactionCount(x, i);
+      reactBtn.textContent = 'Send Starlight ✨' + (initialCount > 0 ? ' (' + initialCount + ')' : '');
+      if (typeof reactBtn.setAttribute === 'function') {
+        reactBtn.setAttribute('aria-label', 'Send Starlight ✨' + (initialCount > 0 ? ' (' + initialCount + ')' : ''));
+        reactBtn.setAttribute('title', 'Send Starlight ✨');
+      }
+
+      if (typeof reactBtn.addEventListener === 'function') {
+        reactBtn.addEventListener('click', function (e) {
+          if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+          var newCount = incrementReactionCount(x, i);
+          reactBtn.textContent = 'Send Starlight ✨ (' + newCount + ')';
+          if (typeof reactBtn.setAttribute === 'function') {
+            reactBtn.setAttribute('aria-label', 'Send Starlight ✨ (' + newCount + ')');
+          }
+          if (typeof window !== 'undefined' && window.PIP && window.PIP.fx && typeof window.PIP.fx.confetti === 'function') {
+            window.PIP.fx.confetti(25);
+          } else if (typeof global !== 'undefined' && global.PIP && global.PIP.fx && typeof global.PIP.fx.confetti === 'function') {
+            global.PIP.fx.confetti(25);
+          } else if (typeof confetti === 'function') {
+            confetti(25);
+          }
+        });
+      }
+
       var delBtn = d.createElement('button');
       delBtn.type = 'button';
       delBtn.className = 'note-del';
@@ -384,6 +460,7 @@
           confirmBox.appendChild(btnRow);
 
           if (delBtn.style) delBtn.style.display = 'none';
+          if (reactBtn.style) reactBtn.style.display = 'none';
           li.appendChild(confirmBox);
 
           if (typeof yesBtn.focus === 'function') {
@@ -395,6 +472,7 @@
               confirmBox.parentNode.removeChild(confirmBox);
             }
             if (delBtn.style) delBtn.style.display = '';
+            if (reactBtn.style) reactBtn.style.display = '';
             if (typeof delBtn.focus === 'function') {
               delBtn.focus();
             }
@@ -421,6 +499,7 @@
         });
       }
 
+      li.appendChild(reactBtn);
       li.appendChild(delBtn);
     }
 
@@ -484,6 +563,13 @@
           store.set('wall_remote_cache', JSON.stringify(remoteWishes));
           if (statusEl) statusEl.textContent = 'Shared wish wall • Synchronized live across dreamers.';
           render();
+          if (typeof wall.syncPendingWishes === 'function') {
+            wall.syncPendingWishes(backend, function (count) {
+              if (count > 0 && typeof toast === 'function') {
+                toast('✨ Synced ' + count + ' offline wish' + (count > 1 ? 'es' : '') + ' to Midnight Wall.');
+              }
+            });
+          }
         } else {
           // Backend offline or unreachable: fall back to cached remote or local
           try {
@@ -554,14 +640,24 @@
           saveLocalWish(newWish);
           activeWishes = loadLocalWishes();
           render();
-          toast(success ? 'Pinned to the wall. Pip yawns happily.' : 'Pinned to your local wall (offline mode).');
+          if (success) {
+            toast('Pinned to the wall. Pip yawns happily.');
+          } else {
+            if (typeof wall.queuePendingWish === 'function') {
+              wall.queuePendingWish(newWish);
+            }
+            toast('Pinned to your local wall (queued for sync).');
+          }
         });
       } else {
         // Local mode or fallback
+        if (backend && wall && typeof wall.queuePendingWish === 'function') {
+          wall.queuePendingWish(newWish);
+        }
         saveLocalWish(newWish);
         activeWishes = loadLocalWishes();
         render();
-        toast('Pinned to the wall. Pip yawns happily.');
+        toast(backend ? 'Pinned to your local wall (queued for sync).' : 'Pinned to the wall. Pip yawns happily.');
       }
 
       if (PIP.audio && typeof PIP.audio.isOn === 'function' && PIP.audio.isOn()) {
@@ -579,6 +675,9 @@
     loadLocalWishes: loadLocalWishes,
     saveLocalWish: saveLocalWish,
     deleteLocalWish: deleteLocalWish,
+    getBackendConfig: getBackendConfig,
+    getReactionCount: getReactionCount,
+    incrementReactionCount: incrementReactionCount,
     init: function () { initSparkles(); initOdometer(); initWall(); initRealVisitorCounter();}
   };
 
@@ -590,6 +689,9 @@
       loadLocalWishes: loadLocalWishes,
       saveLocalWish: saveLocalWish,
       deleteLocalWish: deleteLocalWish,
+      getBackendConfig: getBackendConfig,
+      getReactionCount: getReactionCount,
+      incrementReactionCount: incrementReactionCount,
       ROT: ROT,
       SEEDS: SEEDS
     };

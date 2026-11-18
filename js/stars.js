@@ -13,10 +13,32 @@
     H: 380,
     MAX_MISSES: 3,
     CLOUD_W: 68,
+    CLOUD_W_BOOST: 96,
     CLOUD_H: 22,
+    BOOST_DURATION: 6000,
+    COMET_CHANCE: 0.05,
+    CRYSTAL_CHANCE: 0.03,
     STAR_PALETTE: ['#ffd77a', '#a5f3fc', '#e9d5ff', '#fbcfe8', '#fdba74'],
+    COMBO_PALETTES: {
+      default: ['#ffd77a', '#a5f3fc', '#e9d5ff', '#fbcfe8', '#fdba74'],
+      tier1: ['#ffd77a', '#fbcfe8', '#ffffff'],
+      tier2: ['#38bdf8', '#818cf8', '#c084fc', '#f472b6'],
+      tier3: ['#facc15', '#fb923c', '#f43f5e', '#a855f7', '#60a5fa'],
+      supernova: ['#ffd700', '#ff007f', '#00f5d4', '#7b2cbf', '#ffffff', '#ff9e00'],
+      comet: ['#ffd700', '#f59e0b', '#fef08a', '#ffffff'],
+      crystal: ['#38bdf8', '#a78bfa', '#e0e7ff', '#67e8f9']
+    },
     NOTES: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33] // Pentatonic chime frequencies
   };
+
+  function getComboPalette(combo, starType) {
+    if (starType === 'comet' || starType === 'golden_comet') return STARS_CONFIG.COMBO_PALETTES.comet;
+    if (starType === 'crystal' || starType === 'slumber_crystal') return STARS_CONFIG.COMBO_PALETTES.crystal;
+    if (!combo || combo < 3) return STARS_CONFIG.COMBO_PALETTES.tier1;
+    if (combo < 6) return STARS_CONFIG.COMBO_PALETTES.tier2;
+    if (combo < 10) return STARS_CONFIG.COMBO_PALETTES.tier3;
+    return STARS_CONFIG.COMBO_PALETTES.supernova;
+  }
 
   function checkCollision(star, cloud) {
     if (!star || !cloud) return false;
@@ -61,7 +83,9 @@
         y: H - 44,
         w: STARS_CONFIG.CLOUD_W,
         h: STARS_CONFIG.CLOUD_H,
-        targetX: (W - STARS_CONFIG.CLOUD_W) / 2
+        targetX: (W - STARS_CONFIG.CLOUD_W) / 2,
+        wideUntil: 0,
+        isWide: false
       },
       keys: { left: false, right: false },
       lastSpawn: 0,
@@ -93,42 +117,112 @@
       PIP.audio.note(180, { dur: 0.4, gain: 0.12, type: 'triangle' });
     }
 
-    function spawnStar() {
+    function spawnStar(forcedType) {
+      var rand = Math.random();
+      var type = 'normal';
+      if (forcedType) {
+        type = forcedType;
+      } else if (rand < STARS_CONFIG.COMET_CHANCE) {
+        type = 'comet';
+      } else if (rand < (STARS_CONFIG.COMET_CHANCE + STARS_CONFIG.CRYSTAL_CHANCE)) {
+        type = 'crystal';
+      }
+
       var r = 9 + Math.random() * 4;
       var speed = 1.2 + Math.random() * 1.4 + Math.min(state.score * 0.02, 1.8);
-      var color = STARS_CONFIG.STAR_PALETTE[Math.floor(Math.random() * STARS_CONFIG.STAR_PALETTE.length)];
-      state.stars.push({
+      if (type === 'comet') {
+        speed *= 1.3; // Falls 30% faster
+        r = 11 + Math.random() * 3;
+      } else if (type === 'crystal') {
+        r = 10 + Math.random() * 3;
+      }
+
+      var color;
+      if (type === 'comet') {
+        color = '#ffd700'; // Golden Comet Star
+      } else if (type === 'crystal') {
+        color = '#38bdf8'; // Slumber Moon Crystal
+      } else {
+        color = STARS_CONFIG.STAR_PALETTE[Math.floor(Math.random() * STARS_CONFIG.STAR_PALETTE.length)];
+      }
+
+      var starObj = {
         x: r + Math.random() * (W - r * 2),
         y: -r,
         vy: speed,
         r: r,
         angle: Math.random() * Math.PI,
         vAngle: (Math.random() - 0.5) * 0.04,
-        color: color
-      });
+        color: color,
+        type: type,
+        scoreBonus: type === 'comet' ? 3 : 0
+      };
+      state.stars.push(starObj);
+      return starObj;
     }
 
-    function spawnParticles(x, y, color) {
-      for (var i = 0; i < 7; i++) {
+    function spawnParticles(x, y, colorOrPalette, combo) {
+      var palette;
+      if (Array.isArray(colorOrPalette)) {
+        palette = colorOrPalette;
+      } else if (typeof colorOrPalette === 'string' && colorOrPalette) {
+        palette = [colorOrPalette];
+      } else {
+        palette = getComboPalette(combo || 0);
+      }
+
+      var currentCombo = combo || state.combo || 0;
+      var count = 7 + Math.min(currentCombo * 3, 25);
+      for (var i = 0; i < count; i++) {
         var ang = Math.random() * Math.PI * 2;
-        var spd = 1 + Math.random() * 2.5;
+        var spd = 1 + Math.random() * (2.5 + Math.min(currentCombo * 0.35, 3));
+        var col = palette[Math.floor(Math.random() * palette.length)];
         state.particles.push({
           x: x,
           y: y,
           vx: Math.cos(ang) * spd,
           vy: Math.sin(ang) * spd - 0.5,
           life: 1,
-          decay: 0.03 + Math.random() * 0.03,
-          color: color,
-          size: 2 + Math.random() * 2
+          decay: 0.025 + Math.random() * 0.03,
+          color: col,
+          size: 2 + Math.random() * (2 + Math.min(currentCombo * 0.2, 2.5))
         });
       }
     }
 
-    function drawStarShape(c, x, y, r, angle, color) {
+    function drawStarShape(c, x, y, r, angle, color, type) {
       c.save();
       c.translate(x, y);
       c.rotate(angle);
+
+      if (type === 'crystal') {
+        c.fillStyle = color || '#38bdf8';
+        c.beginPath();
+        c.moveTo(0, -r * 1.35);
+        c.lineTo(r * 0.7, 0);
+        c.lineTo(0, r * 1.35);
+        c.lineTo(-r * 0.7, 0);
+        c.closePath();
+        c.fill();
+
+        // Shimmer facet
+        c.fillStyle = 'rgba(255, 255, 255, 0.75)';
+        c.beginPath();
+        c.moveTo(0, -r * 1.35);
+        c.lineTo(0, r * 1.35);
+        c.lineTo(-r * 0.7, 0);
+        c.closePath();
+        c.fill();
+
+        c.restore();
+        return;
+      }
+
+      if (type === 'comet') {
+        c.shadowColor = '#ffd700';
+        c.shadowBlur = 9;
+      }
+
       c.fillStyle = color;
       c.beginPath();
       var pts = 5;
@@ -142,6 +236,14 @@
       }
       c.closePath();
       c.fill();
+
+      if (type === 'comet') {
+        c.fillStyle = '#ffffff';
+        c.beginPath();
+        c.arc(0, 0, r * 0.35, 0, Math.PI * 2);
+        c.fill();
+      }
+
       c.restore();
     }
 
@@ -151,27 +253,33 @@
       var y = cloud.y;
       var w = cloud.w;
       var h = cloud.h;
+      var isWide = Boolean(cloud.isWide);
 
-      // Soft glow
-      c.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      // Soft glow (warm golden rim when wide basket is active)
+      if (isWide) {
+        c.shadowColor = 'rgba(255, 215, 0, 0.65)';
+        c.shadowBlur = 12;
+      }
+      c.fillStyle = isWide ? 'rgba(255, 253, 230, 0.96)' : 'rgba(255, 255, 255, 0.9)';
       c.beginPath();
       c.arc(x + 16, y + 12, 12, 0, Math.PI * 2);
-      c.arc(x + 32, y + 8, 14, 0, Math.PI * 2);
-      c.arc(x + 50, y + 12, 11, 0, Math.PI * 2);
+      c.arc(x + w / 2, y + 8, 14, 0, Math.PI * 2);
+      c.arc(x + w - 16, y + 12, 12, 0, Math.PI * 2);
       c.rect(x + 12, y + 10, w - 24, h - 10);
       c.fill();
 
       // Cloud outline
-      c.strokeStyle = '#64748b';
-      c.lineWidth = 1.5;
+      c.strokeStyle = isWide ? '#f59e0b' : '#64748b';
+      c.lineWidth = isWide ? 2 : 1.5;
       c.stroke();
 
       // Sleepy eyes on cloud
       c.strokeStyle = '#334155';
       c.lineWidth = 1.8;
       c.beginPath();
-      c.arc(x + 28, y + 12, 3, 0.2, Math.PI - 0.2);
-      c.arc(x + 40, y + 12, 3, 0.2, Math.PI - 0.2);
+      var eyeMid = x + w / 2;
+      c.arc(eyeMid - 6, y + 12, 3, 0.2, Math.PI - 0.2);
+      c.arc(eyeMid + 6, y + 12, 3, 0.2, Math.PI - 0.2);
       c.stroke();
 
       c.restore();
@@ -199,6 +307,12 @@
     function update() {
       if (!state.running) return;
 
+      var now = Date.now();
+      // Cloud width power-up: widens cloud basket for 6 seconds
+      var isWide = Boolean(state.cloud.wideUntil && now < state.cloud.wideUntil);
+      state.cloud.w = isWide ? STARS_CONFIG.CLOUD_W_BOOST : STARS_CONFIG.CLOUD_W;
+      state.cloud.isWide = isWide;
+
       // Cloud movement
       if (state.keys.left) state.cloud.targetX -= 5.5;
       if (state.keys.right) state.cloud.targetX += 5.5;
@@ -208,7 +322,6 @@
       state.cloud.x += (state.cloud.targetX - state.cloud.x) * 0.3;
 
       // Spawning
-      var now = Date.now();
       var spawnInterval = Math.max(700, 1500 - state.score * 15);
       if (now - state.lastSpawn > spawnInterval) {
         spawnStar();
@@ -221,11 +334,40 @@
         s.y += s.vy;
         s.angle += s.vAngle;
 
+        // Sparkling trail for Golden Comet Star
+        if (s.type === 'comet' && Math.random() < 0.6) {
+          state.particles.push({
+            x: s.x + (Math.random() - 0.5) * 8,
+            y: s.y - s.r * 0.4 + (Math.random() - 0.5) * 4,
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: -0.6 - Math.random() * 0.8,
+            life: 0.65,
+            decay: 0.05 + Math.random() * 0.04,
+            color: Math.random() < 0.5 ? '#ffd700' : '#ffffff',
+            size: 1.5 + Math.random() * 2
+          });
+        }
+
         // Check catch
         if (checkCollision(s, state.cloud)) {
-          state.score += 10 + state.combo * 2;
+          var basePoints = 10 + state.combo * 2;
+          if (s.type === 'comet') {
+            state.score += basePoints + 3; // awards +3 score
+            state.cloud.wideUntil = Date.now() + STARS_CONFIG.BOOST_DURATION; // widens cloud basket for 6 seconds
+            state.cloud.w = STARS_CONFIG.CLOUD_W_BOOST;
+            state.cloud.isWide = true;
+          } else if (s.type === 'crystal') {
+            state.score += basePoints;
+            if (state.misses > 0) {
+              state.misses--; // Recovers 1 miss (decrements state.misses)
+            }
+          } else {
+            state.score += basePoints;
+          }
+
           state.combo++;
-          spawnParticles(s.x, s.y, s.color);
+          var burstPalette = getComboPalette(state.combo, s.type);
+          spawnParticles(s.x, s.y, burstPalette, state.combo);
           playCatchChime(state.combo);
           state.stars.splice(i, 1);
           updateStatsUI();
@@ -282,7 +424,7 @@
       // Draw active falling stars
       for (var i = 0; i < state.stars.length; i++) {
         var st = state.stars[i];
-        drawStarShape(ctx, st.x, st.y, st.r, st.angle, st.color);
+        drawStarShape(ctx, st.x, st.y, st.r, st.angle, st.color, st.type);
       }
 
       // Draw spark particles
@@ -323,6 +465,9 @@
       state.combo = 0;
       state.stars = [];
       state.particles = [];
+      state.cloud.w = STARS_CONFIG.CLOUD_W;
+      state.cloud.wideUntil = 0;
+      state.cloud.isWide = false;
       state.running = true;
       state.lastSpawn = Date.now();
       updateStatsUI();
@@ -429,19 +574,25 @@
       state: state,
       startGame: startGame,
       pauseGame: pauseGame,
-      triggerGameOver: triggerGameOver
+      triggerGameOver: triggerGameOver,
+      spawnStar: spawnStar,
+      spawnParticles: spawnParticles,
+      update: update,
+      render: render
     };
   }
 
   PIP.stars = {
     init: initStars,
     checkCollision: checkCollision,
+    getComboPalette: getComboPalette,
     CONFIG: STARS_CONFIG
   };
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
       checkCollision: checkCollision,
+      getComboPalette: getComboPalette,
       STARS_CONFIG: STARS_CONFIG,
       initStars: initStars
     };
