@@ -59,6 +59,10 @@
 
   <div class="desk" aria-hidden="true"></div>
 
+  <!-- Full-page Night Flashlight (hidden by default) -->
+  <div id="flashlightOverlay" class="flashlight-overlay" hidden aria-hidden="true" role="none"></div>
+  <div id="flashlightGlow" class="flashlight-glow" hidden aria-hidden="true" role="none"></div>
+
   <header class="taskbar">
     <a class="start" href="#hello"><svg viewBox="0 0 20 20" aria-hidden="true">
         <use href="#star" width="20" height="20" />
@@ -69,6 +73,8 @@
       <a href="#story" data-i18n="nav_story">Story</a>
       <a href="#wall" data-i18n="nav_wall">Wall</a>
     </nav>
+    <div id="taskbarRunning" class="taskbar-running" role="toolbar" aria-label="Running programs"></div>
+    <div id="taskbarMinimized" class="task-minimized" role="region" aria-label="Minimized Windows"></div>
     <div class="task-right">
       <button class="tb-btn" id="soundBtn" type="button" data-silent aria-pressed="false"
         aria-label="Sound off, turn sound on">
@@ -96,11 +102,13 @@
         <span id="contrastLabel">Contrast</span>
       </button>
       <button class="tb-btn" id="quietBtn" type="button" aria-pressed="false" aria-label="Quiet mode off, turn it on">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle class="globe" cx="12" cy="12" r="9" />
-          <path class="globe" d="M8 12h8" />
-        </svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle class="globe" cx="12" cy="12" r="9" /><path class="globe" d="M8 12h8" /></svg>
         <span id="quietLabel">Quiet</span>
+      </button>
+      <button class="tb-btn" id="flashlightBtn" type="button" aria-pressed="false" aria-label="Night flashlight off, turn it on">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6l1.5 5h-9zM8.5 7v13a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2V7zM10 11h4"/></svg>
+        <span id="flashlightLabel">Lantern</span>
+      </button>
       </button>
       <button class="tb-btn" id="themeBtn" type="button" aria-label="Day mode, switch to night mode">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -144,6 +152,8 @@
                 aria-hidden="true">📖</span>Bedtime Story</a></li>
           <li role="none"><a href="#stars" class="start-item" role="menuitem"><span class="start-ic"
                 aria-hidden="true">✨</span>Falling Stars</a></li>
+          <li role="none"><a href="#calc" class="start-item" role="menuitem"><span class="start-ic"
+                aria-hidden="true">🔢</span>Starlight Calc</a></li>
           <li role="none"><a href="#stickers" class="start-item" role="menuitem"><span class="start-ic"
                 aria-hidden="true">⭐</span>Sticker Book</a></li>
         </ul>
@@ -151,14 +161,13 @@
       <div class="start-menu-col">
         <div class="start-col-title">System &amp; Shortcuts</div>
         <ul class="start-menu-list" role="none">
-          <li role="none"><a href="#wall" class="start-item" role="menuitem"><span class="start-ic"
-                aria-hidden="true">📌</span>Wish Wall</a></li>
-          <li role="none"><a href="#about" class="start-item" role="menuitem"><span class="start-ic"
-                aria-hidden="true">📄</span>About Pip</a></li>
-          <li role="none"><a href="#shortcuts" class="start-item" role="menuitem"><span class="start-ic"
-                aria-hidden="true">⌨️</span>Keys Cheat Sheet</a></li>
-          <li role="none"><button type="button" class="start-item" role="menuitem" data-start-act="fullscreen"><span
-                class="start-ic" aria-hidden="true">⛶</span>Toggle Fullscreen</button></li>
+          <li role="none"><a href="#wall" class="start-item" role="menuitem"><span class="start-ic" aria-hidden="true">📌</span>Wish Wall</a></li>
+          <li role="none"><a href="#about" class="start-item" role="menuitem"><span class="start-ic" aria-hidden="true">📄</span>About Pip</a></li>
+          <li role="none"><a href="#shortcuts" class="start-item" role="menuitem"><span class="start-ic" aria-hidden="true">⌨️</span>Keys Cheat Sheet</a></li>
+          <li role="none"><button type="button" class="start-item" role="menuitem" data-start-act="fullscreen"><span class="start-ic" aria-hidden="true">⛶</span>Toggle Fullscreen</button></li>
+          <li role="none"><button type="button" class="start-item" id="resetLayoutBtn" role="menuitem"><span class="start-ic" aria-hidden="true">🔄</span>Reset Layout</button></li>
+          <li role="none"><button type="button" class="start-item" id="hapticsToggleBtn" role="menuitem" aria-pressed="false"><span class="start-ic" aria-hidden="true">📳</span>Toy Haptics: Off</button></li>
+          <li role="none"><span id="hapticsStatus" class="start-status-note" aria-live="polite">Haptics off (opt-in)</span></li>
         </ul>
       </div>
     </div>
@@ -174,8 +183,9 @@
     <a href="#work"><span class="ic ic-box" aria-hidden="true"></span>My Toys</a>
     <a href="#terminal"><span class="ic ic-term" aria-hidden="true"></span>terminal.exe</a>
     <a href="#monitor"><span class="ic ic-gauge" aria-hidden="true"></span>monitor.exe</a>
-
-    <a href="#notes"><span class="ic ic-pad" aria-hidden="true"></span>notes.exe</a>    <a href="#stickers"><span class="ic ic-star" aria-hidden="true"></span>stickers.exe</a>
+    <a href="#notes"><span class="ic ic-pad" aria-hidden="true"></span>notes.exe</a>
+    <a href="#calc"><span class="ic ic-calc" aria-hidden="true"></span>calc.exe</a>
+    <a href="#stickers"><span class="ic ic-star" aria-hidden="true"></span>stickers.exe</a>
     <a href="#story"><span class="ic ic-book" aria-hidden="true"></span>bedtime.exe</a>
     <a href="#wall"><span class="ic ic-pin" aria-hidden="true"></span>wish wall</a>
     <button type="button" id="trashBtn" aria-label="Nightmares trash can"><span class="ic ic-trash"
@@ -200,6 +210,36 @@
           <div class="hero-actions">
             <button class="btn btn-primary" id="sayHi" type="button" data-i18n="hero_say_hi">Say hi to Pip</button>
             <a class="btn" href="#work" data-i18n="hero_see_work">See what Pip made</a>
+            <button class="btn" id="dressupBtn" type="button" aria-expanded="false" aria-controls="dressupPicker" aria-label="Dress up Pip, choose nightcap colours">Dress up Pip</button>
+          </div>
+          <div id="dressupPicker" class="dressup-picker" hidden role="region" aria-label="Pip dress-up palettes">
+            <span class="dressup-title">Nightcap &amp; Bow Palettes:</span>
+            <div class="dressup-options" role="radiogroup" aria-label="Bedtime palettes">
+              <button type="button" class="dressup-opt is-selected" data-palette="classic" role="radio" aria-checked="true" aria-label="Classic Lavender palette">
+                <span class="dressup-swatch" style="background:#8b8fd9;" aria-hidden="true"></span>
+                <span>Lavender</span>
+              </button>
+              <button type="button" class="dressup-opt" data-palette="minty" role="radio" aria-checked="false" aria-label="Mint Meadow palette">
+                <span class="dressup-swatch" style="background:#48bfe3;" aria-hidden="true"></span>
+                <span>Mint</span>
+              </button>
+              <button type="button" class="dressup-opt" data-palette="twilight" role="radio" aria-checked="false" aria-label="Twilight Dusk palette">
+                <span class="dressup-swatch" style="background:#5a4897;" aria-hidden="true"></span>
+                <span>Twilight</span>
+              </button>
+              <button type="button" class="dressup-opt" data-palette="cotton" role="radio" aria-checked="false" aria-label="Cotton Candy palette">
+                <span class="dressup-swatch" style="background:#f78fb3;" aria-hidden="true"></span>
+                <span>Cotton Candy</span>
+              </button>
+              <button type="button" class="dressup-opt" data-palette="starlight" role="radio" aria-checked="false" aria-label="Cosmic Starlight palette">
+                <span class="dressup-swatch" style="background:#7048e8;" aria-hidden="true"></span>
+                <span>Starlight</span>
+              </button>
+              <button type="button" class="dressup-opt" data-palette="autumn" role="radio" aria-checked="false" aria-label="Autumn Ember palette">
+                <span class="dressup-swatch" style="background:#e76f51;" aria-hidden="true"></span>
+                <span>Autumn</span>
+              </button>
+            </div>
           </div>
           <p class="fine" data-i18n="hero_fine">Pip's eyes follow you. Flip the sun and moon switch up top and see what
             happens.</p>
@@ -488,6 +528,21 @@
                 <span id="ambientValue" class="vol-val" aria-hidden="true">50%</span>
               </div>
             </div>
+
+            <!-- Music Box Tune Recorder -->
+            <div class="lab-recorder" id="labRecorder" role="region" aria-label="Music Box Recorder">
+              <div class="rec-controls">
+                <button type="button" class="btn btn-sm" id="recBtn" aria-label="Record lullaby tune" aria-pressed="false">● Record Tune</button>
+                <button type="button" class="btn btn-sm" id="recPlayBtn" disabled aria-label="Play recorded tune">▶ Replay</button>
+                <button type="button" class="btn btn-sm btn-ghost" id="recShareBtn" disabled aria-label="Share recorded tune by link">🔗 Share Link</button>
+                <span id="recStatus" class="rec-status" aria-live="polite">Ready to record</span>
+              </div>
+              <div id="tunePrompt" class="tune-prompt hidden" hidden>
+                <span class="tune-prompt-text">🎵 A shared lullaby tune was loaded!</span>
+                <button type="button" id="tunePlaySharedBtn" class="btn btn-sm btn-primary">Play Shared Tune</button>
+                <button type="button" id="tuneDismissBtn" class="btn btn-sm btn-ghost">Dismiss</button>
+              </div>
+            </div>
           </div>
         </article>
 
@@ -657,6 +712,14 @@
                 <span class="block-combo" id="blockCombo" aria-live="polite" hidden></span>
               </div>
             </div>
+            <div class="block-leaderboard" id="blockLeaderboard">
+            <div class="block-leaderboard" id="blockLeaderboardWrap">
+              <h4 class="lb-title">Top 5 Builders</h4>
+              <ol class="lb-list" id="blockLeaderboard" aria-label="Top 5 stacking heights">
+                <li class="lb-empty">Stack your first tower to join the nursery records!</li>
+              </ol>
+            </div>
+            <div class="block-leaderboard" id="blockLeaderboardSecondary">
             <div class="block-leaderboard" id="blockScores">
               <span class="block-leaderboard-title">Top 5 Scores</span>
               <ol class="block-leaderboard-list" id="blockLeaderboardList" aria-label="Top 5 stacking heights">
@@ -954,8 +1017,7 @@
             <div class="row row-between book-bar">
               <div class="book-nav">
                 <button class="btn" id="bookPrev" type="button" aria-label="Previous storybook page">← Back</button>
-                <button class="btn btn-primary" id="bookNext" type="button" aria-label="Next storybook page">Next
-                  →</button>
+                <button class="btn btn-primary" id="bookNext" type="button" aria-label="Next storybook page">Next →</button>
               </div>
 
               <!-- Added speech narration controls -->
@@ -964,6 +1026,13 @@
                 <button class="btn" id="storyPauseBtn" type="button" aria-label="Pause narration" hidden>⏸ Pause</button>
                 <button class="btn" id="storyStopBtn" type="button" aria-label="Stop narration" hidden>⏹ Stop</button>
               </div>
+
+            <!-- Added speech narration controls -->
+            <div class="book-speech" role="group" aria-label="Story narration controls">
+              <button class="btn" id="storySpeechBtn" type="button" aria-label="Read this scene aloud">🔊 Read</button>
+              <button class="btn" id="storyPauseBtn" type="button" aria-label="Pause narration" hidden>⏸ Pause</button>
+              <button class="btn" id="storyStopBtn" type="button" aria-label="Stop narration" hidden>⏹ Stop</button>
+            </div>
               <p class="score" id="bookInd" aria-live="polite" aria-atomic="true">Page 1 of 6</p>
             </div>
           </div>
@@ -987,12 +1056,18 @@
               </div>
             </div>
             <div class="stars-canvas-wrap">
+              <canvas id="starsCanvas" width="300" height="380" aria-label="Catch the Falling Stars canvas game"
+                tabindex="0"></canvas>
               <canvas id="starsCanvas" width="300" height="380" aria-label="Catch the Falling Stars canvas game" tabindex="0"></canvas>
               <div id="starsGameOver" class="stars-overlay hidden" hidden>
                 <div class="stars-modal">
                   <div class="stars-modal-icon" aria-hidden="true">🌙</div>
                   <h4 class="stars-modal-title">Dawn has arrived</h4>
                   <p class="stars-modal-msg">Pip's cloud gathered <span id="starsFinalScore">0</span> starlight dreams.</p>
+                  <button type="button" id="starsRestartBtn" class="btn btn-sm" tabindex="-1">Sleep Again</button>
+                  <p class="stars-modal-msg">Pip's cloud gathered <span id="starsFinalScore">0</span> starlight dreams.
+                  </p>
+                  <button type="button" id="starsRestartBtn" class="btn btn-sm">Sleep Again</button>
                 </div>
               </div>
             </div>
@@ -1432,6 +1507,80 @@
           </div>
         </article>
 
+        <!-- Starlight Scientific Calculator -->
+        <article id="calc" class="win w-calc" data-foldable aria-labelledby="calcTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="calcTitle">starlight-calc.exe</h3>
+            <button type="button" class="btn btn-tiny calc-mute-btn" id="calcMuteBtn" aria-label="Toggle calculator chimes">🔔 Chimes</button>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's nursery math machine. Standard arithmetic, scientific trigonometry, logarithms, bracket expressions, and musical pentatonic chimes.</p>
+            </div>
+            <div class="calc-wrap">
+              <div class="calc-screen" aria-live="polite">
+                <div class="calc-expr-row">
+                  <span id="calcMemFlag" class="calc-mem-flag" aria-hidden="true">M</span>
+                  <span id="calcExpr" class="calc-expr"></span>
+                </div>
+                <div id="calcDisplay" class="calc-display" role="status">0</div>
+              </div>
+
+              <div class="calc-top-row">
+                <button type="button" class="btn btn-tiny" id="calcAngleMode" data-act="mode">DEG</button>
+                <button type="button" class="btn btn-tiny" id="calcSheepBtn" data-act="sheep" aria-label="Count sleepy sheep">🐑 Count Sheep</button>
+              </div>
+
+              <div class="calc-grid" id="calcKeys">
+                <!-- Memory & Parentheses row -->
+                <button type="button" class="calc-btn is-mem" data-act="mem" data-val="MC">MC</button>
+                <button type="button" class="calc-btn is-mem" data-act="mem" data-val="MR">MR</button>
+                <button type="button" class="calc-btn is-mem" data-act="mem" data-val="M+">M+</button>
+                <button type="button" class="calc-btn is-mem" data-act="mem" data-val="M-">M-</button>
+                <button type="button" class="calc-btn is-warn" data-act="clear">AC</button>
+
+                <!-- Sci Row 1 & Brackets -->
+                <button type="button" class="calc-btn is-sci" data-act="paren" data-val="(">(</button>
+                <button type="button" class="calc-btn is-sci" data-act="paren" data-val=")">)</button>
+                <button type="button" class="calc-btn is-sci" data-act="sci" data-val="sin">sin</button>
+                <button type="button" class="calc-btn is-sci" data-act="sci" data-val="cos">cos</button>
+                <button type="button" class="calc-btn is-sci" data-act="sci" data-val="tan">tan</button>
+
+                <!-- Sci Row 2 -->
+                <button type="button" class="calc-btn is-sci" data-act="sci" data-val="sqrt">√</button>
+                <button type="button" class="calc-btn is-sci" data-act="sci" data-val="log">log</button>
+                <button type="button" class="calc-btn is-sci" data-act="sci" data-val="ln">ln</button>
+                <button type="button" class="calc-btn is-sci" data-act="sci" data-val="fact">n!</button>
+                <button type="button" class="calc-btn is-op" data-act="op" data-val="^">xʸ</button>
+
+                <!-- Numbers & Ops -->
+                <button type="button" class="calc-btn is-num" data-act="num" data-val="7">7</button>
+                <button type="button" class="calc-btn is-num" data-act="num" data-val="8">8</button>
+                <button type="button" class="calc-btn is-num" data-act="num" data-val="9">9</button>
+                <button type="button" class="calc-btn is-op" data-act="op" data-val="÷">÷</button>
+                <button type="button" class="calc-btn is-act" data-act="back">⌫</button>
+
+                <button type="button" class="calc-btn is-num" data-act="num" data-val="4">4</button>
+                <button type="button" class="calc-btn is-num" data-act="num" data-val="5">5</button>
+                <button type="button" class="calc-btn is-num" data-act="num" data-val="6">6</button>
+                <button type="button" class="calc-btn is-op" data-act="op" data-val="×">×</button>
+                <button type="button" class="calc-btn is-op" data-act="op" data-val="%">%</button>
+
+                <button type="button" class="calc-btn is-num" data-act="num" data-val="1">1</button>
+                <button type="button" class="calc-btn is-num" data-act="num" data-val="2">2</button>
+                <button type="button" class="calc-btn is-num" data-act="num" data-val="3">3</button>
+                <button type="button" class="calc-btn is-op" data-act="op" data-val="-">−</button>
+                <button type="button" class="calc-btn is-sci" data-act="sci" data-val="neg">±</button>
+
+                <button type="button" class="calc-btn is-num" data-act="num" data-val="0">0</button>
+                <button type="button" class="calc-btn is-num" data-act="dot">.</button>
+                <button type="button" class="calc-btn is-sci" data-act="sci" data-val="abs">|x|</button>
+                <button type="button" class="calc-btn is-op" data-act="op" data-val="+">+</button>
+                <button type="button" class="calc-btn is-eq" data-act="eq">=</button>
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -1701,10 +1850,21 @@
     </div>
   </dialog>
 
+  <canvas id="pipFxCanvas" class="pip-fx-canvas" aria-hidden="true"></canvas>
+  <!-- Alt+Tab Task Switcher Modal -->
+  <div id="taskSwitcherModal" class="task-switcher-modal" hidden role="region" aria-label="Application Task Switcher">
+    <div class="task-switcher-head">
+      <span class="switcher-head-title">PipOS Task Switcher (Alt+Tab)</span>
+    </div>
+    <div id="taskSwitcherList" class="switcher-list" role="listbox" aria-label="Running processes"></div>
+  </div>
+
   <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <script src="js/util.js" defer></script>
+  <script src="js/security.js" defer></script>
+  <script src="js/vault.js" defer></script>
   <script src="js/audio.js" defer></script>
   <script src="js/wall.js" defer></script>
   <script src="js/fx.js" defer></script>
@@ -1713,12 +1873,21 @@
   <script src="js/pip.js" defer></script>
   <script src="js/toys.js" defer></script>
   <script src="js/rattle.js" defer></script>
+  <script src="js/vfs.js" defer></script>
+  <script src="js/recorder.js" defer></script>
   <script src="js/terminal.js" defer></script>
   <script src="js/stars.js" defer></script>
   <script src="js/taskbar.js" defer></script>
+  <script src="js/task-switcher.js" defer></script>
   <script src="js/monitor.js" defer></script>
   <script src="js/notes.js" defer></script>
   <script src="js/synth.js" defer></script>
+  <script src="js/window-manager.js" defer></script>
+  <script src="js/calc.js" defer></script>
+  <script src="js/dressup.js" defer></script>
+  <script src="js/flashlight.js" defer></script>
+  <script src="js/drag.js" defer></script>
+  <script src="js/haptics.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 

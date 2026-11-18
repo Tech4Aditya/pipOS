@@ -637,6 +637,9 @@
   /* =====================================================================
      3. RATTLE & BLOCKS (stacker)
      ===================================================================== */
+  var blocksRenderLeaderboard = null;
+  var blocksSyncBest = null;
+
   function initBlocks() {
     var cv = $('#blockCanvas'), btn = $('#blockDrop'), scoreEl = $('#blockScore');
     var leaderboardListEl = $('#blockLeaderboardList'), comboEl = $('#blockCombo');
@@ -743,6 +746,13 @@
     });
     syncUI();
     renderLeaderboard();
+    blocksRenderLeaderboard = renderLeaderboard;
+    blocksSyncBest = function (newBest) {
+      if (newBest > best) {
+        best = newBest;
+        hud();
+      }
+    };
 
     function rr(x, y, w, h, rad) {
       rad = Math.min(rad, w / 2, h / 2);
@@ -867,8 +877,30 @@ var col = theme.pal[idx % theme.pal.length];
       ctx.clearRect(0, 0, W, H);
           if (theme.bg) { ctx.fillStyle = theme.bg; ctx.fillRect(0, 0, W, H); }
       // floor
-     ctx.fillStyle = theme.floor;
+      ctx.fillStyle = theme.floor;
       ctx.fillRect(0, H - 10 + st.cam, W, 10 + 400);
+
+      // Subtle dotted horizontal "Record Height" marker (bestMarker)
+      if (best > 0) {
+        var bestMarker = levelY(best) + st.cam;
+        if (bestMarker >= -20 && bestMarker <= H + 20) {
+          ctx.save();
+          ctx.setLineDash([4, 4]);
+          ctx.strokeStyle = theme.dark ? 'rgba(255, 215, 0, 0.45)' : 'rgba(92, 64, 51, 0.4)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(8, bestMarker);
+          ctx.lineTo(W - 8, bestMarker);
+          ctx.stroke();
+
+          ctx.fillStyle = theme.dark ? 'rgba(255, 215, 0, 0.85)' : 'rgba(92, 64, 51, 0.8)';
+          ctx.font = '500 11px Fredoka, system-ui, sans-serif';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText('Record Height: ' + best, W - 12, bestMarker - 3);
+          ctx.restore();
+        }
+      }
       st.stack.forEach(function (b, i) { block(b, levelY(i) + st.cam, i); });
       st.chips.forEach(function (p) { block(p, p.y + st.cam, p.i, 0.9); });
       if (st.cur) block(st.cur, levelY(st.cur.i) + st.cam, st.cur.i);
@@ -1309,10 +1341,113 @@ var col = theme.pal[idx % theme.pal.length];
     return Math.pow(1.08, Math.min(combo - 1, 8));
   }
 
+  function getBestMarkerY(best, cam) {
+    var H = 420, BH = 28;
+    return (H - 10 - (best + 1) * BH) + (cam || 0);
+  }
+
+  function getPIP() {
+    if (typeof window !== 'undefined' && window.PIP) return window.PIP;
+    if (typeof global !== 'undefined' && global.PIP) return global.PIP;
+    return PIP;
+  }
+
+  function getStore() {
+    var p = getPIP();
+    return (p && p.store) ? p.store : store;
+  }
+
+  function exportScores() {
+    var curStore = getStore();
+    var topScores = [];
+    try {
+      var raw = curStore.get('blockTopScores', '[]');
+      var parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        topScores = parsed.filter(function (s) { return typeof s === 'number' && !isNaN(s) && s > 0; })
+                          .sort(function (a, b) { return b - a; })
+                          .slice(0, 5);
+      }
+    } catch (e) {}
+
+    var best = parseInt(curStore.get('best', '0'), 10) || 0;
+    var mode = curStore.get('blockMode', 'normal') || 'normal';
+
+    var payload = {
+      game: 'rattle-and-blocks',
+      version: '1.0',
+      best: best,
+      mode: mode,
+      topScores: topScores,
+      exportedAt: new Date().toISOString()
+    };
+    return JSON.stringify(payload, null, 2);
+  }
+
+  function importScores(json) {
+    var curStore = getStore();
+    var data = json;
+    if (typeof json === 'string') {
+      try {
+        data = JSON.parse(json);
+      } catch (e) {
+        return false;
+      }
+    }
+    if (!data || typeof data !== 'object') return false;
+
+    var list = [];
+    if (Array.isArray(data)) {
+      list = data;
+    } else if (Array.isArray(data.topScores)) {
+      list = data.topScores;
+    } else if (Array.isArray(data.scores)) {
+      list = data.scores;
+    }
+
+    var validScores = list.map(function (val) {
+      if (typeof val === 'number') return val;
+      if (val && typeof val === 'object' && typeof val.score === 'number') return val.score;
+      return parseInt(val, 10);
+    }).filter(function (s) {
+      return typeof s === 'number' && !isNaN(s) && s > 0;
+    }).sort(function (a, b) {
+      return b - a;
+    }).slice(0, 5);
+
+    curStore.set('blockTopScores', JSON.stringify(validScores));
+
+    var importedBest = 0;
+    if (typeof data.best === 'number' && !isNaN(data.best) && data.best > 0) {
+      importedBest = data.best;
+    } else if (validScores.length > 0) {
+      importedBest = validScores[0];
+    }
+
+    if (importedBest > 0) {
+      var curBest = parseInt(curStore.get('best', '0'), 10) || 0;
+      if (importedBest > curBest) {
+        curStore.set('best', importedBest);
+      }
+    }
+
+    if (typeof blocksRenderLeaderboard === 'function') {
+      blocksRenderLeaderboard(validScores);
+    }
+    if (typeof blocksSyncBest === 'function' && importedBest > 0) {
+      blocksSyncBest(importedBest);
+    }
+
+    return true;
+  }
+
   PIP.toys = {
     HOUSE_STORIES: HOUSE_STORIES,
     updateLeaderboardList: updateLeaderboardList,
     getComboPitchMultiplier: getComboPitchMultiplier,
+    getBestMarkerY: getBestMarkerY,
+    exportScores: exportScores,
+    importScores: importScores,
     init: function () {
       initLab();
       initLights();
@@ -1327,7 +1462,10 @@ var col = theme.pal[idx % theme.pal.length];
     module.exports = {
       HOUSE_STORIES: HOUSE_STORIES,
       updateLeaderboardList: updateLeaderboardList,
-      getComboPitchMultiplier: getComboPitchMultiplier
+      getComboPitchMultiplier: getComboPitchMultiplier,
+      getBestMarkerY: getBestMarkerY,
+      exportScores: exportScores,
+      importScores: importScores
     };
   }
 })();

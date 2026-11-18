@@ -19,7 +19,12 @@ const globals = {
   module: 'readonly',
   __dirname: 'readonly',
   process: 'readonly',
-  globalThis: 'readonly'
+  globalThis: 'readonly',
+  global: 'readonly',
+  fetch: 'readonly',
+  AbortController: 'readonly',
+  IntersectionObserver: 'readonly',
+  SpeechSynthesisUtterance: 'readonly'
 };
 
 module.exports = [
