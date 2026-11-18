@@ -198,6 +198,13 @@
       var bar = $('.win-bar', win), body = $('.win-body', win), title = $('.win-title', win);
       if (!bar || !body) return;
       if (!body.id) body.id = 'winbody' + n;
+
+      win.addEventListener('pointerdown', function () { bringToFront(win); });
+      win.addEventListener('focusin', function () { bringToFront(win); });
+
+      var titleText = title ? title.textContent.trim() : 'window ' + n;
+      var minId = 'tb-min-' + (win.id || n);
+
       var b = $('.win-btn', bar);
       if (!b) {
         b = document.createElement('button');
@@ -207,18 +214,6 @@
         b.setAttribute('data-silent', '');
         bar.appendChild(b);
       }
-
-      win.addEventListener('pointerdown', function () { bringToFront(win); });
-      win.addEventListener('focusin', function () { bringToFront(win); });
-
-      var titleText = title ? title.textContent.trim() : 'window ' + n;
-      var minId = 'tb-min-' + (win.id || n);
-
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'win-btn';
-      b.setAttribute('aria-controls', body.id);
-      b.setAttribute('data-silent', '');
 
       function updateTaskbarDock(open) {
         if (!minDock) return;
@@ -285,15 +280,6 @@
         }
       });
 
-      b.addEventListener('click', function () {
-        body.hidden = !body.hidden;
-        paint();
-        if (!body.hidden) {
-          bringToFront(win);
-        }
-      });
-
-      bar.appendChild(b);
       paint();
     });
   }

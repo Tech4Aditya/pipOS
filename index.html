@@ -64,7 +64,7 @@
   <div id="flashlightGlow" class="flashlight-glow" hidden aria-hidden="true" role="none"></div>
 
   <header class="taskbar">
-    <a class="start" href="#hello"><svg viewBox="0 0 20 20" aria-hidden="true">
+    <a class="start" href="#hello" aria-label="Pip OS Start Menu"><svg viewBox="0 0 20 20" aria-hidden="true">
         <use href="#star" width="20" height="20" />
       </svg><span>Pip OS</span></a>
     <nav class="task-nav" aria-label="Sections">
@@ -532,9 +532,9 @@
             <!-- Music Box Tune Recorder -->
             <div class="lab-recorder" id="labRecorder" role="region" aria-label="Music Box Recorder">
               <div class="rec-controls">
-                <button type="button" class="btn btn-sm" id="recBtn" aria-label="Record lullaby tune" aria-pressed="false">● Record Tune</button>
-                <button type="button" class="btn btn-sm" id="recPlayBtn" disabled aria-label="Play recorded tune">▶ Replay</button>
-                <button type="button" class="btn btn-sm btn-ghost" id="recShareBtn" disabled aria-label="Share recorded tune by link">🔗 Share Link</button>
+                <button type="button" class="btn btn-sm" id="recBtn" aria-label="Record Tune" aria-pressed="false">● Record Tune</button>
+                <button type="button" class="btn btn-sm" id="recPlayBtn" disabled aria-label="Replay recorded tune">▶ Replay</button>
+                <button type="button" class="btn btn-sm btn-ghost" id="recShareBtn" disabled aria-label="Share Link">🔗 Share Link</button>
                 <span id="recStatus" class="rec-status" aria-live="polite">Ready to record</span>
               </div>
               <div id="tunePrompt" class="tune-prompt hidden" hidden>
@@ -1139,8 +1139,7 @@
               </div>
               <div class="sticker-actions">
                 <p class="score" id="stickerCount" aria-live="polite" aria-atomic="true">0 of 5 stickers collected</p>
-                <button class="btn" id="resetStickersBtn" type="button" aria-label="Reset all collected stickers">Reset
-                  stickers</button>
+                <button class="btn" id="resetStickersBtn" type="button" aria-label="Reset stickers">Reset stickers</button>
               </div>
             </div>
 
@@ -1345,7 +1344,7 @@
                   <span class="mon-card-val" id="monFpsVal">60 FPS (16.6ms)</span>
                 </div>
                 <div class="mon-bar-wrap">
-                  <div class="mon-bar-fill" id="monFpsBar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="60"
+                  <div class="mon-bar-fill" id="monFpsBar" role="progressbar" aria-label="Slumber Cadence FPS" aria-valuenow="60" aria-valuemin="0" aria-valuemax="60"
                     style="width: 100%;"></div>
                 </div>
                 <svg id="monSparkline" class="mon-sparkline" viewBox="0 0 180 36"
@@ -1361,7 +1360,7 @@
                   <span class="mon-card-val" id="monMemVal">28.4 MB / 64.0 MB (44%)</span>
                 </div>
                 <div class="mon-bar-wrap">
-                  <div class="mon-bar-fill" id="monMemBar" aria-valuenow="44" aria-valuemin="0" aria-valuemax="100"
+                  <div class="mon-bar-fill" id="monMemBar" role="progressbar" aria-label="Dream Memory Heap" aria-valuenow="44" aria-valuemin="0" aria-valuemax="100"
                     style="width: 44%;"></div>
                 </div>
                 <div class="mon-card-actions">
@@ -1376,7 +1375,7 @@
                   <span class="mon-card-val" id="monBatteryVal">100% ⚡ (Starlight AC)</span>
                 </div>
                 <div class="mon-bar-wrap">
-                  <div class="mon-bar-fill is-battery" id="monBatteryBar" aria-valuenow="100" aria-valuemin="0"
+                  <div class="mon-bar-fill is-battery" id="monBatteryBar" role="progressbar" aria-label="Starlight Battery Power" aria-valuenow="100" aria-valuemin="0"
                     aria-valuemax="100" style="width: 100%;"></div>
                 </div>
                 <div class="mon-card-note">Celestial power grid stable</div>
@@ -1484,7 +1483,7 @@
                 <span>D5</span>
                 <span>C5</span>
               </div>
-              <div id="synthGrid" class="synth-grid" role="grid" aria-label="Lullaby sequencer 8-step grid"></div>
+              <div id="synthGrid" class="synth-grid" role="region" aria-label="Lullaby sequencer 8-step grid"></div>
             </div>
           </div>
         </article>
@@ -1538,7 +1537,7 @@
 
               <div class="calc-top-row">
                 <button type="button" class="btn btn-tiny" id="calcAngleMode" data-act="mode">DEG</button>
-                <button type="button" class="btn btn-tiny" id="calcSheepBtn" data-act="sheep" aria-label="Count sleepy sheep">🐑 Count Sheep</button>
+                <button type="button" class="btn btn-tiny" id="calcSheepBtn" data-act="sheep" aria-label="Count Sheep">🐑 Count Sheep</button>
               </div>
 
               <div class="calc-grid" id="calcKeys">
@@ -1914,12 +1913,12 @@
     </div>
   </div>
   <!-- Desktop Right-Click Context Menu -->
-  <menu id="desktopContextMenu" class="desktop-context-menu" hidden role="menu" aria-label="Desktop Context Menu" tabindex="-1">
-    <li role="none"><button type="button" id="cmArrange" class="cm-item" role="menuitem">📐 Arrange Icons to Grid</button></li>
-    <li role="none"><button type="button" id="cmTheme" class="cm-item" role="menuitem">🌓 Toggle Day/Night Theme</button></li>
-    <li role="none"><button type="button" id="cmTerminal" class="cm-item" role="menuitem">💻 Open Terminal</button></li>
-    <li role="none"><button type="button" id="cmSound" class="cm-item" role="menuitem">🎵 Mute/Unmute Sounds</button></li>
-  </menu>
+  <div id="desktopContextMenu" class="desktop-context-menu" hidden role="menu" aria-label="Desktop Context Menu" tabindex="-1">
+    <button type="button" id="cmArrange" class="cm-item" role="menuitem">📐 Arrange Icons to Grid</button>
+    <button type="button" id="cmTheme" class="cm-item" role="menuitem">🌓 Toggle Day/Night Theme</button>
+    <button type="button" id="cmTerminal" class="cm-item" role="menuitem">💻 Open Terminal</button>
+    <button type="button" id="cmSound" class="cm-item" role="menuitem">🎵 Mute/Unmute Sounds</button>
+  </div>
   <canvas id="pipFxCanvas" class="pip-fx-canvas" aria-hidden="true"></canvas>
   <!-- Alt+Tab Task Switcher Modal -->
   <div id="taskSwitcherModal" class="task-switcher-modal" hidden role="region" aria-label="Application Task Switcher">

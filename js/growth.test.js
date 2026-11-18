@@ -30,8 +30,9 @@ test('growth chart defines 5 milestones with accessible progress bars', () => {
   assert.match(html, /Dream delivery route/);
   assert.match(html, /Junior Dream Engineer/);
 
-  // Verify accessible progress bars
-  const progressBars = html.match(/role=["']progressbar["']/g);
+  // Verify accessible progress bars in growth chart
+  const progressBars = html.match(/class=["']growth-bar["'][^>]*role=["']progressbar["']/g) ||
+                       html.match(/role=["']progressbar["'][^>]*class=["']growth-bar["']/g);
   assert.ok(progressBars, 'Progress bars must exist');
   assert.strictEqual(progressBars.length, 5, 'Every milestone must have an accessible progress bar');
 });
