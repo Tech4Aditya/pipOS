@@ -61,3 +61,17 @@ test('css/style.css defines responsive grid and reduced-motion overrides for sto
   assert.match(css, /prefers-reduced-motion:\s*reduce[\s\S]*\.book-page/,
     'Reduced motion media query must override .book-page transition');
 });
+
+test('js/toys.js guards speech synthesis interactions and handles utterance errors (Fixes #227)', () => {
+  const toysSrc = fs.readFileSync(TOYS_JS_PATH, 'utf8');
+
+  // Must guard stopSpeech with speechSynthesis check
+  assert.match(toysSrc, /if\s*\(\s*['"]speechSynthesis['"]\s+in\s+window\s*&&\s*window\.speechSynthesis\s*\)\s*window\.speechSynthesis\.cancel\(\)/,
+    'stopSpeech must guard speechSynthesis in window before cancelling');
+
+  // Must handle utterance error event
+  assert.match(toysSrc, /utterance\.onerror\s*=/, 'utterance must handle onerror event');
+
+  // Must guard pauseBtn listener with speechSynthesis check
+  assert.match(toysSrc, /pauseBtn[\s\S]*!window\.speechSynthesis\s*\)\s*return/, 'pauseBtn must guard against missing window.speechSynthesis');
+});
