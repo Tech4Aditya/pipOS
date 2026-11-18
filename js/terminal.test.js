@@ -303,3 +303,101 @@ test('initTerminal handles Tab and Shift-Tab cycling in-place and updates cursor
     delete global.document;
   }
 });
+
+test('ArrowUp and ArrowDown navigate cmdHistory with pending buffer restoration and cursor positioning', () => {
+  const term = require(TERM_JS_PATH);
+  term.setHistory(['whoami', 'theme night', 'calc 42 * 2']);
+
+  let keydownHandler = null;
+  let selectionEnd = null;
+  const mockInput = {
+    value: '',
+    focus() {},
+    setSelectionRange(start, end) { selectionEnd = end; },
+    addEventListener(evt, fn) {
+      if (evt === 'keydown') keydownHandler = fn;
+    }
+  };
+  const mockScreen = {
+    appendChild() {},
+    scrollTop: 0,
+    scrollHeight: 100,
+    parentElement: { addEventListener() {} }
+  };
+  const mockWin = {
+    parentElement: { addEventListener() {} }
+  };
+  const mockGhost = { innerHTML: '' };
+  const mockSuggestions = {
+    innerHTML: '',
+    classList: { add() {}, remove() {} },
+    appendChild() {}
+  };
+
+  const mockDoc = {
+    readyState: 'complete',
+    getElementById(id) {
+      if (id === 'terminal') return mockWin;
+      if (id === 'termScreen') return mockScreen;
+      if (id === 'termInput') return mockInput;
+      if (id === 'termGhost') return mockGhost;
+      if (id === 'termSuggestions') return mockSuggestions;
+      return null;
+    },
+    querySelector(sel) {
+      return this.getElementById(sel.replace('#', ''));
+    },
+    querySelectorAll() { return []; },
+    createElement() {
+      return {
+        className: '',
+        textContent: '',
+        setAttribute() {},
+        appendChild() {},
+        addEventListener() {}
+      };
+    }
+  };
+
+  global.document = mockDoc;
+  try {
+    term.init();
+    assert.strictEqual(typeof keydownHandler, 'function');
+
+    // User types pending text
+    mockInput.value = 'my unfinished input';
+
+    // 1. ArrowUp -> should save pending input and recall newest command ('calc 42 * 2')
+    keydownHandler({ key: 'ArrowUp', preventDefault() {} });
+    assert.strictEqual(mockInput.value, 'calc 42 * 2');
+    assert.strictEqual(selectionEnd, 'calc 42 * 2'.length);
+
+    // 2. ArrowUp -> recall previous command ('theme night')
+    keydownHandler({ key: 'ArrowUp', preventDefault() {} });
+    assert.strictEqual(mockInput.value, 'theme night');
+    assert.strictEqual(selectionEnd, 'theme night'.length);
+
+    // 3. ArrowUp -> recall oldest command ('whoami')
+    keydownHandler({ key: 'ArrowUp', preventDefault() {} });
+    assert.strictEqual(mockInput.value, 'whoami');
+
+    // 4. ArrowUp at boundary -> stays at oldest command
+    keydownHandler({ key: 'ArrowUp', preventDefault() {} });
+    assert.strictEqual(mockInput.value, 'whoami');
+
+    // 5. ArrowDown -> cycle forward to 'theme night'
+    keydownHandler({ key: 'ArrowDown', preventDefault() {} });
+    assert.strictEqual(mockInput.value, 'theme night');
+
+    // 6. ArrowDown -> cycle forward to 'calc 42 * 2'
+    keydownHandler({ key: 'ArrowDown', preventDefault() {} });
+    assert.strictEqual(mockInput.value, 'calc 42 * 2');
+
+    // 7. ArrowDown past newest command -> restore pending buffer
+    keydownHandler({ key: 'ArrowDown', preventDefault() {} });
+    assert.strictEqual(mockInput.value, 'my unfinished input');
+    assert.strictEqual(selectionEnd, 'my unfinished input'.length);
+  } finally {
+    delete global.document;
+  }
+});
