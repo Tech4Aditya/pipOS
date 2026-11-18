@@ -160,3 +160,34 @@ test('css/style.css defines styling for retro calculator and LCD display', () =>
   assert.match(css, /\.calc-grid/, 'Must define .calc-grid layout');
   assert.match(css, /\.calc-btn/, 'Must define .calc-btn styles');
 });
+
+test('multi-term decimal input operates correctly without blocking trailing terms (Fixes #224)', () => {
+  const calc = require(CALC_JS_PATH);
+
+  // 12.5 + 3.5 = 16
+  calc.clearAll();
+  calc.inputDigit(1);
+  calc.inputDigit(2);
+  calc.inputDecimal();
+  calc.inputDigit(5);
+  assert.strictEqual(calc.getState().display, '12.5');
+
+  calc.inputOperator('+');
+  calc.inputDigit(3);
+  calc.inputDecimal(); // must NOT be blocked!
+  calc.inputDigit(5);
+  assert.strictEqual(calc.getState().display, '3.5');
+
+  calc.calculate();
+  assert.strictEqual(calc.getState().display, '16');
+
+  // Multi-term within bracket expressions e.g. (1.5 * 2.5)
+  calc.clearAll();
+  calc.inputBracket('(');
+  calc.inputDigit(1);
+  calc.inputDecimal();
+  calc.inputDigit(5);
+  assert.strictEqual(calc.getState().display, '(1.5');
+  calc.inputDecimal(); // Duplicate decimal on same token must be ignored
+  assert.strictEqual(calc.getState().display, '(1.5');
+});

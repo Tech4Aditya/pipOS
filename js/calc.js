@@ -240,8 +240,14 @@
     if (state.resetNext || state.display === 'Error') {
       state.display = '0.';
       state.resetNext = false;
-    } else if (state.display.indexOf('.') === -1) {
-      state.display += '.';
+    } else {
+      var match = state.display.match(/(\d*\.?\d*)$/);
+      var currentToken = match ? match[1] : '';
+      if (!currentToken && /[+\-×÷%^(]\s*$/.test(state.display)) {
+        state.display += '0.';
+      } else if (currentToken.indexOf('.') === -1) {
+        state.display += '.';
+      }
     }
     render();
   }
