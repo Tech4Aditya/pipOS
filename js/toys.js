@@ -15,7 +15,27 @@
      ===================================================================== */
   function initLab() {
     var keysEl = $('#keys'), stage = $('#mbStage'), wind = $('#windBtn'), endless = $('#endlessBtn');
+    var chordBtn = $('#chordModeBtn');
     if (!keysEl || !stage || !wind || !endless) return;
+
+    var chordActive = store.get('chord_mode', '') === 'on';
+
+    function setChordMode(active) {
+      chordActive = !!active;
+      store.set('chord_mode', chordActive ? 'on' : 'off');
+      if (chordBtn) {
+        chordBtn.setAttribute('aria-pressed', chordActive ? 'true' : 'false');
+        chordBtn.setAttribute('aria-label', chordActive ? 'Chord harmony mode on, turn it off' : 'Chord harmony mode off, turn it on');
+        chordBtn.classList.toggle('is-on', chordActive);
+      }
+    }
+
+    if (chordBtn) {
+      setChordMode(chordActive);
+      chordBtn.addEventListener('click', function () {
+        setChordMode(!chordActive);
+      });
+    }
 
     var NAMES = ['C', 'D', 'E', 'G', 'A', 'high C', 'high D', 'high E'];
     var PAL = ['#ff9fb4', '#ffd27a', '#9fd8c4', '#9ab8f0', '#d3a8f2', '#ffb08a', '#8fd3e8', '#c7e58a'];
@@ -52,12 +72,16 @@
     function press(i) {
       flash(i);
       if (audio.request()) {
-        audio.note(audio.SCALE[i], {
+        var f = audio.SCALE[i];
+        audio.note(f, {
           dur: 1.6,
           gain: 0.24,
           adsr: { a: 0.005, d: 0.15, s: 0.25, r: 0.9 },
           bell: true
         });
+        if (chordActive) {
+          audio.note(f * 1.25, { dur: 1.2, gain: 0.1, when: 0.05 });
+        }
       }
     }
 
@@ -1695,6 +1719,7 @@
     importScores: importScores,
     updateRouteTrail: updateRouteTrail,
     renderRouteTrail: renderRouteTrail,
+    initLab: initLab,
     init: function () {
       initLab();
       initLights();
@@ -1714,7 +1739,8 @@
       exportScores: exportScores,
       importScores: importScores,
       updateRouteTrail: updateRouteTrail,
-      renderRouteTrail: renderRouteTrail
+      renderRouteTrail: renderRouteTrail,
+      initLab: initLab
     };
   }
 })();
