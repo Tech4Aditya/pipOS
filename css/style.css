@@ -2990,3 +2990,131 @@ dialog.secret::backdrop { background: rgba(40, 24, 40, 0.55); }
 [data-theme="night"] .notes-status.is-saved {
   color: #5ce68b;
 }
+
+/* ==========================================================================
+   Starlight Synthesizer (pip-synth.exe)
+   ========================================================================== */
+.w-synth {
+  grid-column: span 12;
+}
+
+.synth-controls {
+  margin: 12px 0 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.synth-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.synth-settings {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-family: var(--f-sans, sans-serif);
+}
+
+.synth-label {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.synth-slider {
+  width: 100px;
+  cursor: pointer;
+}
+
+.synth-select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line, #ccc);
+  background: var(--paper, #fff);
+  color: var(--ink);
+  font-family: inherit;
+}
+
+.synth-grid-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
+}
+
+[data-theme="night"] .synth-grid-container {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.synth-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 220px;
+  font-family: var(--f-mono, monospace);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink);
+  opacity: 0.8;
+  padding-right: 4px;
+}
+
+.synth-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  flex: 1;
+}
+
+.synth-step-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.02);
+  transition: background 0.1s ease;
+}
+
+.synth-step-col.is-active-step {
+  background: rgba(243, 181, 98, 0.25);
+  box-shadow: 0 0 8px rgba(243, 181, 98, 0.4);
+}
+
+.synth-cell {
+  height: 38px;
+  border-radius: 6px;
+  background: var(--paper, #fff);
+  border: 1px solid var(--line, #ddd);
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.synth-cell:hover {
+  border-color: var(--gold, #f3b562);
+  transform: scale(1.05);
+}
+
+.synth-cell.is-on {
+  background: var(--gold, #f3b562);
+  border-color: #d89643;
+  box-shadow: 0 0 10px rgba(243, 181, 98, 0.6);
+}
+
+[data-theme="night"] .synth-cell {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="night"] .synth-cell.is-on {
+  background: var(--gold, #f3b562);
+  box-shadow: 0 0 14px rgba(243, 181, 98, 0.8);
+}
+
