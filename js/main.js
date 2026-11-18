@@ -140,6 +140,52 @@
       apply();
     });
   }
+
+  /* ---------- CRT scanline & phosphor bloom mode ---------- */
+  function initCrt() {
+    var crtBtn = $('#crtBtn');
+    var isCrt = store.get('crt_mode', '') === 'on' || store.get('crt_mode', false) === true;
+
+    function applyCrt(active) {
+      isCrt = !!active;
+      store.set('crt_mode', isCrt ? 'on' : 'off');
+      if (typeof document !== 'undefined' && document.body) {
+        document.body.classList.toggle('crt-active', isCrt);
+      }
+      if (crtBtn) {
+        crtBtn.setAttribute('aria-pressed', isCrt ? 'true' : 'false');
+        crtBtn.setAttribute('aria-label', isCrt ? 'CRT scanline mode on, turn it off' : 'CRT scanline mode off, turn it on');
+        crtBtn.classList.toggle('is-on', isCrt);
+      }
+    }
+
+    applyCrt(isCrt);
+
+    if (crtBtn) {
+      crtBtn.addEventListener('click', function () {
+        applyCrt(!isCrt);
+        if (audio && typeof audio.isOn === 'function' && audio.isOn()) {
+          audio.pop();
+        }
+      });
+    }
+
+    document.addEventListener('pip-crt-toggle', function (e) {
+      if (e && e.detail && typeof e.detail.active === 'boolean') {
+        applyCrt(e.detail.active);
+      } else {
+        applyCrt(!isCrt);
+      }
+    });
+
+    if (PIP) {
+      PIP.crt = {
+        isOn: function () { return isCrt; },
+        toggle: function () { applyCrt(!isCrt); return isCrt; },
+        set: function (val) { applyCrt(val); }
+      };
+    }
+  }
   /* ---------- sound switch ---------- */
   function initSound() {
     var btn = $('#soundBtn'), label = $('#soundLabel');
@@ -420,6 +466,7 @@
   safe('theme', initTheme);
   safe('sound', initSound);
   safe('quiet', initQuiet);
+  safe('crt', initCrt);
   safe('clock', initClock);
   safe('foldable', initFoldable);
   safe('shortcuts', initShortcuts);

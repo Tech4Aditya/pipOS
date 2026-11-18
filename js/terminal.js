@@ -28,7 +28,7 @@
 
   var COMMANDS = [
     'help', 'whoami', 'time', 'date', 'theme', 'sound', 'quiet',
-    'play', 'wish', 'fortune', 'dream', 'calc', 'clear', 'history'
+    'play', 'wish', 'fortune', 'dream', 'calc', 'crt', 'clear', 'history'
   ];
 
   var FORTUNES = [
@@ -90,6 +90,7 @@
           "  wish <text>        - Post a wish to the wish wall",
           "  fortune / dream    - Read a midnight prophecy",
           "  calc <expr>        - Quick arithmetic evaluator (e.g., calc 24 * 7)",
+          "  crt [on|off]       - Toggle vintage CRT monitor scanline & bloom overlay",
           "  history            - Display recent command history",
           "  clear              - Wipe terminal screen"
         ].join('\n');
@@ -222,6 +223,39 @@
         }
         break;
 
+      case 'crt':
+        var crtVal = (args[0] || '').toLowerCase();
+        var p = getPIP();
+        if (crtVal === 'on') {
+          if (p && p.crt) p.crt.set(true);
+          else {
+            store.set('crt_mode', 'on');
+            if (typeof document !== 'undefined' && document.body) document.body.classList.add('crt-active');
+          }
+          out = "CRT scanline & phosphor bloom effect enabled 📺";
+        } else if (crtVal === 'off') {
+          if (p && p.crt) p.crt.set(false);
+          else {
+            store.set('crt_mode', 'off');
+            if (typeof document !== 'undefined' && document.body) document.body.classList.remove('crt-active');
+          }
+          out = "CRT scanline effect disabled.";
+        } else if (crtVal === 'toggle' || !crtVal) {
+          var state = false;
+          if (p && p.crt) {
+            state = p.crt.toggle();
+          } else {
+            var cur = (typeof document !== 'undefined' && document.body) ? document.body.classList.contains('crt-active') : false;
+            state = !cur;
+            store.set('crt_mode', state ? 'on' : 'off');
+            if (typeof document !== 'undefined' && document.body) document.body.classList.toggle('crt-active', state);
+          }
+          out = state ? "CRT scanline & phosphor bloom effect enabled 📺" : "CRT scanline effect disabled.";
+        } else {
+          out = "Usage: crt [on|off|toggle]";
+        }
+        break;
+
       case 'history':
         out = history.map(function (h, i) { return (i + 1) + '  ' + h; }).join('\n');
         break;
@@ -266,6 +300,11 @@
       params: ['on', 'off'],
       hint: ' [on|off]',
       pills: ['quiet on', 'quiet off']
+    },
+    crt: {
+      params: ['on', 'off', 'toggle'],
+      hint: ' [on|off|toggle]',
+      pills: ['crt on', 'crt off', 'crt toggle']
     }
   };
 
