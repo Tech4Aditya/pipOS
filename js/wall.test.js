@@ -95,3 +95,127 @@ test('parseRemotePayload handles empty/malformed data without throwing', () => {
   assert.deepStrictEqual(wall.parseRemotePayload(undefined, 'supabase'), []);
   assert.deepStrictEqual(wall.parseRemotePayload('not-json', 'firebase'), []);
 });
+
+/* =========================================================================
+   Offline Resilient Sync Queue (pip:pending_wishes) Tests
+   ========================================================================= */
+test('getPendingWishes returns empty array when queue is empty or malformed', () => {
+  const store = { get: () => '[]', set: () => {} };
+  assert.deepStrictEqual(wall.getPendingWishes(store), []);
+
+  const brokenStore = { get: () => 'not-json{', set: () => {} };
+  assert.deepStrictEqual(wall.getPendingWishes(brokenStore), []);
+});
+
+test('queuePendingWish validates, sanitizes, and queues wishes in store', () => {
+  const memory = {};
+  const mockStore = {
+    get: (k, d) => (k in memory ? memory[k] : d),
+    set: (k, v) => { memory[k] = String(v); }
+  };
+
+  // Rejects invalid wish
+  assert.strictEqual(wall.queuePendingWish(null, mockStore), false);
+  assert.strictEqual(wall.queuePendingWish({ w: '' }, mockStore), false);
+  assert.strictEqual(wall.queuePendingWish({ w: '   ' }, mockStore), false);
+
+  // Queues valid wish
+  const ok = wall.queuePendingWish({ w: 'Soft raindrops and warm tea', n: 'Dreamer', t: 123456 }, mockStore);
+  assert.strictEqual(ok, true);
+
+  const queue = wall.getPendingWishes(mockStore);
+  assert.strictEqual(queue.length, 1);
+  assert.strictEqual(queue[0].w, 'Soft raindrops and warm tea');
+  assert.strictEqual(queue[0].n, 'Dreamer');
+  assert.strictEqual(queue[0].t, 123456);
+
+  // Queues second wish
+  wall.queuePendingWish({ w: 'More sleepy stories' }, mockStore);
+  const queue2 = wall.getPendingWishes(mockStore);
+  assert.strictEqual(queue2.length, 2);
+  assert.strictEqual(queue2[1].w, 'More sleepy stories');
+  assert.strictEqual(queue2[1].n, 'A sleepy visitor');
+});
+
+test('clearPendingWishes empties queued wishes', () => {
+  const memory = {
+    'pip:pending_wishes': JSON.stringify([{ w: 'Test wish', n: 'Visitor', t: 100 }])
+  };
+  const mockStore = {
+    get: (k, d) => (k in memory ? memory[k] : d),
+    set: (k, v) => { memory[k] = String(v); }
+  };
+
+  assert.strictEqual(wall.getPendingWishes(mockStore).length, 1);
+  wall.clearPendingWishes(mockStore);
+  assert.deepStrictEqual(wall.getPendingWishes(mockStore), []);
+});
+
+test('syncPendingWishes transmits queued wishes to backend and clears queue on completion', async () => {
+  const memory = {};
+  const mockStore = {
+    get: (k, d) => (k in memory ? memory[k] : d),
+    set: (k, v) => { memory[k] = String(v); }
+  };
+
+  wall.queuePendingWish({ w: 'Wish 1', n: 'Visitor 1', t: 100 }, mockStore);
+  wall.queuePendingWish({ w: 'Wish 2', n: 'Visitor 2', t: 200 }, mockStore);
+  assert.strictEqual(wall.getPendingWishes(mockStore).length, 2);
+
+  const posted = [];
+  const origFetch = global.fetch;
+  global.fetch = async (url, opts) => {
+    posted.push({ url, body: JSON.parse(opts.body) });
+    return { ok: true, json: async () => ({}) };
+  };
+
+  try {
+    await new Promise((resolve) => {
+      wall.syncPendingWishes({ url: 'https://pip-wall.firebaseio.com/wishes' }, (count) => {
+        assert.strictEqual(count, 2);
+        resolve();
+      }, mockStore);
+    });
+
+    assert.strictEqual(posted.length, 2);
+    assert.strictEqual(posted[0].body.w, 'Wish 1');
+    assert.strictEqual(posted[1].body.w, 'Wish 2');
+    assert.deepStrictEqual(wall.getPendingWishes(mockStore), [], 'Queue must be empty after full sync');
+  } finally {
+    global.fetch = origFetch;
+  }
+});
+
+test('syncPendingWishes stops and preserves remaining wishes if a network error occurs', async () => {
+  const memory = {};
+  const mockStore = {
+    get: (k, d) => (k in memory ? memory[k] : d),
+    set: (k, v) => { memory[k] = String(v); }
+  };
+
+  wall.queuePendingWish({ w: 'Success Wish', n: 'Visitor 1', t: 100 }, mockStore);
+  wall.queuePendingWish({ w: 'Failing Wish', n: 'Visitor 2', t: 200 }, mockStore);
+
+  let callCount = 0;
+  const origFetch = global.fetch;
+  global.fetch = async () => {
+    callCount++;
+    if (callCount === 1) return { ok: true, json: async () => ({}) };
+    return { ok: false, status: 503 };
+  };
+
+  try {
+    await new Promise((resolve) => {
+      wall.syncPendingWishes({ url: 'https://pip-wall.firebaseio.com/wishes' }, (count) => {
+        assert.strictEqual(count, 1, 'Only 1 wish succeeded before error');
+        resolve();
+      }, mockStore);
+    });
+
+    const remaining = wall.getPendingWishes(mockStore);
+    assert.strictEqual(remaining.length, 1, 'Failing wish must remain in queue for retry');
+    assert.strictEqual(remaining[0].w, 'Failing Wish');
+  } finally {
+    global.fetch = origFetch;
+  }
+});

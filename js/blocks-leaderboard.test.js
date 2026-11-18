@@ -73,3 +73,101 @@ test('js/toys.js implements combo tracking and DOM updates in initBlocks', () =>
   assert.match(toysSrc, /renderLeaderboard\(/, 'Must call renderLeaderboard to update DOM');
   assert.match(toysSrc, /saveTopScore\(/, 'Must save score on game over');
 });
+
+test('js/toys.js draws dotted personal best ghost line (bestMarker) across canvas', () => {
+  const toysSrc = fs.readFileSync(TOYS_JS_PATH, 'utf8');
+
+  assert.match(toysSrc, /bestMarker\s*=\s*levelY\(best\)\s*\+\s*st\.cam/, 'Must calculate bestMarker at levelY(best) + st.cam');
+  assert.match(toysSrc, /setLineDash\(\[\s*4\s*,\s*4\s*\]\)/, 'Must draw dotted/dashed line for ghost marker');
+  assert.match(toysSrc, /Record Height:\s*['"]\s*\+\s*best/, 'Must display Record Height text marker');
+
+  const toys = require('./toys.js');
+  assert.strictEqual(typeof toys.getBestMarkerY, 'function', 'Must export getBestMarkerY helper');
+  // levelY(i) = H - 10 - (i + 1) * BH; for H=420, BH=28, best=5, cam=0: 420 - 10 - 6*28 = 242
+  assert.strictEqual(toys.getBestMarkerY(5, 0), 242);
+  assert.strictEqual(toys.getBestMarkerY(5, 10), 252);
+});
+
+test('js/toys.js exports exportScores and importScores helper methods', () => {
+  const toys = require('./toys.js');
+  assert.strictEqual(typeof toys.exportScores, 'function', 'Must export exportScores helper');
+  assert.strictEqual(typeof toys.importScores, 'function', 'Must export importScores helper');
+
+  // Setup mock store
+  const memStore = {};
+  global.PIP = global.PIP || {};
+  global.PIP.store = {
+    get: (k, def) => (memStore[k] !== undefined ? memStore[k] : (def || '')),
+    set: (k, v) => { memStore[k] = String(v); }
+  };
+
+  try {
+    // Import scores via JSON string
+    const sampleData = {
+      game: 'rattle-and-blocks',
+      best: 42,
+      topScores: [42, 35, 28, 20, 15]
+    };
+    const importSuccess = toys.importScores(JSON.stringify(sampleData));
+    assert.strictEqual(importSuccess, true, 'importScores must return true on success');
+    assert.strictEqual(memStore['best'], '42', 'Must update best in store');
+    assert.deepStrictEqual(JSON.parse(memStore['blockTopScores']), [42, 35, 28, 20, 15], 'Must update blockTopScores in store');
+
+    // Export scores
+    const exportedRaw = toys.exportScores();
+    assert.strictEqual(typeof exportedRaw, 'string', 'exportScores must return JSON string');
+    const exported = JSON.parse(exportedRaw);
+    assert.strictEqual(exported.game, 'rattle-and-blocks');
+    assert.strictEqual(exported.best, 42);
+    assert.deepStrictEqual(exported.topScores, [42, 35, 28, 20, 15]);
+    assert.ok(exported.exportedAt);
+
+    // Import handles malformed input safely
+    assert.strictEqual(toys.importScores("invalid json"), false, 'Must return false for invalid JSON');
+    assert.strictEqual(toys.importScores(null), false, 'Must return false for null');
+  } finally {
+    delete global.PIP.store;
+  }
+});
+
+test('terminal blocks command provides stats, export, and autocomplete', () => {
+  const term = require('./terminal.js');
+  assert.ok(term.COMMANDS.includes('blocks'), 'COMMANDS must include blocks');
+
+  // Setup mock store and toys
+  const memStore = {
+    best: '25',
+    blockTopScores: JSON.stringify([25, 18, 12])
+  };
+  global.PIP = global.PIP || {};
+  global.PIP.store = {
+    get: (k, def) => (memStore[k] !== undefined ? memStore[k] : (def || '')),
+    set: (k, v) => { memStore[k] = String(v); }
+  };
+  global.PIP.toys = require('./toys.js');
+
+  try {
+    // blocks stats
+    const statsRes = term.executeCommand('blocks stats');
+    assert.ok(statsRes.ok);
+    assert.match(statsRes.output, /Personal Best: 25 blocks/);
+    assert.match(statsRes.output, /#1 — 25 pts/);
+
+    // blocks export
+    const exportRes = term.executeCommand('blocks export');
+    assert.ok(exportRes.ok);
+    const parsed = JSON.parse(exportRes.output);
+    assert.strictEqual(parsed.best, 25);
+    assert.deepStrictEqual(parsed.topScores, [25, 18, 12]);
+
+    // Autocomplete
+    const bloMatch = term.autocomplete('blo');
+    assert.deepStrictEqual(bloMatch, ['blocks']);
+
+    const blocksSub = term.autocomplete('blocks ');
+    assert.deepStrictEqual(blocksSub, ['blocks stats', 'blocks export']);
+  } finally {
+    delete global.PIP.store;
+    delete global.PIP.toys;
+  }
+});
