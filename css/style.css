@@ -1638,7 +1638,8 @@ dialog.secret::backdrop { background: rgba(40, 24, 40, 0.55); }
 }
 @media (max-width: 960px) {
   .work { grid-template-columns: 1fr; }
-  .w-lab, .w-lights, .w-blocks, .w-route, .w-growth { grid-column: auto; }
+  .work > .win,
+  .w-lab, .w-lights, .w-blocks, .w-route, .w-growth, .w-flipbook, .w-stars, .w-stickers, .w-term, .w-monitor, .w-notes { grid-column: auto; }
   .wall { grid-template-columns: 1fr; }
   .task-nav a { padding: 0.4rem 0.6rem; }
 }
