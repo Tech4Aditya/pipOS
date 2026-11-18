@@ -108,9 +108,17 @@
     return list.slice(0, 30);
   }
 
+  function getFetch() {
+    if (typeof window !== 'undefined' && window.fetch) return window.fetch.bind(window);
+    if (typeof global !== 'undefined' && global.fetch) return global.fetch.bind(global);
+    if (typeof fetch === 'function') return fetch;
+    return null;
+  }
+
   // Fetch remote wishes with timeout and safe fallback
   function fetchWishes(backend, cb) {
-    if (!backend || !backend.url || typeof window === 'undefined' || !window.fetch) {
+    var fetchFn = getFetch();
+    if (!backend || !backend.url || !fetchFn) {
       return cb(null);
     }
 
@@ -131,7 +139,7 @@
     var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     var timer = controller ? setTimeout(function () { controller.abort(); }, 6000) : 0;
 
-    fetch(url, {
+    fetchFn(url, {
       method: 'GET',
       headers: headers,
       signal: controller ? controller.signal : undefined
@@ -153,7 +161,8 @@
 
   // Post remote wish with safe fallback
   function postWish(backend, wishData, cb) {
-    if (!backend || !backend.url || typeof window === 'undefined' || !window.fetch) {
+    var fetchFn = getFetch();
+    if (!backend || !backend.url || !fetchFn) {
       return cb(false);
     }
 
@@ -179,7 +188,7 @@
     var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     var timer = controller ? setTimeout(function () { controller.abort(); }, 6000) : 0;
 
-    fetch(url, {
+    fetchFn(url, {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(payload),
@@ -196,6 +205,145 @@
     });
   }
 
+  /* ---------- Offline Sync Queue (pip:pending_wishes) ---------- */
+  var PENDING_KEY = 'pip:pending_wishes';
+
+  function getStore(customStore) {
+    if (customStore) return customStore;
+    if (typeof window !== 'undefined' && window.PIP && window.PIP.store) return window.PIP.store;
+    if (typeof global !== 'undefined' && global.PIP && global.PIP.store) return global.PIP.store;
+    return {
+      get: function (k, d) {
+        try {
+          if (typeof localStorage !== 'undefined') {
+            var v = localStorage.getItem(k);
+            if (v !== null) return v;
+            if (k.indexOf('pip:') !== 0) {
+              v = localStorage.getItem('pip:' + k);
+              if (v !== null) return v;
+            }
+          }
+        } catch (e) {}
+        return d;
+      },
+      set: function (k, v) {
+        try {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(k, v);
+            if (k.indexOf('pip:') !== 0) localStorage.setItem('pip:' + k, v);
+          }
+        } catch (e) {}
+      }
+    };
+  }
+
+  function getPendingWishes(customStore) {
+    var s = getStore(customStore);
+    try {
+      var raw = s.get('pending_wishes', null);
+      if (raw === null || raw === undefined) {
+        raw = s.get(PENDING_KEY, '[]');
+      }
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function queuePendingWish(wishItem, customStore) {
+    if (!wishItem || typeof wishItem.w !== 'string') return false;
+    var cleanWish = sanitize(wishItem.w).slice(0, 120);
+    if (!cleanWish) return false;
+    var s = getStore(customStore);
+    var queue = getPendingWishes(s);
+    queue.push({
+      n: sanitize(wishItem.n) || 'A sleepy visitor',
+      w: cleanWish,
+      t: typeof wishItem.t === 'number' ? wishItem.t : Date.now()
+    });
+    var data = JSON.stringify(queue);
+    s.set(PENDING_KEY, data);
+    s.set('pending_wishes', data);
+    return true;
+  }
+
+  function clearPendingWishes(customStore) {
+    var s = getStore(customStore);
+    s.set(PENDING_KEY, '[]');
+    s.set('pending_wishes', '[]');
+  }
+
+  var isSyncing = false;
+  function syncPendingWishes(backend, cb, customStore) {
+    if (isSyncing) {
+      if (typeof cb === 'function') cb(0);
+      return;
+    }
+    var s = getStore(customStore);
+    var queue = getPendingWishes(s);
+    if (!queue.length) {
+      if (typeof cb === 'function') cb(0);
+      return;
+    }
+    if (!backend || !backend.url) {
+      if (typeof cb === 'function') cb(0);
+      return;
+    }
+
+    isSyncing = true;
+    var remaining = queue.slice();
+    var syncedCount = 0;
+
+    function finish(count) {
+      isSyncing = false;
+      if (typeof cb === 'function') cb(count);
+    }
+
+    function processNext() {
+      if (!remaining.length) {
+        clearPendingWishes(s);
+        finish(syncedCount);
+        return;
+      }
+      var item = remaining[0];
+      postWish(backend, item, function (ok) {
+        if (ok) {
+          syncedCount++;
+          remaining.shift();
+          var data = JSON.stringify(remaining);
+          s.set(PENDING_KEY, data);
+          s.set('pending_wishes', data);
+          processNext();
+        } else {
+          var data = JSON.stringify(remaining);
+          s.set(PENDING_KEY, data);
+          s.set('pending_wishes', data);
+          finish(syncedCount);
+        }
+      });
+    }
+
+    processNext();
+  }
+
+  // Automatic offline-to-online sync event listener
+  if (typeof window !== 'undefined' && window.addEventListener) {
+    window.addEventListener('online', function () {
+      var p = (typeof window.PIP !== 'undefined') ? window.PIP : {};
+      var backend = (p.fx && typeof p.fx.getBackendConfig === 'function')
+        ? p.fx.getBackendConfig()
+        : (typeof p.getBackendConfig === 'function' ? p.getBackendConfig() : null);
+      if (backend) {
+        syncPendingWishes(backend, function (count) {
+          if (count > 0 && typeof p.toast === 'function') {
+            p.toast('✨ Reconnected! Synced ' + count + ' offline wish' + (count > 1 ? 'es' : '') + ' to Midnight Wall.');
+          }
+        });
+      }
+    });
+  }
+
   var wallModule = {
     sanitize: sanitize,
     validateWish: validateWish,
@@ -203,6 +351,11 @@
     parseRemotePayload: parseRemotePayload,
     fetchWishes: fetchWishes,
     postWish: postWish,
+    PENDING_KEY: PENDING_KEY,
+    getPendingWishes: getPendingWishes,
+    queuePendingWish: queuePendingWish,
+    clearPendingWishes: clearPendingWishes,
+    syncPendingWishes: syncPendingWishes,
     COOLDOWN_MS: COOLDOWN_MS,
     WINDOW_MS: WINDOW_MS,
     MAX_PER_WINDOW: MAX_PER_WINDOW

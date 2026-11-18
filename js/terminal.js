@@ -28,8 +28,11 @@
 
   var COMMANDS = [
     'help', 'whoami', 'time', 'date', 'theme', 'sound', 'quiet',
-    'play', 'wish', 'fortune', 'dream', 'calc', 'clear', 'history'
+    'play', 'wish', 'fortune', 'dream', 'calc', 'blocks', 'clear', 'history',
+    'ls', 'cd', 'pwd', 'cat', 'mkdir', 'touch', 'rm'
   ];
+
+  var currentCwd = '/home/pip';
 
   var FORTUNES = [
     "A star falls only when a dreamer needs a bedtime flashlight.",
@@ -90,6 +93,7 @@
           "  wish <text>        - Post a wish to the wish wall",
           "  fortune / dream    - Read a midnight prophecy",
           "  calc <expr>        - Quick arithmetic evaluator (e.g., calc 24 * 7)",
+          "  blocks [stats|export] - View or export Rattle & Blocks tower records",
           "  history            - Display recent command history",
           "  clear              - Wipe terminal screen"
         ].join('\n');
@@ -222,6 +226,152 @@
         }
         break;
 
+      case 'pwd':
+        out = currentCwd;
+        break;
+
+      case 'cd':
+        var targetCd = args[0] || '/home/pip';
+        var resolvedCd = PIP.fs ? PIP.fs.resolvePath(currentCwd, targetCd) : targetCd;
+        if (PIP.fs && !PIP.fs.isDirectory(resolvedCd)) {
+          out = 'cd: no such directory: ' + targetCd;
+        } else {
+          currentCwd = resolvedCd;
+          out = '';
+        }
+        break;
+
+      case 'ls':
+        if (!PIP.fs) {
+          out = 'desktop  documents';
+        } else {
+          var targetLs = args[0] ? PIP.fs.resolvePath(currentCwd, args[0]) : currentCwd;
+          try {
+            var entries = PIP.fs.readDir(targetLs);
+            out = entries.map(function (e) {
+              return (e.type === 'dir' ? '📁 ' : '📄 ') + e.name + (e.type === 'file' ? ' (' + e.size + ' B)' : '/');
+            }).join('\n') || '(empty directory)';
+          } catch (e) {
+            out = 'ls: ' + (e.message || 'error');
+          }
+        }
+        break;
+
+      case 'cat':
+        if (!args[0]) {
+          out = 'Usage: cat <file>';
+        } else if (!PIP.fs) {
+          out = 'cat: file system not ready';
+        } else {
+          try {
+            var targetCat = PIP.fs.resolvePath(currentCwd, args[0]);
+            out = PIP.fs.readFile(targetCat);
+          } catch (e) {
+            out = 'cat: ' + (e.message || 'error reading file');
+          }
+        }
+        break;
+
+      case 'touch':
+        if (!args[0]) {
+          out = 'Usage: touch <file>';
+        } else if (PIP.fs) {
+          try {
+            var targetTouch = PIP.fs.resolvePath(currentCwd, args[0]);
+            PIP.fs.writeFile(targetTouch, '');
+            out = 'Created ' + args[0];
+          } catch (e) {
+            out = 'touch: ' + (e.message || 'error');
+          }
+        }
+        break;
+
+      case 'mkdir':
+        if (!args[0]) {
+          out = 'Usage: mkdir <directory>';
+        } else if (PIP.fs) {
+          try {
+            var targetMkdir = PIP.fs.resolvePath(currentCwd, args[0]);
+            PIP.fs.mkdir(targetMkdir);
+            out = 'Directory created: ' + args[0];
+          } catch (e) {
+            out = 'mkdir: ' + (e.message || 'error');
+          }
+        }
+        break;
+
+      case 'rm':
+        if (!args[0]) {
+          out = 'Usage: rm <file>';
+        } else if (PIP.fs) {
+          try {
+            var targetRm = PIP.fs.resolvePath(currentCwd, args[0]);
+            PIP.fs.unlink(targetRm);
+            out = 'Removed ' + args[0];
+          } catch (e) {
+            out = 'rm: ' + (e.message || 'error');
+          }
+        }
+        break;
+      case 'blocks':
+        var sub = args[0] ? args[0].toLowerCase() : 'stats';
+        var pipObj = getPIP();
+        if (sub === 'export') {
+          var exporter = (pipObj.toys && typeof pipObj.toys.exportScores === 'function')
+            ? pipObj.toys.exportScores
+            : (typeof require !== 'undefined' ? (function () {
+                try { return require('./toys.js').exportScores; } catch (e) { return null; }
+              })() : null);
+          if (typeof exporter === 'function') {
+            out = exporter();
+          } else {
+            out = "pip-blocks: Score export not available.";
+          }
+        } else if (sub === 'stats') {
+          var curStore = (pipObj && pipObj.store) ? pipObj.store : store;
+          var curBest = curStore.get('best', '0');
+          var topScores = [];
+          try {
+            var raw = curStore.get('blockTopScores', '[]');
+            topScores = JSON.parse(raw);
+          } catch (e) {}
+          if (!Array.isArray(topScores)) topScores = [];
+
+          var lines = [
+            "🧱 Rattle & Blocks Stacking Statistics:",
+            "  Personal Best: " + curBest + " blocks"
+          ];
+          if (topScores.length > 0) {
+            lines.push("  Top Leaderboard Records:");
+            topScores.forEach(function (score, idx) {
+              lines.push("    #" + (idx + 1) + " — " + score + " pts");
+            });
+          } else {
+            lines.push("  Top Leaderboard Records: None recorded yet.");
+          }
+          out = lines.join('\n');
+        } else if (sub === 'import') {
+          var jsonStr = args.slice(1).join(' ');
+          if (!jsonStr) {
+            out = "Usage: blocks import <json>";
+          } else {
+            var importer = (pipObj.toys && typeof pipObj.toys.importScores === 'function')
+              ? pipObj.toys.importScores
+              : (typeof require !== 'undefined' ? (function () {
+                  try { return require('./toys.js').importScores; } catch (e) { return null; }
+                })() : null);
+            if (typeof importer === 'function') {
+              var ok = importer(jsonStr);
+              out = ok ? "✨ Stacking records imported successfully!" : "pip-blocks: Invalid score data.";
+            } else {
+              out = "pip-blocks: Score import not available.";
+            }
+          }
+        } else {
+          out = "Usage: blocks [stats|export]";
+        }
+        break;
+
       case 'history':
         out = history.map(function (h, i) { return (i + 1) + '  ' + h; }).join('\n');
         break;
@@ -237,6 +387,11 @@
   }
 
   var PARAM_HINTS = {
+    blocks: {
+      params: ['stats', 'export'],
+      hint: ' [stats|export]',
+      pills: ['blocks stats', 'blocks export']
+    },
     theme: {
       params: ['day', 'night', 'contrast'],
       hint: ' [day|night|contrast]',

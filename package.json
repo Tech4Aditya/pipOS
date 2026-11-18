@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "test": "node --test js/*.test.js",
+    "build": "node --check sw.js && node scripts/check-links.js",
     "lint": "npx eslint js/",
     "lint:fix": "npx eslint js/ --fix",
     "format": "npx prettier --write \"**/*.{js,json,css,html,md}\"",

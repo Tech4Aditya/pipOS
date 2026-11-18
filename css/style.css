@@ -1,4 +1,4 @@
-/* ===================================================================   Pip's Dream OS - Stylesheet
+﻿/* ===================================================================   Pip's Dream OS - Stylesheet
    Palette from haX.baby: cream #fff8f1, berry #a34063, cocoa #5c4033.
    Architecture & Tokens Guide: docs/CSS.md
 
@@ -217,6 +217,95 @@ code { font-size: 0.9em; background: var(--blush); padding: 0.05rem 0.3rem; bord
 .tb-btn.is-hint { animation: ring 2.2s ease-in-out infinite; }
 .clock { font: 600 0.9rem var(--f-ui); min-width: 4.6rem; text-align: right; }
 
+.taskbar-running {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 440px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  padding: 2px 4px;
+}
+.taskbar-running::-webkit-scrollbar {
+  display: none;
+}
+.taskbar-pill, .taskbar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  height: 36px;
+  padding: 0 10px;
+  font: 600 0.8rem var(--f-ui);
+  color: var(--ink);
+  background: var(--paper, #fffbf4);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 2px 0 var(--shadow);
+  cursor: pointer;
+  white-space: nowrap;
+  touch-action: manipulation;
+  transition: transform 0.08s ease, background 0.12s ease, border-color 0.12s ease, box-shadow 0.08s ease;
+  user-select: none;
+}
+.taskbar-pill:hover, .taskbar-item:hover {
+  background: #ffffff;
+  border-color: var(--berry);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 var(--shadow);
+}
+.taskbar-pill:active, .taskbar-item:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--shadow);
+}
+.taskbar-pill:focus-visible, .taskbar-item:focus-visible {
+  outline: 2px solid var(--berry);
+  outline-offset: 1px;
+}
+.taskbar-pill.is-focused, .taskbar-pill.is-active,
+.taskbar-item.is-focused, .taskbar-item.is-active {
+  background: var(--berry);
+  color: #ffffff;
+  border-color: var(--line);
+  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+.taskbar-pill-dot, .taskbar-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 4px rgba(34, 197, 94, 0.6);
+  flex-shrink: 0;
+}
+.taskbar-pill.is-minimized .taskbar-pill-dot,
+.taskbar-item.is-minimized .taskbar-indicator {
+  background: #f59e0b;
+  box-shadow: 0 0 4px rgba(245, 158, 11, 0.6);
+}
+.taskbar-pill.is-focused .taskbar-pill-dot,
+.taskbar-item.is-focused .taskbar-indicator {
+  background: #ffe9ae;
+  box-shadow: 0 0 6px #ffe9ae;
+}
+.taskbar-pill.is-minimized, .taskbar-item.is-minimized {
+  opacity: 0.88;
+  background: rgba(255, 255, 255, 0.65);
+  border-style: dashed;
+}
+[data-theme="night"] .taskbar-pill, [data-theme="night"] .taskbar-item {
+  background: var(--paper);
+  color: var(--ink);
+}
+[data-theme="night"] .taskbar-pill.is-focused, [data-theme="night"] .taskbar-item.is-focused {
+  background: var(--berry);
+  color: #ffffff;
+}
+[data-theme="night"] .taskbar-pill.is-minimized, [data-theme="night"] .taskbar-item.is-minimized {
+  background: rgba(30, 24, 40, 0.65);
+}
+
 /* ===================================================================   05. Desktop Shortcuts (Large Screens >= 1360px)
    ========================================================================== */
 .desk-icons { position: fixed; left: 18px; top: 84px; z-index: 5; display: none; flex-direction: column; gap: 14px; }
@@ -245,9 +334,11 @@ code { font-size: 0.9em; background: var(--blush); padding: 0.05rem 0.3rem; bord
 .ic-term::after { border-radius: 2px; border-color: #a4f4c6; }
 .ic-gauge { background: var(--mint); }
 .ic-gauge::after { border-radius: 50% 50% 0 0; }
-
 .ic-pad { background: var(--lavender); }
-.ic-pad::after { border-radius: 2px; }.ic-trash { background: var(--paper); }
+.ic-pad::after { border-radius: 2px; }
+.ic-calc { background: var(--butter); }
+.ic-calc::after { border-radius: 2px; }
+.ic-trash { background: var(--paper); }
 .ic-trash::after { border-radius: 2px 2px 8px 8px; }
 
 /* ===================================================================   06. Main Layout & Section Headings
@@ -260,10 +351,18 @@ main { max-width: 1120px; margin: 0 auto; padding: 92px 16px 40px; }
 /* ===================================================================   07. Window Component (.win)
    ========================================================================== */
 .win {
+  position: relative;
   margin: 0 0 28px;
   background: var(--paper); color: var(--ink);
   border: 3px solid var(--line); border-radius: 14px; box-shadow: 7px 7px 0 var(--shadow);
   overflow: hidden;
+  transition: box-shadow 0.15s ease;
+}
+.win.is-focused {
+  box-shadow: 0 0 0 3px var(--berry), 10px 10px 0 var(--shadow);
+}
+.win.is-minimized {
+  display: none !important;
 }
 .win-bar {
   display: flex; align-items: center; gap: 0.6rem;
@@ -282,6 +381,20 @@ main { max-width: 1120px; margin: 0 auto; padding: 92px 16px 40px; }
   font: 700 1.2rem/1 var(--f-ui); color: var(--ink);
   background: var(--cream); border: 2.5px solid var(--line); border-radius: 9px; cursor: pointer;
 }
+.win-actions { display: flex; align-items: center; gap: 6px; }
+.win.is-focused { box-shadow: 0 0 0 2px var(--amber, #f59e0b), 7px 7px 0 var(--shadow); }
+.win.is-maximized {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-height: 75vh;
+  box-shadow: 0 0 0 3px var(--amber, #f59e0b), 10px 10px 0 var(--shadow);
+  transition: all 0.18s ease-in-out;
+}
+.win.is-snapped-left, .win.is-snapped-right {
+  grid-column: span 6 !important;
+  transition: all 0.18s ease-in-out;
+}
+.win-btn-max { font-size: 1rem; }
 .win-body { padding: 1.1rem 1.2rem 1.3rem; }
 
 /* ===================================================================   08. Hero & Pip Illustration
@@ -409,10 +522,10 @@ main { max-width: 1120px; margin: 0 auto; padding: 92px 16px 40px; }
   transform-origin: center;
   transition: fill 0.2s, opacity 0.2s, transform 0.2s;
 }
-.pip-svg .p-cap { fill: #8b8fd9; stroke: #5c4033; stroke-width: 5; stroke-linejoin: round; }
+.pip-svg .p-cap { fill: var(--pip-cap, #8b8fd9); stroke: #5c4033; stroke-width: 5; stroke-linejoin: round; transition: fill 0.25s ease; }
 .pip-svg .p-brim, .pip-svg .p-pom { fill: #fff1da; stroke: #5c4033; stroke-width: 5; stroke-linejoin: round; }
-.pip-svg .p-capstar { fill: #fff1da; }
-.pip-svg .p-bow path, .pip-svg .p-bow circle { fill: #ff7fa8; stroke: #5c4033; stroke-width: 3.5; stroke-linejoin: round; }
+.pip-svg .p-capstar { fill: var(--pip-capstar, #fff1da); transition: fill 0.25s ease; }
+.pip-svg .p-bow path, .pip-svg .p-bow circle { fill: var(--pip-bow, #ff7fa8); stroke: #5c4033; stroke-width: 3.5; stroke-linejoin: round; transition: fill 0.25s ease; }
 .pip-svg #egg { cursor: pointer; }
 .pip-svg #egg:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; border-radius: 50%; }
 .pip-svg .egg-star { fill: #ffc83d; stroke: #5c4033; stroke-width: 1.3; stroke-linejoin: round; transform-box: fill-box; transform-origin: center; transition: filter 0.15s; }
@@ -1509,6 +1622,37 @@ html.js .growth-chart.is-visible .growth-fill { width: calc(var(--progress, 0) *
   outline-offset: 1px;
 }
 
+.note-react {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 0.6rem;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1.5px solid rgba(92, 64, 51, 0.45);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #4a332a;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.1s ease, background 0.1s ease, border-color 0.1s ease;
+  user-select: none;
+}
+.note-react:hover {
+  background: #ffffff;
+  border-color: #5c4033;
+  transform: scale(1.04);
+}
+.note-react:active {
+  transform: scale(0.96);
+}
+.note-react:focus-visible {
+  outline: 2px solid var(--berry, #a34063);
+  outline-offset: 1px;
+}
+
 .note-confirm {
   position: absolute;
   inset: 0;
@@ -1607,6 +1751,8 @@ html.js .growth-chart.is-visible .growth-fill { width: calc(var(--progress, 0) *
   transition: opacity 0.25s, transform 0.25s;
 }
 .toast.is-show { opacity: 1; transform: translate(-50%, 0); }
+.pip-fx-canvas { position: fixed; inset: 0; z-index: 70; width: 100%; height: 100%; pointer-events: none; }
+[data-quiet="on"] .pip-fx-canvas { display: none; }
 .confetti { position: fixed; inset: 0; z-index: 80; width: 100%; height: 100%; pointer-events: none; display: none; }
 .sparkle {
   position: fixed; z-index: 70; pointer-events: none; line-height: 1;
@@ -2049,10 +2195,11 @@ dialog.secret::backdrop { background: rgba(40, 24, 40, 0.55); }
 }
 
 
-/* ===================================================================   21. Midnight Interactive Terminal Shell (.w-term)
+/* ==========================================================================
+   18. System Resource Monitor (.w-monitor) & Terminal (.w-term)
    ========================================================================== */
-.w-term,
-.w-monitor {
+.w-monitor,
+.w-term {
   grid-column: 1 / -1;
   background: var(--paper);
 }
@@ -2377,6 +2524,8 @@ dialog.secret::backdrop { background: rgba(40, 24, 40, 0.55); }
 
 .start-foot-note {
   opacity: 0.75;
+}
+
 .mon-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -3054,3 +3203,722 @@ dialog.secret::backdrop { background: rgba(40, 24, 40, 0.55); }
   color: #1e1636;
 }
 
+   Starlight Synthesizer (pip-synth.exe)
+   ========================================================================== */
+.w-synth {
+  grid-column: span 12;
+}
+
+.synth-controls {
+  margin: 12px 0 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ==========================================================================
+   Constellation Cartographer (pip-sky.exe)
+   ========================================================================== */
+.w-sky {
+  grid-column: span 12;
+}
+
+.sky-header {
+  margin: 12px 0;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.synth-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.synth-settings {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-family: var(--f-sans, sans-serif);
+}
+
+.synth-label {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.synth-slider {
+  width: 100px;
+  cursor: pointer;
+}
+
+.synth-select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line, #ccc);
+  background: var(--paper, #fff);
+  color: var(--ink);
+  font-family: inherit;
+}
+
+.synth-grid-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  border: 1px solid var(--line, rgba(0, 0, 0, 0.1));
+}
+
+[data-theme="night"] .synth-grid-container {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.synth-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 220px;
+  font-family: var(--f-mono, monospace);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink);
+  opacity: 0.8;
+  padding-right: 4px;
+}
+
+.synth-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  flex: 1;
+}
+
+.synth-step-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.02);
+  transition: background 0.1s ease;
+}
+
+.synth-step-col.is-active-step {
+  background: rgba(243, 181, 98, 0.25);
+  box-shadow: 0 0 8px rgba(243, 181, 98, 0.4);
+}
+
+.synth-cell {
+  height: 38px;
+  border-radius: 6px;
+  background: var(--paper, #fff);
+  border: 1px solid var(--line, #ddd);
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.synth-cell:hover {
+  border-color: var(--gold, #f3b562);
+  transform: scale(1.05);
+}
+
+.synth-cell.is-on {
+  background: var(--gold, #f3b562);
+  border-color: #d89643;
+  box-shadow: 0 0 10px rgba(243, 181, 98, 0.6);
+}
+
+[data-theme="night"] .synth-cell {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="night"] .synth-cell.is-on {
+  background: var(--gold, #f3b562);
+  box-shadow: 0 0 14px rgba(243, 181, 98, 0.8);
+}
+
+   PipOS Alt+Tab Task Switcher (HUD Overlay)
+   ========================================================================== */
+.task-switcher-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99999;
+  background: rgba(30, 22, 54, 0.92);
+  border: 2px solid var(--gold, #f3b562);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 24px rgba(243, 181, 98, 0.35);
+  backdrop-filter: blur(12px);
+  padding: 16px;
+  min-width: 320px;
+  max-width: 90vw;
+  pointer-events: auto;
+  color: #fff;
+  font-family: var(--f-sans, sans-serif);
+}
+
+.task-switcher-modal[hidden] {
+  display: none !important;
+}
+
+.task-switcher-head {
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.switcher-head-title {
+  font-family: var(--f-head, cursive);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  color: var(--gold, #f3b562);
+}
+
+.switcher-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.switcher-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 80px;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+}
+
+.switcher-item:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.switcher-item.is-selected {
+  background: rgba(243, 181, 98, 0.28);
+  border-color: var(--gold, #f3b562);
+  box-shadow: 0 0 14px rgba(243, 181, 98, 0.5);
+  transform: scale(1.06);
+}
+
+.switcher-icon {
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+}
+
+.switcher-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+   20. Starlight Scientific Calculator (.w-calc)
+   ========================================================================== */
+.w-calc {
+  grid-column: 1 / -1;
+  background: var(--paper);
+}
+
+.calc-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--cream);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.calc-screen {
+  background: #2b2636;
+  color: #a4f4c6;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.4);
+  font-family: monospace, var(--f-ui);
+}
+
+[data-theme="night"] .calc-screen {
+  background: #110e1a;
+  color: #ffda79;
+}
+
+.calc-expr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 18px;
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+.calc-mem-flag {
+  font-weight: 700;
+  display: none;
+  background: #a4f4c6;
+  color: #110e1a;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+}
+
+.calc-mem-flag.is-active {
+  display: inline-block;
+}
+
+.calc-expr {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calc-display {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: right;
+  letter-spacing: 0.05em;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-top: 4px;
+}
+
+.calc-top-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.calc-btn {
+  padding: 12px 6px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  font-family: var(--f-ui);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--paper);
+  cursor: pointer;
+  box-shadow: 1.5px 1.5px 0 var(--shadow);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  user-select: none;
+}
+
+.calc-btn:hover {
+  background: var(--bar);
+}
+
+.calc-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+.calc-btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.calc-btn.is-num {
+  font-weight: 700;
+  background: var(--cream);
+  font-size: 1.05rem;
+}
+
+.calc-btn.is-op {
+  background: var(--sky);
+  color: var(--ink);
+}
+
+.calc-btn.is-sci {
+  background: var(--mint);
+  font-size: 0.82rem;
+}
+
+.calc-btn.is-mem {
+  background: var(--blush);
+  font-size: 0.8rem;
+}
+
+.calc-btn.is-warn {
+  background: #f8b4b4;
+  color: #721c24;
+  font-weight: 700;
+}
+
+.calc-btn.is-act {
+  background: var(--butter);
+}
+
+.calc-btn.is-eq {
+  background: var(--berry);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.calc-btn.is-eq:hover {
+  background: var(--berry-2);
+}
+
+.calc-mute-btn {
+  margin-left: auto;
+  font-size: 0.75rem;
+   Pip Dress-up Customizer
+   ========================================================================== */
+:root {
+  --pip-cap: #8b8fd9;
+  --pip-bow: #ff7fa8;
+  --pip-capstar: #fff1da;
+}
+
+.dressup-picker {
+  margin-top: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--paper);
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+}
+
+.dressup-title {
+  display: block;
+  font: 600 0.8rem var(--f-ui);
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+
+.dressup-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.dressup-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.6rem;
+  min-height: 36px;
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  font: 500 0.82rem var(--f-ui);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dressup-opt:hover,
+.dressup-opt:focus-visible {
+  border-color: var(--ink);
+  background: var(--sky);
+}
+
+.dressup-opt.is-selected,
+.dressup-opt[aria-checked="true"] {
+  background: var(--blush);
+  border-color: var(--berry);
+  font-weight: 600;
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.dressup-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 760px) {
+  .dressup-opt {
+    min-height: 44px;
+    padding: 0.4rem 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pip-svg .p-cap,
+  .pip-svg .p-capstar,
+  .pip-svg .p-bow path,
+  .pip-svg .p-bow circle,
+  .dressup-picker,
+  .dressup-opt {
+    transition: none !important;
+  }
+   Full-page Night Flashlight
+   ========================================================================== */
+:root {
+  --fl-x: 50vw;
+  --fl-y: 50vh;
+  --fl-r: 160px;
+}
+
+#flashlightBtn[aria-pressed="true"] {
+  background: var(--butter);
+}
+
+.flashlight-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  pointer-events: none;
+  background: radial-gradient(
+    circle var(--fl-r) at var(--fl-x) var(--fl-y),
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.05) 30%,
+    rgba(10, 7, 24, 0.55) 70%,
+    rgba(10, 7, 24, 0.96) 100%
+  );
+  transition: opacity 0.3s ease;
+  will-change: background;
+}
+
+.flashlight-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 8001;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    circle var(--fl-r) at var(--fl-x) var(--fl-y),
+    rgba(255, 238, 179, 0.16) 0%,
+    rgba(255, 220, 130, 0.06) 55%,
+    transparent 85%
+  );
+  will-change: background;
+}
+
+[data-theme="contrast"] .flashlight-overlay {
+  background: radial-gradient(
+    circle var(--fl-r) at var(--fl-x) var(--fl-y),
+    transparent 0%,
+    transparent 94%,
+    #ffff00 96%,
+    #000000 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flashlight-overlay,
+  .flashlight-glow {
+    transition: none;
+  }
+/* --- Draggable Desktop Windows --- */
+@media (min-width: 900px) {
+  .win-bar.is-draggable {
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .win-bar.is-draggable:active,
+  .win.is-dragging .win-bar {
+    cursor: grabbing;
+  }
+
+  .win.is-dragging {
+    opacity: 0.95;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25), 8px 8px 0 var(--shadow);
+    transition: none !important;
+  }
+/* --- Window Management & Taskbar Minimized Dock --- */
+.win {
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.win.win-active {
+  border-color: var(--focus, #6366f1) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3), 6px 6px 0 var(--shadow) !important;
+}
+
+.task-minimized {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  max-width: 320px;
+  scrollbar-width: none;
+}
+
+.task-minimized::-webkit-scrollbar {
+  display: none;
+}
+
+.tb-min-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  padding: 0.2rem 0.65rem;
+  font: 600 0.82rem var(--f-ui);
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 2px 0 var(--shadow);
+  cursor: pointer;
+  white-space: nowrap;
+  touch-action: manipulation;
+  transition: transform 0.08s, background 0.15s, box-shadow 0.08s;
+}
+
+.tb-min-btn:hover {
+  background: var(--blush, #fce7f3);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 var(--shadow);
+}
+
+.tb-min-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--shadow);
+}
+
+.tb-min-btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tb-min-icon {
+  font-size: 0.88rem;
+}
+
+.tb-min-title {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+/* --- Lullaby Lab Tune Recorder & Share Link --- */
+.lab-recorder {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--paper-warm, rgba(0, 0, 0, 0.03));
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+}
+
+.rec-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.rec-status {
+  font-size: 0.82rem;
+  color: var(--ink);
+  opacity: 0.85;
+  margin-left: auto;
+}
+
+.tune-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: var(--blush, #fce7f3);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+}
+
+.tune-prompt.hidden {
+  display: none;
+}
+
+.tune-prompt-text {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+.sky-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sky-name {
+  font-family: var(--f-head, cursive);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold, #f3b562);
+}
+
+.sky-progress {
+  font-size: 0.82rem;
+  color: var(--ink);
+  opacity: 0.8;
+}
+
+.sky-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sky-stage {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  background: radial-gradient(circle at center, #241a45 0%, #110c22 100%);
+  border-radius: 10px;
+  border: 2px solid var(--gold, #f3b562);
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.7);
+}
+
+.sky-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.sky-lore {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: rgba(243, 181, 98, 0.12);
+  border-left: 3px solid var(--gold, #f3b562);
+  border-radius: 4px;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+[data-theme="night"] .sky-lore {
+  color: #fff;
+  background: rgba(243, 181, 98, 0.18);
+}

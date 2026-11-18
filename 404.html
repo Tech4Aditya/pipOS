@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fff8f1">
+<title>404 – Pip Got Lost | Pip OS</title>
+<meta name="description" content="Pip got lost in the clouds. Let's find our way home.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/404.css">
+<script>
+(function () {
+  var root = document.documentElement;
+  function read(key) {
+    try { return localStorage.getItem('pip:' + key) || ''; }
+    catch (e) { return ''; }
+  }
+  var mode = read('themeMode');
+  if (['auto', 'day', 'night'].indexOf(mode) === -1) {
+    var legacy = read('theme');
+    mode = (legacy === 'day' || legacy === 'night') ? legacy : 'auto';
+  }
+  var resolved = mode === 'day' || mode === 'night'
+    ? mode : ((new Date().getHours() >= 6 && new Date().getHours() < 19) ? 'day' : 'night');
+  root.setAttribute('data-theme', read('contrast') === 'on' ? 'contrast' : resolved);
+  root.setAttribute('data-theme-mode', mode);
+})();
+</script>
+</head>
+<body class="not-found">
+<div class="desk" aria-hidden="true"></div>
+<main class="lost-page">
+  <p class="lost-label">PIP OS · DREAM DELIVERY DEPARTMENT</p>
+  <div class="pip-float lost-pip">
+    <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+      <symbol id="star" viewBox="-10 -10 20 20">
+        <path d="M0-9 2.6-2.8 9-2.4 4 1.7 5.6 8 0 4.5-5.6 8-4 1.7-9-2.4-2.6-2.8Z"/>
+      </symbol>
+    </svg>
+                <svg id="pipSvg" class="pip-svg" viewBox="0 0 420 440" role="group" aria-labelledby="pipT pipD">
+              <title id="pipT">Pip, the skull baby</title>
+              <desc id="pipD">A cute baby with a round skull face, glowing amber eyes, a tiny crooked smile and a starry
+                nightcap with a pink bow, floating on a cloud and waving.</desc>
+              <defs>
+                <radialGradient id="gGlow">
+                  <stop offset="0" stop-color="#fffbe6" />
+                  <stop offset=".35" stop-color="#ffc24d" />
+                  <stop offset="1" stop-color="#ff9a1f" stop-opacity="0" />
+                </radialGradient>
+                <radialGradient id="gHalo">
+                  <stop offset="0" stop-color="#ffd98a" stop-opacity=".55" />
+                  <stop offset="1" stop-color="#ffd98a" stop-opacity="0" />
+                </radialGradient>
+                <clipPath id="clipL">
+                  <ellipse cx="160" cy="214" rx="38" ry="46" />
+                </clipPath>
+                <clipPath id="clipR">
+                  <ellipse cx="260" cy="214" rx="38" ry="46" />
+                </clipPath>
+              </defs>
+
+              <circle class="halo" cx="210" cy="210" r="200" fill="url(#gHalo)" />
+
+              <!-- cloud -->
+              <g class="p-cloud">
+                <ellipse cx="210" cy="405" rx="190" ry="34" />
+                <circle cx="100" cy="392" r="42" />
+                <circle cx="170" cy="372" r="52" />
+                <circle cx="262" cy="374" r="50" />
+                <circle cx="332" cy="396" r="40" />
+                <ellipse cx="210" cy="408" rx="176" ry="28" class="p-cloud-fill" />
+              </g>
+
+              <!-- body -->
+              <path class="p-onesie" d="M146 316C122 392 150 420 210 420s88-28 64-104z" />
+              <path class="p-line" d="M178 372q32 16 64 0" fill="none" />
+              <!-- resting arm -->
+              <g class="p-arm-rest">
+                <path class="p-arm-out" d="M146 340C118 350 104 372 114 394" />
+                <path class="p-arm-in" d="M146 340C118 350 104 372 114 394" />
+                <circle class="p-hand" cx="114" cy="396" r="14" />
+              </g>
+              <!-- waving arm -->
+              <g id="pipArm" class="p-arm-wave">
+                <path class="p-arm-out" d="M276 340C312 330 336 304 344 268" />
+                <path class="p-arm-in" d="M276 340C312 330 336 304 344 268" />
+                <circle class="p-hand" cx="345" cy="262" r="15" />
+              </g>
+
+              <!-- head -->
+              <g id="pipHead" class="p-head">
+                <ellipse class="p-skull" cx="210" cy="202" rx="124" ry="116" />
+                <path class="p-jaw" d="M116 262Q210 352 304 262" fill="none" />
+                <path class="p-shine" d="M112 168Q130 124 178 112" fill="none" />
+
+                <ellipse class="p-socket" cx="160" cy="214" rx="38" ry="46" />
+                <ellipse class="p-socket" cx="260" cy="214" rx="38" ry="46" />
+
+                <g clip-path="url(#clipL)">
+                  <g class="pupil" id="pupilL">
+                    <g class="pupil-in">
+                      <circle cx="160" cy="214" r="26" fill="url(#gGlow)" />
+                      <circle cx="160" cy="214" r="7" fill="#fffbe6" />
+                    </g>
+                  </g>
+                  <path class="lid" d="M118 160H202V228Q160 244 118 228Z" />
+                </g>
+                <g clip-path="url(#clipR)">
+                  <g class="pupil" id="pupilR">
+                    <g class="pupil-in">
+                      <circle cx="260" cy="214" r="26" fill="url(#gGlow)" />
+                      <circle cx="260" cy="214" r="7" fill="#fffbe6" />
+                    </g>
+                  </g>
+                  <path class="lid" d="M218 160H302V228Q260 244 218 228Z" />
+                </g>
+
+                <path id="pipNose" class="p-nose"
+                  d="M210 258C203 258 200 266 204 270C207 272 210 270 210 270S213 272 216 270C220 266 217 258 210 258Z"
+                  tabindex="0" role="button" aria-label="Pip's nose. Tickle to surprise Pip." />
+                <path class="p-mouth mouth-smile" d="M178 292Q208 318 246 286" fill="none" />
+                <g class="mouth-giggle">
+                  <path class="p-mouth-open" d="M178 288Q210 340 246 284Q210 298 178 288Z" />
+                  <ellipse cx="212" cy="316" rx="13" ry="7" fill="#ff8fab" />
+                </g>
+                <g class="mouth-surprised">
+                  <ellipse cx="212" cy="298" rx="10" ry="14" class="p-mouth-open" />
+                </g>
+                <g class="mouth-yawn">
+                  <ellipse cx="212" cy="302" rx="15" ry="19" class="p-mouth-open" />
+                  <ellipse cx="212" cy="312" rx="9" ry="5" fill="#ff8fab" />
+                </g>
+                <circle class="p-cheek" cx="116" cy="262" r="15" />
+                <circle class="p-cheek" cx="304" cy="262" r="15" />
+
+                <!-- nightcap -->
+                <path class="p-cap" d="M96 134C108 62 220 24 330 46C300 78 318 108 326 138C250 110 160 114 96 134Z" />
+                <path class="p-brim" d="M90 136C160 106 262 106 332 140L328 160C250 130 160 130 92 158Z" />
+                <circle class="p-pom" cx="332" cy="44" r="17" />
+                <use class="p-capstar" href="#star" x="196" y="62" width="16" height="16" />
+                <use class="p-capstar" href="#star" x="246" y="50" width="12" height="12" />
+                <use class="p-capstar" href="#star" x="278" y="84" width="14" height="14" />
+                <use class="p-capstar" href="#star" x="226" y="92" width="10" height="10" />
+                <g class="p-bow">
+                  <path d="M112 152C82 128 74 170 106 162Z" />
+                  <path d="M112 152C142 128 150 170 118 162Z" />
+                  <circle cx="112" cy="156" r="7" />
+                </g>
+                <g id="egg" role="button" tabindex="0"
+                  aria-label="A tiny gold star on Pip's nightcap. Tap five times to wake Pip."
+                  aria-description="Interactive easter egg">
+                  <circle cx="156" cy="96" r="26" fill="transparent" />
+                  <use class="egg-star" href="#star" x="140" y="80" width="32" height="32" />
+                </g>
+              </g>
+
+              <g class="p-zzz" aria-hidden="true">
+                <text x="350" y="130" font-size="34">Z</text>
+                <text x="376" y="100" font-size="26">z</text>
+                <text x="394" y="76" font-size="20">z</text>
+              </g>
+            </svg>
+  </div>
+  <p class="lost-code">ERROR 404 · DREAM NOT FOUND</p>
+  <h1>Oops! Pip got lost.</h1>
+  <p class="lost-message">Looks like this page floated away into the clouds. Pip is trying to find the way back!</p>
+  <a class="btn btn-primary lost-home" href="./">Take Pip home</a>
+  <p class="lost-footer">Don't worry. Even dream engineers take a wrong turn sometimes.</p>
+</main>
+</body>
+</html>
