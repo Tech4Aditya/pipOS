@@ -71,6 +71,8 @@
 
     var state = {
       running: false,
+      isPaused: false,
+      isGameOver: false,
       visible: true,
       score: 0,
       best: parseInt(store.get('pip_stars_best', '0'), 10) || 0,
@@ -287,6 +289,8 @@
 
     function triggerGameOver() {
       state.running = false;
+      state.isPaused = false;
+      state.isGameOver = true;
       if (state.score > state.best) {
         state.best = state.score;
         store.set('pip_stars_best', String(state.best));
@@ -469,6 +473,8 @@
       state.cloud.wideUntil = 0;
       state.cloud.isWide = false;
       state.running = true;
+      state.isPaused = false;
+      state.isGameOver = false;
       state.lastSpawn = Date.now();
       updateStatsUI();
 
@@ -482,7 +488,9 @@
     }
 
     function pauseGame() {
+      if (!state.running) return;
       state.running = false;
+      state.isPaused = true;
       cancelAnimationFrame(state.rafId);
       if (actionBtn) {
         actionBtn.textContent = 'Resume Game';
@@ -491,11 +499,26 @@
       render();
     }
 
+    function resumeGame() {
+      if (state.running || !state.isPaused) return;
+      state.running = true;
+      state.isPaused = false;
+      state.lastSpawn = Date.now();
+      if (actionBtn) {
+        actionBtn.textContent = 'Pause Game';
+        actionBtn.setAttribute('aria-label', 'Pause Catch the Falling Stars game');
+      }
+      cancelAnimationFrame(state.rafId);
+      state.rafId = requestAnimationFrame(loop);
+    }
+
     // Event Listeners
     if (actionBtn) {
       actionBtn.addEventListener('click', function () {
         if (state.running) {
           pauseGame();
+        } else if (state.isPaused) {
+          resumeGame();
         } else {
           startGame();
         }
@@ -543,8 +566,9 @@
         state.keys.right = true;
         e.preventDefault();
       } else if (e.key === ' ' || e.key === 'Enter') {
-        if (!state.running) startGame();
-        else pauseGame();
+        if (state.running) pauseGame();
+        else if (state.isPaused) resumeGame();
+        else startGame();
         e.preventDefault();
       }
     });
@@ -574,6 +598,7 @@
       state: state,
       startGame: startGame,
       pauseGame: pauseGame,
+      resumeGame: resumeGame,
       triggerGameOver: triggerGameOver,
       spawnStar: spawnStar,
       spawnParticles: spawnParticles,

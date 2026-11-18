@@ -213,3 +213,81 @@ test('Catch the Falling Stars: dynamic particle bursts with combo-scaled palette
   assert.deepStrictEqual(crystalPal, STARS_CONFIG.COMBO_PALETTES.crystal);
 });
 
+test('Catch the Falling Stars: resumeGame preserves active score and game state (Fixes #225)', () => {
+  const { initStars } = require('./stars.js');
+
+  const mockCanvas = {
+    getContext: () => ({
+      scale: () => {},
+      clearRect: () => {},
+      createLinearGradient: () => ({ addColorStop: () => {} }),
+      fillRect: () => {},
+      rect: () => {},
+      beginPath: () => {},
+      arc: () => {},
+      fill: () => {},
+      stroke: () => {},
+      save: () => {},
+      restore: () => {},
+      translate: () => {},
+      rotate: () => {},
+      moveTo: () => {},
+      lineTo: () => {},
+      closePath: () => {}
+    }),
+    addEventListener: () => {}
+  };
+
+  const actionBtn = {
+    textContent: '',
+    setAttribute: () => {},
+    addEventListener: () => {}
+  };
+
+  global.document = {
+    getElementById: (id) => {
+      if (id === 'starsCanvas') return mockCanvas;
+      if (id === 'starsActionBtn') return actionBtn;
+      return { textContent: '', setAttribute: () => {}, addEventListener: () => {}, classList: { add: () => {}, remove: () => {} } };
+    }
+  };
+  global.window = { devicePixelRatio: 1 };
+  global.requestAnimationFrame = (_cb) => 1;
+  global.cancelAnimationFrame = () => {};
+
+  try {
+    const game = initStars();
+    assert.ok(game, 'initStars should return game instance');
+
+    // Start game and simulate score progress
+    game.startGame();
+    game.state.score = 42;
+    game.state.misses = 1;
+    game.state.combo = 5;
+    game.state.stars = [{ x: 50, y: 100, r: 8 }];
+
+    // Pause game
+    game.pauseGame();
+    assert.strictEqual(game.state.running, false, 'Game should not be running when paused');
+    assert.strictEqual(game.state.isPaused, true, 'isPaused flag should be true');
+    assert.strictEqual(actionBtn.textContent, 'Resume Game');
+
+    // Resume game
+    game.resumeGame();
+    assert.strictEqual(game.state.running, true, 'Game should be running after resume');
+    assert.strictEqual(game.state.isPaused, false, 'isPaused flag should reset on resume');
+    assert.strictEqual(actionBtn.textContent, 'Pause Game');
+
+    // State must NOT be reset to 0!
+    assert.strictEqual(game.state.score, 42, 'Score must remain 42');
+    assert.strictEqual(game.state.misses, 1, 'Misses must remain 1');
+    assert.strictEqual(game.state.combo, 5, 'Combo must remain 5');
+    assert.strictEqual(game.state.stars.length, 1, 'Stars array must not be cleared');
+  } finally {
+    delete global.document;
+    delete global.window;
+    delete global.requestAnimationFrame;
+    delete global.cancelAnimationFrame;
+  }
+});
+
