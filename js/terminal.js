@@ -90,7 +90,7 @@
           "  wish <text>        - Post a wish to the wish wall",
           "  fortune / dream    - Read a midnight prophecy",
           "  calc <expr>        - Quick arithmetic evaluator (e.g., calc 24 * 7)",
-          "  blocks [stats|export] - View or export Rattle & Blocks tower records",
+          "  blocks snapshot    - Capture and download PNG of current block tower",
           "  history            - Display recent command history",
           "  clear              - Wipe terminal screen"
         ].join('\n');
@@ -224,61 +224,19 @@
         break;
 
       case 'blocks':
-        var sub = args[0] ? args[0].toLowerCase() : 'stats';
-        var pipObj = getPIP();
-        if (sub === 'export') {
-          var exporter = (pipObj.toys && typeof pipObj.toys.exportScores === 'function')
-            ? pipObj.toys.exportScores
-            : (typeof require !== 'undefined' ? (function () {
-                try { return require('./toys.js').exportScores; } catch (e) { return null; }
-              })() : null);
-          if (typeof exporter === 'function') {
-            out = exporter();
+        var sub = (args[0] || '').toLowerCase();
+        if (sub === 'snapshot') {
+          var cv = typeof document !== 'undefined' ? document.getElementById('blockCanvas') : null;
+          var p = getPIP();
+          var toys = (p && p.toys) ? p.toys : (PIP.toys || {});
+          if (cv && typeof toys.downloadCanvas === 'function') {
+            toys.downloadCanvas(cv, 'pip-blocks-snapshot.png');
+            out = "📸 Stacking tower snapshot captured and downloaded!";
           } else {
-            out = "pip-blocks: Score export not available.";
-          }
-        } else if (sub === 'stats') {
-          var curStore = (pipObj && pipObj.store) ? pipObj.store : store;
-          var curBest = curStore.get('best', '0');
-          var topScores = [];
-          try {
-            var raw = curStore.get('blockTopScores', '[]');
-            topScores = JSON.parse(raw);
-          } catch (e) {}
-          if (!Array.isArray(topScores)) topScores = [];
-
-          var lines = [
-            "🧱 Rattle & Blocks Stacking Statistics:",
-            "  Personal Best: " + curBest + " blocks"
-          ];
-          if (topScores.length > 0) {
-            lines.push("  Top Leaderboard Records:");
-            topScores.forEach(function (score, idx) {
-              lines.push("    #" + (idx + 1) + " — " + score + " pts");
-            });
-          } else {
-            lines.push("  Top Leaderboard Records: None recorded yet.");
-          }
-          out = lines.join('\n');
-        } else if (sub === 'import') {
-          var jsonStr = args.slice(1).join(' ');
-          if (!jsonStr) {
-            out = "Usage: blocks import <json>";
-          } else {
-            var importer = (pipObj.toys && typeof pipObj.toys.importScores === 'function')
-              ? pipObj.toys.importScores
-              : (typeof require !== 'undefined' ? (function () {
-                  try { return require('./toys.js').importScores; } catch (e) { return null; }
-                })() : null);
-            if (typeof importer === 'function') {
-              var ok = importer(jsonStr);
-              out = ok ? "✨ Stacking records imported successfully!" : "pip-blocks: Invalid score data.";
-            } else {
-              out = "pip-blocks: Score import not available.";
-            }
+            out = "blocks snapshot: canvas or snapshot exporter unavailable";
           }
         } else {
-          out = "Usage: blocks [stats|export]";
+          out = "Usage: blocks snapshot";
         }
         break;
 
@@ -331,6 +289,11 @@
       params: ['on', 'off'],
       hint: ' [on|off]',
       pills: ['quiet on', 'quiet off']
+    },
+    blocks: {
+      params: ['snapshot'],
+      hint: ' [snapshot]',
+      pills: ['blocks snapshot']
     }
   };
 

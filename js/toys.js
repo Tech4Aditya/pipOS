@@ -790,8 +790,12 @@
     }
 
     function drop() {
+      if (!st) { reset(); return; }
       if (st.over) { reset(); return; }
-      var top = st.stack[st.stack.length - 1], c = st.cur;
+      if (!st.cur) return;
+      var top = (st.stack && st.stack.length) ? st.stack[st.stack.length - 1] : null;
+      if (!top) return;
+      var c = st.cur;
       var left = Math.max(c.x, top.x), right = Math.min(c.x + c.w, top.x + top.w), ov = right - left;
       if (ov < 3) {
         st.chips.push({ x: c.x, w: c.w, y: levelY(c.i), vy: 0, i: c.i });
@@ -1341,113 +1345,57 @@ var col = theme.pal[idx % theme.pal.length];
     return Math.pow(1.08, Math.min(combo - 1, 8));
   }
 
-  function getBestMarkerY(best, cam) {
-    var H = 420, BH = 28;
-    return (H - 10 - (best + 1) * BH) + (cam || 0);
-  }
+  function downloadCanvas(canvasEl, filename) {
+    if (!canvasEl) return false;
+    var name = filename || 'pip-game-snapshot.png';
+    if (!/\.png$/i.test(name)) name += '.png';
 
-  function getPIP() {
-    if (typeof window !== 'undefined' && window.PIP) return window.PIP;
-    if (typeof global !== 'undefined' && global.PIP) return global.PIP;
-    return PIP;
-  }
-
-  function getStore() {
-    var p = getPIP();
-    return (p && p.store) ? p.store : store;
-  }
-
-  function exportScores() {
-    var curStore = getStore();
-    var topScores = [];
-    try {
-      var raw = curStore.get('blockTopScores', '[]');
-      var parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        topScores = parsed.filter(function (s) { return typeof s === 'number' && !isNaN(s) && s > 0; })
-                          .sort(function (a, b) { return b - a; })
-                          .slice(0, 5);
-      }
-    } catch (e) {}
-
-    var best = parseInt(curStore.get('best', '0'), 10) || 0;
-    var mode = curStore.get('blockMode', 'normal') || 'normal';
-
-    var payload = {
-      game: 'rattle-and-blocks',
-      version: '1.0',
-      best: best,
-      mode: mode,
-      topScores: topScores,
-      exportedAt: new Date().toISOString()
-    };
-    return JSON.stringify(payload, null, 2);
-  }
-
-  function importScores(json) {
-    var curStore = getStore();
-    var data = json;
-    if (typeof json === 'string') {
-      try {
-        data = JSON.parse(json);
-      } catch (e) {
-        return false;
-      }
-    }
-    if (!data || typeof data !== 'object') return false;
-
-    var list = [];
-    if (Array.isArray(data)) {
-      list = data;
-    } else if (Array.isArray(data.topScores)) {
-      list = data.topScores;
-    } else if (Array.isArray(data.scores)) {
-      list = data.scores;
-    }
-
-    var validScores = list.map(function (val) {
-      if (typeof val === 'number') return val;
-      if (val && typeof val === 'object' && typeof val.score === 'number') return val.score;
-      return parseInt(val, 10);
-    }).filter(function (s) {
-      return typeof s === 'number' && !isNaN(s) && s > 0;
-    }).sort(function (a, b) {
-      return b - a;
-    }).slice(0, 5);
-
-    curStore.set('blockTopScores', JSON.stringify(validScores));
-
-    var importedBest = 0;
-    if (typeof data.best === 'number' && !isNaN(data.best) && data.best > 0) {
-      importedBest = data.best;
-    } else if (validScores.length > 0) {
-      importedBest = validScores[0];
-    }
-
-    if (importedBest > 0) {
-      var curBest = parseInt(curStore.get('best', '0'), 10) || 0;
-      if (importedBest > curBest) {
-        curStore.set('best', importedBest);
+    function triggerDownload(url) {
+      var doc = (canvasEl && canvasEl.ownerDocument) || (typeof document !== 'undefined' ? document : null);
+      if (!doc || typeof doc.createElement !== 'function') return;
+      var a = doc.createElement('a');
+      a.href = url;
+      a.download = name;
+      if (typeof a.setAttribute === 'function') a.setAttribute('download', name);
+      if (a.style) a.style.display = 'none';
+      if (doc.body && typeof doc.body.appendChild === 'function') {
+        doc.body.appendChild(a);
+        if (typeof a.click === 'function') a.click();
+        setTimeout(function () {
+          if (a.parentNode && typeof a.parentNode.removeChild === 'function') {
+            a.parentNode.removeChild(a);
+          }
+          if (typeof URL !== 'undefined' && typeof URL.revokeObjectURL === 'function' && typeof url === 'string' && url.indexOf('blob:') === 0) {
+            URL.revokeObjectURL(url);
+          }
+        }, 150);
       }
     }
 
-    if (typeof blocksRenderLeaderboard === 'function') {
-      blocksRenderLeaderboard(validScores);
+    if (typeof canvasEl.toBlob === 'function') {
+      canvasEl.toBlob(function (blob) {
+        if (!blob) return;
+        var url = (typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function')
+          ? URL.createObjectURL(blob)
+          : '';
+        if (url) {
+          triggerDownload(url);
+        }
+      }, 'image/png');
+      return true;
+    } else if (typeof canvasEl.toDataURL === 'function') {
+      var dataUrl = canvasEl.toDataURL('image/png');
+      triggerDownload(dataUrl);
+      return true;
     }
-    if (typeof blocksSyncBest === 'function' && importedBest > 0) {
-      blocksSyncBest(importedBest);
-    }
-
-    return true;
+    return false;
   }
 
   PIP.toys = {
     HOUSE_STORIES: HOUSE_STORIES,
     updateLeaderboardList: updateLeaderboardList,
     getComboPitchMultiplier: getComboPitchMultiplier,
-    getBestMarkerY: getBestMarkerY,
-    exportScores: exportScores,
-    importScores: importScores,
+    downloadCanvas: downloadCanvas,
     init: function () {
       initLab();
       initLights();
@@ -1463,9 +1411,7 @@ var col = theme.pal[idx % theme.pal.length];
       HOUSE_STORIES: HOUSE_STORIES,
       updateLeaderboardList: updateLeaderboardList,
       getComboPitchMultiplier: getComboPitchMultiplier,
-      getBestMarkerY: getBestMarkerY,
-      exportScores: exportScores,
-      importScores: importScores
+      downloadCanvas: downloadCanvas
     };
   }
 })();
