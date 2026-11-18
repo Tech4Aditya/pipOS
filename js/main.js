@@ -5,7 +5,7 @@
   var PIP = window.PIP;
   var $ = PIP.$, $$ = PIP.$$, store = PIP.store, clamp = PIP.clamp, reduce = PIP.reduceMotion;
   var audio = PIP.audio;
-  var tr = function (text) { return PIP.i18n && typeof PIP.i18n.t === 'function' ? PIP.i18n.t(text) : text; };
+  var tr = function (text, params) { return PIP.i18n && typeof PIP.i18n.t === 'function' ? PIP.i18n.t(text, params) : text; };
   var toast = function (text, ms) { PIP.toast(tr(text), ms); };
 
   function safe(name, fn) {

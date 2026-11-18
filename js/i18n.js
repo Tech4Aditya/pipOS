@@ -50,7 +50,11 @@
       'Sound on': 'Sound on',
       'Sound off': 'Sound off',
       'Turn sound on': 'Turn sound on',
-      'Turn sound off': 'Turn sound off'
+      'Turn sound off': 'Turn sound off',
+      dreams_count: '{count} dream delivered | {count} dreams delivered',
+      stars_count: '{count} star caught | {count} stars caught',
+      wishes_count: '{count} wish pinned | {count} wishes pinned',
+      page_indicator: 'Page {current} of {total}'
     },
     hi: {
       nav_pip: 'पिप',
@@ -94,17 +98,144 @@
       'Sound on': 'ध्वनि चालू',
       'Sound off': 'ध्वनि बंद',
       'Turn sound on': 'ध्वनि चालू करें',
-      'Turn sound off': 'ध्वनि बंद करें'
+      'Turn sound off': 'ध्वनि बंद करें',
+      dreams_count: '{count} सपना पहुँचाया गया | {count} सपने पहुँचाए गए',
+      stars_count: '{count} तारा पकड़ा गया | {count} तारे पकड़े गए',
+      wishes_count: '{count} ख्वाहिश जोड़ी गई | {count} ख्वाहिशें जोड़ी गईं',
+      page_indicator: 'पृष्ठ {current} का {total}'
     }
   };
 
-  var curLang = store.get('lang', 'en');
+  function getStore() {
+    if (typeof window !== 'undefined' && window.PIP && window.PIP.store) {
+      return window.PIP.store;
+    }
+    return store;
+  }
+
+  function detectLocale(nav) {
+    var n = nav !== undefined ? nav : (typeof navigator !== 'undefined' ? navigator : null);
+    if (!n) return 'en';
+    var langs = [];
+    if (Array.isArray(n.languages) && n.languages.length > 0) {
+      langs = n.languages;
+    } else if (typeof n.language === 'string' && n.language) {
+      langs = [n.language];
+    } else if (typeof n.userLanguage === 'string' && n.userLanguage) {
+      langs = [n.userLanguage];
+    }
+
+    for (var i = 0; i < langs.length; i++) {
+      var raw = langs[i];
+      if (typeof raw !== 'string') continue;
+      var clean = raw.trim().toLowerCase();
+      if (TRANSLATIONS[clean]) return clean;
+      var primary = clean.split(/[-_]/)[0];
+      if (TRANSLATIONS[primary]) return primary;
+    }
+    return 'en';
+  }
+
+  function getInitialLang(nav, customStore) {
+    var s = customStore || getStore();
+    var saved = (s && typeof s.get === 'function') ? s.get('lang', null) : null;
+    if (saved && TRANSLATIONS[saved]) {
+      return saved;
+    }
+    return detectLocale(nav);
+  }
+
+  var curLang = getInitialLang();
   if (curLang !== 'en' && curLang !== 'hi') curLang = 'en';
+
+  function interpolate(str, params) {
+    if (typeof str !== 'string' || !params) return str;
+    return str.replace(/\{\s*([a-zA-Z0-9_]+)\s*\}/g, function (match, key) {
+      if (params && params[key] !== undefined && params[key] !== null) {
+        return String(params[key]);
+      }
+      return match;
+    });
+  }
+
+  function getPluralCategory(count, lang) {
+    var num = typeof count === 'number' ? count : Number(count);
+    if (isNaN(num)) return 'other';
+
+    var l = (lang || curLang || 'en').toLowerCase().split(/[-_]/)[0];
+
+    if (typeof Intl !== 'undefined' && Intl.PluralRules) {
+      try {
+        return new Intl.PluralRules(l).select(num);
+      } catch (e) {}
+    }
+
+    if (l === 'hi') {
+      return (num === 0 || num === 1) ? 'one' : 'other';
+    }
+    return num === 1 ? 'one' : 'other';
+  }
+
+  function formatIcuPlural(template, count, lang) {
+    if (typeof template !== 'string') return template;
+    var marker = 'plural,';
+    var maxLoops = 10;
+    while (template.indexOf(marker) !== -1 && maxLoops-- > 0) {
+      var idx = template.indexOf(marker);
+      var openBrace = template.lastIndexOf('{', idx);
+      if (openBrace === -1) break;
+
+      var depth = 1;
+      var closeBrace = -1;
+      for (var i = openBrace + 1; i < template.length; i++) {
+        if (template[i] === '{') depth++;
+        else if (template[i] === '}') {
+          depth--;
+          if (depth === 0) {
+            closeBrace = i;
+            break;
+          }
+        }
+      }
+      if (closeBrace === -1) break;
+
+      var content = template.slice(openBrace + 1, closeBrace);
+      var parts = content.split(/,\s*plural\s*,\s*/);
+      if (parts.length < 2) break;
+
+      var varName = parts[0].trim();
+      var body = parts.slice(1).join(', plural, ');
+      var num = (varName === 'count' && count !== null) ? count : Number(count);
+      if (isNaN(num)) num = 0;
+
+      var branches = {};
+      var bRegex = /(=?\w+)\s*\{([^{}]*)\}/g;
+      var m;
+      while ((m = bRegex.exec(body)) !== null) {
+        branches[m[1]] = m[2];
+      }
+
+      var exact = '=' + num;
+      var chosen = '';
+      if (branches[exact] !== undefined) {
+        chosen = branches[exact];
+      } else if (num === 0 && branches.zero !== undefined) {
+        chosen = branches.zero;
+      } else {
+        var cat = getPluralCategory(num, lang);
+        chosen = branches[cat] || branches.other || branches.one || '';
+      }
+
+      var replacement = chosen.replace(/#/g, String(num));
+      template = template.slice(0, openBrace) + replacement + template.slice(closeBrace + 1);
+    }
+    return template;
+  }
 
   function apply(lang) {
     if (!TRANSLATIONS[lang]) lang = 'en';
     curLang = lang;
-    store.set('lang', lang);
+    getStore().set('lang', lang);
 
     if (typeof document === 'undefined') return;
     document.documentElement.setAttribute('lang', lang);
@@ -114,7 +245,15 @@
     for (var i = 0; i < elements.length; i++) {
       var el = elements[i];
       var key = el.getAttribute('data-i18n');
-      if (dict[key]) {
+      var countAttr = el.getAttribute('data-i18n-count');
+      var params = null;
+      if (countAttr !== null && !isNaN(Number(countAttr))) {
+        params = { count: Number(countAttr) };
+      }
+      var res = t(key, params);
+      if (res && res !== key) {
+        el.textContent = res;
+      } else if (dict[key]) {
         el.textContent = dict[key];
       }
     }
@@ -148,10 +287,142 @@
     }
   }
 
-  function t(text) {
-    if (!text) return '';
-    var dict = TRANSLATIONS[curLang] || TRANSLATIONS.en;
-    return (dict && dict[text]) ? dict[text] : text;
+  function t(key, params, extra) {
+    if (!key) return '';
+    var dict = TRANSLATIONS[curLang] || TRANSLATIONS.en || {};
+    var entry = (typeof key === 'string') ? dict[key] : key;
+
+    if (entry === undefined && typeof key === 'string') {
+      if (TRANSLATIONS.en && TRANSLATIONS.en[key] !== undefined) {
+        entry = TRANSLATIONS.en[key];
+      } else {
+        entry = key;
+      }
+    }
+
+    // Determine count and param object
+    var count = null;
+    var paramObj = null;
+
+    if (typeof params === 'number') {
+      count = params;
+      paramObj = { count: params };
+      if (typeof extra === 'function') {
+        paramObj.plural = extra;
+      }
+    } else if (typeof params === 'function') {
+      paramObj = { plural: params };
+    } else if (params && typeof params === 'object') {
+      paramObj = Object.assign({}, params);
+      if (typeof paramObj.count === 'number') count = paramObj.count;
+      else if (typeof paramObj.n === 'number') count = paramObj.n;
+      else if (typeof paramObj.num === 'number') count = paramObj.num;
+      else if (typeof paramObj.count === 'string' && !isNaN(Number(paramObj.count))) {
+        count = Number(paramObj.count);
+      }
+    } else if (typeof params === 'string') {
+      paramObj = { count: params, value: params };
+      if (!isNaN(Number(params))) count = Number(params);
+    }
+
+    if (typeof extra === 'function' && paramObj) {
+      paramObj.plural = extra;
+    }
+
+    // If entry is a function
+    if (typeof entry === 'function') {
+      entry = entry(paramObj || count, curLang);
+    }
+
+    // If paramObj has custom plural function
+    if (paramObj && typeof paramObj.plural === 'function' && count !== null) {
+      var customRes = paramObj.plural(count, curLang);
+      if (customRes !== undefined && customRes !== null) {
+        entry = customRes;
+      }
+    }
+
+    // If entry is an object of plural forms: { zero, one, other } or { singular, plural }
+    if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+      var num = count !== null ? count : 0;
+      var cat = getPluralCategory(num, curLang);
+      var chosen = null;
+      if (num === 0 && entry.zero !== undefined) {
+        chosen = entry.zero;
+      } else if (entry[cat] !== undefined) {
+        chosen = entry[cat];
+      } else if (cat === 'one' && entry.singular !== undefined) {
+        chosen = entry.singular;
+      } else if (cat === 'other' && entry.plural !== undefined) {
+        chosen = entry.plural;
+      } else {
+        chosen = entry.other !== undefined ? entry.other
+          : (entry.one !== undefined ? entry.one
+          : (entry.plural !== undefined ? entry.plural
+          : (entry.singular !== undefined ? entry.singular
+          : Object.values(entry)[0])));
+      }
+      entry = chosen !== undefined ? chosen : '';
+    }
+
+    if (typeof entry === 'string') {
+      // Pipe-delimited plural forms: "singular | plural" or "zero | singular | plural"
+      if (entry.indexOf('|') !== -1 && count !== null) {
+        var parts = entry.split('|').map(function (s) { return s.trim(); });
+        if (parts.length === 2) {
+          entry = (count === 1) ? parts[0] : parts[1];
+        } else if (parts.length >= 3) {
+          entry = (count === 0) ? parts[0] : ((count === 1) ? parts[1] : parts[2]);
+        }
+      }
+
+      // ICU plural format
+      if (entry.indexOf('plural') !== -1 && entry.indexOf('{') !== -1) {
+        entry = formatIcuPlural(entry, count, curLang);
+      }
+
+      // Parameter interpolation
+      if (paramObj) {
+        entry = interpolate(entry, paramObj);
+      }
+    }
+
+    return entry;
+  }
+
+  function plural(count, forms, lang) {
+    var num = typeof count === 'number' ? count : Number(count);
+    if (isNaN(num)) num = 0;
+
+    if (typeof forms === 'string' && arguments.length >= 3 && typeof arguments[2] === 'string') {
+      var singular = forms;
+      var pluralStr = arguments[2];
+      var chosenStr = (num === 1) ? singular : pluralStr;
+      if (chosenStr.indexOf('{count}') !== -1) {
+        return interpolate(chosenStr, { count: num });
+      }
+      return num + ' ' + chosenStr;
+    }
+
+    var targetLang = (typeof lang === 'string' && lang) ? lang : curLang;
+    var prevLang = curLang;
+    if (targetLang !== curLang && TRANSLATIONS[targetLang]) {
+      curLang = targetLang;
+    }
+
+    var res;
+    if (typeof forms === 'object' && forms !== null) {
+      res = t(forms, { count: num });
+    } else if (typeof forms === 'string') {
+      res = t(forms, { count: num });
+    } else if (typeof forms === 'function') {
+      res = forms(num, curLang);
+    } else {
+      res = String(num);
+    }
+
+    curLang = prevLang;
+    return res;
   }
 
   function toggle() {
@@ -160,6 +431,7 @@
 
   function init() {
     if (typeof document === 'undefined') return;
+    curLang = getInitialLang();
     var btn = document.getElementById('langBtn');
     if (btn) {
       btn.addEventListener('click', toggle);
@@ -170,8 +442,15 @@
   var i18nModule = {
     init: init,
     apply: apply,
+    setLanguage: apply,
     toggle: toggle,
     t: t,
+    interpolate: interpolate,
+    detectLocale: detectLocale,
+    getInitialLang: getInitialLang,
+    getPluralRule: getPluralCategory,
+    selectPlural: getPluralCategory,
+    plural: plural,
     getLang: function () { return curLang; },
     TRANSLATIONS: TRANSLATIONS
   };
