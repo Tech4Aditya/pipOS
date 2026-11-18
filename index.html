@@ -182,8 +182,8 @@
     <a href="#work"><span class="ic ic-box" aria-hidden="true"></span>My Toys</a>
     <a href="#terminal"><span class="ic ic-term" aria-hidden="true"></span>terminal.exe</a>
     <a href="#monitor"><span class="ic ic-gauge" aria-hidden="true"></span>monitor.exe</a>
-
-    <a href="#notes"><span class="ic ic-pad" aria-hidden="true"></span>notes.exe</a>    <a href="#stickers"><span class="ic ic-star" aria-hidden="true"></span>stickers.exe</a>
+    <a href="#notes"><span class="ic ic-pad" aria-hidden="true"></span>notes.exe</a>
+    <a href="#stickers"><span class="ic ic-star" aria-hidden="true"></span>stickers.exe</a>
     <a href="#story"><span class="ic ic-book" aria-hidden="true"></span>bedtime.exe</a>
     <a href="#wall"><span class="ic ic-pin" aria-hidden="true"></span>wish wall</a>
     <button type="button" id="trashBtn" aria-label="Nightmares trash can"><span class="ic ic-trash"
@@ -672,8 +672,6 @@
               </ol>
             </div>
             <div class="block-leaderboard" id="blockLeaderboardSecondary">
-            <div class="block-leaderboard" id="blockScores">
-            <div class="block-leaderboard">
               <span class="block-leaderboard-title">Top 5 Scores</span>
               <ol class="block-leaderboard-list" id="blockLeaderboardList">
                 <li class="block-leaderboard-empty">No scores yet &mdash; start stacking!</li>
@@ -970,24 +968,15 @@
             <div class="row row-between book-bar">
               <div class="book-nav">
                 <button class="btn" id="bookPrev" type="button" aria-label="Previous storybook page">← Back</button>
-                <button class="btn btn-primary" id="bookNext" type="button" aria-label="Next storybook page">Next
-                  →</button>
+                <button class="btn btn-primary" id="bookNext" type="button" aria-label="Next storybook page">Next →</button>
               </div>
 
               <!-- Added speech narration controls -->
               <div class="book-speech" role="group" aria-label="Story narration controls">
-                <button class="btn" id="storySpeechBtn" type="button" aria-label="Read this scene aloud">🔊
-                  Read</button>
-                <button class="btn" id="storyPauseBtn" type="button" aria-label="Pause narration" hidden>⏸
-                  Pause</button>
+                <button class="btn" id="storySpeechBtn" type="button" aria-label="Read this scene aloud">🔊 Read</button>
+                <button class="btn" id="storyPauseBtn" type="button" aria-label="Pause narration" hidden>⏸ Pause</button>
                 <button class="btn" id="storyStopBtn" type="button" aria-label="Stop narration" hidden>⏹ Stop</button>
               </div>
-
-            <div class="book-speech" role="group" aria-label="Story narration controls">
-              <button class="btn" id="storySpeechBtn" type="button" aria-label="Read this scene aloud">🔊 Read</button>
-              <button class="btn" id="storyPauseBtn" type="button" aria-label="Pause narration" hidden>⏸ Pause</button>
-              <button class="btn" id="storyStopBtn" type="button" aria-label="Stop narration" hidden>⏹ Stop</button>
-            </div>
               <p class="score" id="bookInd" aria-live="polite" aria-atomic="true">Page 1 of 6</p>
             </div>
           </div>
@@ -1013,14 +1002,12 @@
             <div class="stars-canvas-wrap">
               <canvas id="starsCanvas" width="300" height="380" aria-label="Catch the Falling Stars canvas game"
                 tabindex="0"></canvas>
-              <div id="starsGameOver" class="stars-overlay hidden" aria-hidden="true">
-              <canvas id="starsCanvas" width="300" height="380" aria-label="Catch the Falling Stars canvas game" tabindex="0"></canvas>
               <div id="starsGameOver" class="stars-overlay hidden" hidden>
                 <div class="stars-modal">
                   <div class="stars-modal-icon" aria-hidden="true">🌙</div>
                   <h4 class="stars-modal-title">Dawn has arrived</h4>
-                  <p class="stars-modal-msg">Pip's cloud gathered <span id="starsFinalScore">0</span> starlight dreams.
-                  </p>
+                  <p class="stars-modal-msg">Pip's cloud gathered <span id="starsFinalScore">0</span> starlight dreams.</p>
+                  <button type="button" id="starsRestartBtn" class="btn btn-sm" tabindex="-1">Sleep Again</button>
                 </div>
               </div>
             </div>
@@ -1288,8 +1275,6 @@
               </div>
               <div class="term-prompt-row">
                 <span class="term-prompt-label" aria-hidden="true">pip@midnight:~$</span>
-                <input type="text" id="termInput" class="term-input" autocomplete="off" spellcheck="false"
-                  aria-label="Terminal command input prompt" placeholder="type a command...">
                 <div class="term-input-wrap">
                   <input type="text" id="termInput" class="term-input" autocomplete="off" spellcheck="false" aria-label="Terminal command input prompt" placeholder="type a command...">
                   <span id="termGhost" class="term-ghost" aria-hidden="true"></span>
@@ -1423,7 +1408,6 @@
             </div>
           </div>
         </article>
-
       </div>
     </section>
 
