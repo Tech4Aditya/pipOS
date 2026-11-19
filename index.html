@@ -1787,6 +1787,45 @@
                   <span>Screen Brightness</span>
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
+          </div>
+          </div>
+          </div>
+        </article>
+        <!-- Rain, Ocean & Thunder Generator (pip-ambience) -->
+        <article id="ambienceWin" class="win w-ambience" data-foldable aria-labelledby="ambienceTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="ambienceTitle">pip-ambience.exe</h3>
+            <span class="ambience-badge" aria-hidden="true">Soundscapes</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Bedtime Ambience Generator. Procedural rain, rolling ocean surf, and distant thunder synthesized with Web Audio.</p>
+            </div>
+            <div class="ambience-grid" role="region" aria-label="Ambient sound channels">
+              <div class="amb-channel">
+                <div class="amb-head">
+                  <span class="amb-name">🌧️ Gentle Rain</span>
+                  <button type="button" class="btn btn-tiny" id="ambRainToggle" aria-pressed="false">Play</button>
+                </div>
+                <label for="ambRainVol" class="sr-only">Rain Volume</label>
+                <input type="range" id="ambRainVol" class="amb-slider" min="0" max="100" value="50">
+              </div>
+
+              <div class="amb-channel">
+                <div class="amb-head">
+                  <span class="amb-name">🌊 Ocean Surf</span>
+                  <button type="button" class="btn btn-tiny" id="ambOceanToggle" aria-pressed="false">Play</button>
+                </div>
+                <label for="ambOceanVol" class="sr-only">Ocean Volume</label>
+                <input type="range" id="ambOceanVol" class="amb-slider" min="0" max="100" value="50">
+              </div>
+
+              <div class="amb-channel">
+                <div class="amb-head">
+                  <span class="amb-name">⚡ Distant Thunder</span>
+                  <button type="button" class="btn btn-tiny btn-primary" id="ambThunderBtn">Roll</button>
+                </div>
+                <span class="amb-desc">Deep low-frequency procedural rumble</span>
               </div>
             </div>
           </div>
@@ -2224,6 +2263,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/ambience.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
