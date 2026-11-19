@@ -314,6 +314,21 @@
     }
 
     initIconDrag();
+
+    var trashBtn = $('#cmTrash');
+    if (trashBtn) {
+      trashBtn.addEventListener('click', function () {
+        hideContextMenu();
+        var trashWin = $('#trash');
+        if (trashWin) {
+          trashWin.removeAttribute('hidden');
+          trashWin.scrollIntoView({ behavior: 'smooth' });
+          if (PIP.windowManager && typeof PIP.windowManager.bringToFront === 'function') {
+            PIP.windowManager.bringToFront(trashWin);
+          }
+        }
+      });
+    }
   }
 
   if (typeof document !== 'undefined') {

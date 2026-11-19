@@ -1788,6 +1788,29 @@
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
               </div>
+          </div>
+          </div>
+        </article>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- TRASH CAN WINDOW -->
+        <article id="trash" class="win w-trash" data-foldable aria-labelledby="trashTitle" hidden>
+          <div class="win-bar">
+            <span class="win-title" id="trashTitle">trash.exe — Nursery Recycle Bin</span>
+            <div class="win-actions">
+              <button type="button" class="btn btn-sm btn-ghost win-min" aria-label="Minimize Trash Can">_</button>
+              <button type="button" class="btn btn-sm btn-ghost win-close" aria-label="Close Trash Can">✕</button>
+            </div>
+          </div>
+          <div class="win-body">
+            <div class="trash-controls">
+              <span class="trash-desc">Deleted bedtime stories and files stay here until permanently cleared.</span>
+              <button type="button" id="trashEmptyBtn" class="btn btn-sm btn-danger" disabled>Empty Trash</button>
+            </div>
+            <div id="trashList" class="trash-list"></div>
+            <div id="trashEmptyMsg" class="trash-empty-msg">
+              <span class="trash-empty-icon" aria-hidden="true">🧺</span>
+              <p>The trash basket is squeaky clean!</p>
             </div>
           </div>
         </article>
@@ -2224,6 +2247,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/trash.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 

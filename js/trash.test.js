@@ -136,3 +136,61 @@ test('trash click event triggers audio note, 10 starlight particles, toast, and 
   // Verify sticker unlock
   assert.ok(unlockedSticker === 'trash' || unlockedSticker === 'route7', 'Must unlock trash or route7 sticker');
 });
+
+const PipTrash = require('./trash.js');
+
+test.describe('Desktop Trash Can & Soft File Deletion Engine (pip-trash)', () => {
+  test.beforeEach(() => {
+    PipTrash.emptyTrash();
+  });
+
+  test('moveToTrash creates valid metadata envelope', () => {
+    const item = PipTrash.moveToTrash('/home/pip/test_story.txt', 'Once upon a midnight dream...');
+    assert.ok(item.id.startsWith('trash_'));
+    assert.strictEqual(item.name, 'test_story.txt');
+    assert.strictEqual(item.originalPath, '/home/pip/test_story.txt');
+    assert.strictEqual(item.content, 'Once upon a midnight dream...');
+    assert.strictEqual(item.size, 29);
+    assert.ok(item.deletedAt > 0);
+
+    const list = PipTrash.listTrash();
+    assert.strictEqual(list.length, 1);
+    assert.strictEqual(list[0].id, item.id);
+  });
+
+  test('restore removes item from trash and recovers file', () => {
+    const item = PipTrash.moveToTrash('/home/pip/lullaby.md', '# Lullaby Notes');
+    assert.strictEqual(PipTrash.listTrash().length, 1);
+
+    const restored = PipTrash.restore(item.id);
+    assert.strictEqual(restored.id, item.id);
+    assert.strictEqual(restored.originalPath, '/home/pip/lullaby.md');
+    assert.strictEqual(PipTrash.listTrash().length, 0);
+  });
+
+  test('restore throws on non-existent item id', () => {
+    assert.throws(() => {
+      PipTrash.restore('trash_invalid_9999');
+    }, /Item not found in trash/);
+  });
+
+  test('emptyTrash wipes all deleted items', () => {
+    PipTrash.moveToTrash('/home/pip/note1.txt', 'Note 1');
+    PipTrash.moveToTrash('/home/pip/note2.txt', 'Note 2');
+    PipTrash.moveToTrash('/home/pip/note3.txt', 'Note 3');
+    assert.strictEqual(PipTrash.listTrash().length, 3);
+
+    const clearedCount = PipTrash.emptyTrash();
+    assert.strictEqual(clearedCount, 3);
+    assert.strictEqual(PipTrash.listTrash().length, 0);
+  });
+
+  test('getItem retrieves specific trash entry', () => {
+    const item = PipTrash.moveToTrash('/home/pip/secret.txt', 'gold star');
+    const found = PipTrash.getItem(item.id);
+    assert.deepStrictEqual(found, item);
+
+    const notFound = PipTrash.getItem('trash_unknown');
+    assert.strictEqual(notFound, null);
+  });
+});
