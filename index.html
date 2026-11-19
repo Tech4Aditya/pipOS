@@ -1788,6 +1788,73 @@
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
               </div>
+          </div>
+          </div>
+        </article>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- Midnight Garden Virtual Pet & Plant Care -->
+        <article id="gardenWin" class="win w-garden" data-foldable aria-labelledby="gardenTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="gardenTitle">pip-garden.exe</h3>
+            <span class="garden-badge" aria-hidden="true">Celestial Flora</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Midnight Garden. Nurture glowing bedtime flora with starlight dew, moonbeams, and gentle lullabies.</p>
+            </div>
+
+            <!-- Garden Species Toolbar -->
+            <div class="garden-toolbar" role="toolbar" aria-label="Garden species controls">
+              <label for="gardenPlantSelect" class="sr-only">Choose plant:</label>
+              <select id="gardenPlantSelect" class="garden-select" aria-label="Choose plant species">
+                <option value="moonflower">🌸 Celestial Moonflower</option>
+                <option value="fern">🌿 Starlight Fern</option>
+                <option value="shroom">🍄 Lullaby Shroom</option>
+                <option value="berry">🫐 Dream Berry</option>
+                <option value="cactus">🌵 Celestial Cactus</option>
+              </select>
+              <div class="garden-harvest-stat">
+                <span>Harvested:</span>
+                <span id="gardenBloomsCount" class="garden-stat-num">0</span>
+              </div>
+            </div>
+
+            <!-- Plant Terrarium Card -->
+            <div class="garden-terrarium">
+              <div id="gardenPlantIcon" class="garden-terrarium-icon" aria-hidden="true">🌱</div>
+              <div class="garden-terrarium-meta">
+                <h4 id="gardenPlantStage" class="garden-stage-name">Seed 🌱</h4>
+                <p id="gardenPlantDesc" class="garden-plant-desc">Blooms under full moonlight with glowing petals.</p>
+              </div>
+            </div>
+
+            <!-- Vitals Meters -->
+            <div class="garden-meters" role="region" aria-label="Plant vitals">
+              <div class="garden-meter-row">
+                <span class="garden-meter-lbl">💧 Moisture</span>
+                <div class="garden-meter-track"><div id="gardenWaterBar" class="garden-meter-fill fill-water"></div></div>
+              </div>
+              <div class="garden-meter-row">
+                <span class="garden-meter-lbl">🌙 Starlight</span>
+                <div class="garden-meter-track"><div id="gardenLightBar" class="garden-meter-fill fill-light"></div></div>
+              </div>
+              <div class="garden-meter-row">
+                <span class="garden-meter-lbl">💖 Affection</span>
+                <div class="garden-meter-track"><div id="gardenLoveBar" class="garden-meter-fill fill-love"></div></div>
+              </div>
+              <div class="garden-meter-row">
+                <span class="garden-meter-lbl">✨ Growth</span>
+                <div class="garden-meter-track"><div id="gardenGrowthBar" class="garden-meter-fill fill-growth"></div></div>
+              </div>
+            </div>
+
+            <!-- Care Actions Bar -->
+            <div class="garden-actions">
+              <button type="button" class="btn btn-tiny" id="gardenWaterBtn">💧 Water</button>
+              <button type="button" class="btn btn-tiny" id="gardenShineBtn">🌙 Beam</button>
+              <button type="button" class="btn btn-tiny" id="gardenSingBtn">🎶 Lullaby</button>
+              <button type="button" class="btn btn-tiny btn-primary" id="gardenHarvestBtn" disabled>🌸 Harvest</button>
             </div>
           </div>
         </article>
@@ -2224,6 +2291,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/garden.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 

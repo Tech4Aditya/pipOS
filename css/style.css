@@ -4778,6 +4778,7 @@ html.mode-wide-spacing body {
   display: none;
   transition: background 0.2s ease;
 }
+* Real-Time FPS Telemetry HUD & Battery Saver (pip-perf.exe)
 
 /* Sensory Bubble Wrap (pip-bubbles.exe) */
 .w-bubbles {
@@ -4941,3 +4942,136 @@ html.mode-wide-spacing body {
 .btn-danger:hover {
   background: #c82333;
 }
+* Midnight Garden Virtual Pet & Plant Care (pip-garden.exe)
+ * ----------------------------------------------------------- */
+.w-garden {
+  min-width: 320px;
+}
+
+.garden-badge {
+  font-size: 0.75rem;
+  background: rgba(74, 222, 128, 0.25);
+  color: #15803d;
+  border: 1px solid rgba(74, 222, 128, 0.5);
+
+
+
+
+[data-theme="night"] .garden-badge {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+}
+
+.garden-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.garden-select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #ccc);
+  background: var(--card-bg, #fff);
+  color: var(--ink, #111);
+  font-size: 0.85rem;
+}
+
+.garden-harvest-stat {
+  font-size: 0.85rem;
+  color: var(--muted, #666);
+}
+
+.garden-stat-num {
+  font-weight: 700;
+  color: var(--ink, #111);
+}
+
+.garden-terrarium {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: radial-gradient(circle at center, rgba(167, 243, 208, 0.2) 0%, rgba(6, 78, 59, 0.25) 100%);
+  border: 2px solid rgba(52, 211, 153, 0.4);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.garden-terrarium-icon {
+  font-size: 3rem;
+  line-height: 1;
+  text-shadow: 0 0 16px rgba(52, 211, 153, 0.6);
+  animation: plantBreathe 3s ease-in-out infinite alternate;
+}
+
+@keyframes plantBreathe {
+  0% { transform: scale(0.96); }
+  100% { transform: scale(1.05); }
+}
+
+.garden-terrarium-meta {
+  flex: 1;
+}
+
+.garden-stage-name {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink, #111);
+}
+
+.garden-plant-desc {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted, #666);
+  line-height: 1.4;
+}
+
+.garden-meters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.garden-meter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.garden-meter-lbl {
+  width: 90px;
+  color: var(--ink, #333);
+}
+
+.garden-meter-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.garden-meter-fill {
+  height: 100%;
+  width: 50%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.fill-water { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+.fill-light { background: linear-gradient(90deg, #fde047, #f59e0b); }
+.fill-love { background: linear-gradient(90deg, #f472b6, #ec4899); }
+.fill-growth { background: linear-gradient(90deg, #34d399, #10b981); }
+
+.garden-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
