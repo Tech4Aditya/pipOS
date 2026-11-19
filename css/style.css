@@ -4778,6 +4778,7 @@ html.mode-wide-spacing body {
   display: none;
   transition: background 0.2s ease;
 }
+* Real-Time FPS Telemetry HUD & Battery Saver (pip-perf.exe)
 
 /* Sensory Bubble Wrap (pip-bubbles.exe) */
 .w-bubbles {
@@ -4941,3 +4942,154 @@ html.mode-wide-spacing body {
 .btn-danger:hover {
   background: #c82333;
 }
+* Taskbar Notification Center & Do-Not-Disturb Drawer (pip-notifications)
+ * ----------------------------------------------------------- */
+.notif-bell-btn {
+  position: relative;
+}
+
+.notif-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+.notif-badge.is-hidden {
+  display: none;
+}
+
+.notif-center {
+  position: fixed;
+  top: 42px;
+  right: 12px;
+  width: 320px;
+  max-height: calc(100vh - 60px);
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+.notif-center.is-hidden {
+  transform: translateX(110%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.notif-center-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color, #eee);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.notif-center-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink, #111);
+}
+
+.notif-center-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notif-close-btn {
+  font-size: 1rem;
+}
+
+.notif-filter-wrap {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.notif-select {
+  width: 100%;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #ccc);
+  background: var(--card-bg, #fff);
+  color: var(--ink, #111);
+  font-size: 0.82rem;
+}
+
+.notif-list {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  background: var(--card-bg, #fff);
+  font-size: 0.85rem;
+  position: relative;
+}
+
+.notif-item.is-unread {
+  border-left: 3px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.notif-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.notif-body {
+  flex: 1;
+}
+
+.notif-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--ink, #111);
+  margin-bottom: 2px;
+}
+
+.notif-msg {
+  font-size: 0.8rem;
+  color: var(--muted, #444);
+  line-height: 1.35;
+  margin-bottom: 4px;
+}
+
+.notif-time {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.notif-del {
+  color: var(--muted, #888);
+}
+
+.notif-empty {
+  padding: 24px 12px;
+  text-align: center;
+  font-style: italic;
+  color: var(--muted, #666);
+  font-size: 0.85rem;

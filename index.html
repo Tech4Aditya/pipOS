@@ -1826,6 +1826,30 @@
   </dialog>
 
   <script src="js/crash-reporter.js" defer></script>
+        <!-- Notification Center & Do-Not-Disturb Drawer -->
+  <aside id="notifCenter" class="notif-center is-hidden" aria-label="Notification Center" inert>
+    <div class="notif-center-head">
+      <h3 class="notif-center-title">Notifications</h3>
+      <div class="notif-center-actions">
+        <button type="button" class="btn btn-tiny" id="notifDndBtn" aria-pressed="false">🔔 DND: Off</button>
+        <button type="button" class="btn btn-tiny" id="notifClearBtn">Clear All</button>
+        <button type="button" class="btn-icon-tiny notif-close-btn" id="notifCloseBtn" aria-label="Close notification center">✕</button>
+      </div>
+    </div>
+    <div class="notif-filter-wrap">
+      <label for="notifFilterSelect" class="sr-only">Filter notifications</label>
+      <select id="notifFilterSelect" class="notif-select">
+        <option value="all">All Alerts</option>
+        <option value="system">⚙️ System</option>
+        <option value="starlight">🌟 Starlight</option>
+        <option value="audio">🎵 Audio</option>
+        <option value="security">🛡️ Security</option>
+      </select>
+    </div>
+    <div id="notifList" class="notif-list" role="region" aria-label="Notification alerts list"></div>
+  </aside>
+
+  <script src="js/notifications.js" defer></script>
       </div>
     </section>
 
