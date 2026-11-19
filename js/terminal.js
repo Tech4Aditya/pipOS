@@ -27,7 +27,7 @@
   var toast = PIP.toast || function () {};
 
   var COMMANDS = [
-    'help', 'whoami', 'time', 'date', 'theme', 'sound', 'quiet', 'sleep',
+    'help', 'whoami', 'time', 'date', 'theme', 'sound', 'quiet', 'sleep', 'gravity',
     'play', 'wish', 'fortune', 'dream', 'calc', 'blocks', 'clear', 'history',
     'ls', 'cd', 'pwd', 'cat', 'mkdir', 'touch', 'rm',
     'echo', 'grep', 'wc', 'sort', 'uniq', 'head', 'tail'
@@ -99,11 +99,12 @@
           "  sound [on|off]     - Check or toggle audio synthesizer",
           "  quiet [on|off]     - Check or toggle quiet mode",
           "  sleep [minutes]    - Bedtime timer with gradual lullaby fade-out",
+          "  gravity [up|down|flip] - Control Rattle & Blocks gravity direction",
           "  play [chime|lullaby] - Synthesize Web Audio melody",
           "  wish <text>        - Post a wish to the wish wall",
           "  fortune / dream    - Read a midnight prophecy",
           "  calc <expr>        - Quick arithmetic evaluator (e.g., calc 24 * 7)",
-          "  blocks [stats|export] - View or export Rattle & Blocks tower records",
+          "  blocks [stats|export|gravity] - View records or adjust stacking gravity",
           "  history            - Display recent command history",
           "  clear              - Wipe terminal screen"
         ].join('\n');
@@ -204,6 +205,46 @@
             } else {
               out = "Audio system unavailable.";
             }
+          }
+        }
+        break;
+
+      case 'gravity':
+        var pipObjG = getPIP();
+        var toysModule = (pipObjG && (pipObjG.toys || pipObjG.blocks)) || null;
+        if (!toysModule || typeof toysModule.setGravity !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { toysModule = require('./toys.js'); } catch (e) {}
+          }
+        }
+        var setGrav = (toysModule && typeof toysModule.setGravity === 'function')
+          ? toysModule.setGravity
+          : ((typeof PIP !== 'undefined' && PIP.toys && typeof PIP.toys.setGravity === 'function') ? PIP.toys.setGravity : null);
+        var getGrav = (toysModule && typeof toysModule.getGravity === 'function')
+          ? toysModule.getGravity
+          : ((typeof PIP !== 'undefined' && PIP.toys && typeof PIP.toys.getGravity === 'function') ? PIP.toys.getGravity : null);
+
+        if (args.length === 0) {
+          var curG = (typeof getGrav === 'function') ? getGrav() : 1;
+          var dirLabel = (curG === -1 ? 'inverted (up -1 🌌)' : 'normal (down 1 ⬇️)');
+          out = "Rattle & Blocks Gravity: " + dirLabel + "\nUsage: gravity [up|down|flip]";
+        } else {
+          var dirArg = args[0].toLowerCase();
+          if (dirArg === 'up') {
+            if (setGrav) setGrav(-1);
+            out = "🌌 Gravity inverted! Blocks and chips now float upward into the cosmos.";
+          } else if (dirArg === 'down') {
+            if (setGrav) setGrav(1);
+            out = "⬇️ Gravity restored to downward.";
+          } else if (dirArg === 'flip' || dirArg === 'toggle') {
+            var currentG = (typeof getGrav === 'function') ? getGrav() : 1;
+            var nextG = -currentG;
+            if (setGrav) setGrav(nextG);
+            out = (nextG === -1)
+              ? "🌌 Gravity inverted! Chips now float upward."
+              : "⬇️ Gravity restored to downward.";
+          } else {
+            out = "Usage: gravity [up|down|flip]";
           }
         }
         break;
@@ -427,8 +468,37 @@
               out = "pip-blocks: Score import not available.";
             }
           }
+        } else if (sub === 'gravity') {
+          var dirArgB = args[1] ? args[1].toLowerCase() : '';
+          var tMod = (pipObj && (pipObj.toys || pipObj.blocks)) || null;
+          if (!tMod || typeof tMod.setGravity !== 'function') {
+            if (typeof require !== 'undefined') {
+              try { tMod = require('./toys.js'); } catch (e) {}
+            }
+          }
+          var sGrav = tMod && typeof tMod.setGravity === 'function' ? tMod.setGravity : null;
+          var gGrav = tMod && typeof tMod.getGravity === 'function' ? tMod.getGravity : null;
+          if (!dirArgB) {
+            var cur = gGrav ? gGrav() : 1;
+            out = "Rattle & Blocks Gravity: " + (cur === -1 ? "inverted (up -1 🌌)" : "normal (down 1 ⬇️)") + "\nUsage: blocks gravity [up|down|flip]";
+          } else if (dirArgB === 'up') {
+            if (sGrav) sGrav(-1);
+            out = "🌌 Gravity inverted! Blocks and chips now float upward into the cosmos.";
+          } else if (dirArgB === 'down') {
+            if (sGrav) sGrav(1);
+            out = "⬇️ Gravity restored to downward.";
+          } else if (dirArgB === 'flip' || dirArgB === 'toggle') {
+            var curr = gGrav ? gGrav() : 1;
+            var nxt = -curr;
+            if (sGrav) sGrav(nxt);
+            out = (nxt === -1)
+              ? "🌌 Gravity inverted! Chips now float upward."
+              : "⬇️ Gravity restored to downward.";
+          } else {
+            out = "Usage: blocks gravity [up|down|flip]";
+          }
         } else {
-          out = "Usage: blocks [stats|export]";
+          out = "Usage: blocks [stats|export|gravity]";
         }
         break;
 
@@ -712,9 +782,9 @@
 
   var PARAM_HINTS = {
     blocks: {
-      params: ['stats', 'export'],
-      hint: ' [stats|export]',
-      pills: ['blocks stats', 'blocks export']
+      params: ['stats', 'export', 'gravity'],
+      hint: ' [stats|export|gravity]',
+      pills: ['blocks stats', 'blocks export', 'blocks gravity']
     },
     theme: {
       params: ['day', 'night', 'contrast'],
@@ -750,6 +820,11 @@
       params: ['15', '30', '45', 'cancel'],
       hint: ' [minutes]',
       pills: ['sleep 15', 'sleep 30', 'sleep cancel']
+    },
+    gravity: {
+      params: ['up', 'down', 'flip'],
+      hint: ' [up|down|flip]',
+      pills: ['gravity up', 'gravity down', 'gravity flip']
     }
   };
 

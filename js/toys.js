@@ -639,6 +639,27 @@
      ===================================================================== */
   var blocksRenderLeaderboard = null;
   var blocksSyncBest = null;
+  var blockGravityDir = parseInt(store.get('blockGravity', '1'), 10) || 1;
+  if (blockGravityDir !== 1 && blockGravityDir !== -1) blockGravityDir = 1;
+
+  function setGravity(dir) {
+    if (typeof dir === 'string') {
+      var s = dir.toLowerCase().trim();
+      if (s === 'up' || s === '-1' || s === 'invert' || s === 'inverted') dir = -1;
+      else if (s === 'down' || s === '1' || s === 'normal') dir = 1;
+      else if (s === 'flip' || s === 'toggle') dir = -blockGravityDir;
+    }
+    if (dir === -1 || dir === 1) {
+      blockGravityDir = dir;
+      store.set('blockGravity', dir);
+      return true;
+    }
+    return false;
+  }
+
+  function getGravity() {
+    return blockGravityDir;
+  }
 
   function initBlocks() {
     var cv = $('#blockCanvas'), btn = $('#blockDrop'), scoreEl = $('#blockScore');
@@ -646,6 +667,15 @@
     if (!cv || !cv.getContext) return;
     var ctx = cv.getContext('2d');
     if (!ctx) return;
+
+    PIP.toys = PIP.toys || {};
+    PIP.toys.setGravity = setGravity;
+    PIP.toys.getGravity = getGravity;
+    PIP.blocks = PIP.blocks || {};
+    PIP.blocks.setGravity = setGravity;
+    PIP.blocks.getGravity = getGravity;
+    initBlocks.setGravity = setGravity;
+    initBlocks.getGravity = getGravity;
 
     var W = 300, H = 420, BH = 28;
     var PAL = ['#ff9fb4', '#ffd27a', '#9fd8c4', '#9ab8f0', '#d3a8f2', '#ffb08a'];
@@ -947,11 +977,14 @@
       var target = Math.max(0, (st.stack ? st.stack.length : 1) - 9) * BH;
       st.cam += (target - st.cam) * Math.min(1, dt * 6);
       if (Array.isArray(st.chips)) {
+        var g = 900;
         st.chips.forEach(function (p) {
-          p.vy = (typeof p.vy === 'number' && !isNaN(p.vy)) ? p.vy + 900 * dt : 900 * dt;
+          p.vy = (typeof p.vy === 'number' && !isNaN(p.vy)) ? p.vy + (g * blockGravityDir) * dt : (g * blockGravityDir) * dt;
           p.y = (typeof p.y === 'number' && !isNaN(p.y)) ? p.y + p.vy * dt : H;
         });
-        st.chips = st.chips.filter(function (p) { return p.y < H + st.cam + 60; });
+        st.chips = st.chips.filter(function (p) {
+          return blockGravityDir === -1 ? (p.y > -st.cam - 60) : (p.y < H + st.cam + 60);
+        });
       }
     }
 
@@ -1695,6 +1728,8 @@
     importScores: importScores,
     updateRouteTrail: updateRouteTrail,
     renderRouteTrail: renderRouteTrail,
+    setGravity: setGravity,
+    getGravity: getGravity,
     init: function () {
       initLab();
       initLights();
@@ -1714,7 +1749,9 @@
       exportScores: exportScores,
       importScores: importScores,
       updateRouteTrail: updateRouteTrail,
-      renderRouteTrail: renderRouteTrail
+      renderRouteTrail: renderRouteTrail,
+      setGravity: setGravity,
+      getGravity: getGravity
     };
   }
 })();
