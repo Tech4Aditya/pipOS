@@ -1,13 +1,14 @@
 /* calc.js: Pip's Starlight Scientific & Nursery Calculator (starlight-calc.exe)
    A retro LCD scientific calculator featuring standard arithmetic, trigonometry,
-   logarithms, bracket parsing, memory registers, sheep counter Easter egg, and pentatonic audio chime feedback. */
+   logarithms, bracket parsing, memory registers, sheep counter Easter egg, and pentatonic audio chime feedback.
+   See technical documentation & parser specification in docs/CALCULATOR_ENGINE.md. */
 (function () {
   'use strict';
 
   var PIP = (typeof window !== 'undefined' && window.PIP) ? window.PIP : {};
   var $ = PIP.$ || function (sel) { return typeof document !== 'undefined' ? document.querySelector(sel) : null; };
-  var audio = PIP.audio || { isOn: function () { return false; }, note: function () {}, pop: function () {}, SCALE: [523, 587, 659, 784, 880, 1046, 1175, 1318] };
-  var toast = PIP.toast || function () {};
+  var audio = PIP.audio || { isOn: function () { return false; }, note: function () { }, pop: function () { }, SCALE: [523, 587, 659, 784, 880, 1046, 1175, 1318] };
+  var toast = PIP.toast || function () { };
 
   var state = {
     display: '0',
@@ -152,7 +153,7 @@
           ops.length &&
           ops[ops.length - 1].value !== '(' &&
           ((assoc[token] === 'L' && prec[token] <= prec[ops[ops.length - 1].value]) ||
-           (assoc[token] === 'R' && prec[token] < prec[ops[ops.length - 1].value]))
+            (assoc[token] === 'R' && prec[token] < prec[ops[ops.length - 1].value]))
         ) {
           output.push(ops.pop());
         }
