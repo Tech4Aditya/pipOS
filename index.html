@@ -1788,6 +1788,50 @@
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
               </div>
+          </div>
+          </div>
+        </article>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- Master Audio Oscilloscope & Frequency Spectrum Visualizer -->
+        <article id="visualizer" class="win w-vis" data-foldable aria-labelledby="visTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="visTitle">pip-visualizer.exe</h3>
+            <span class="vis-badge" aria-hidden="true">📊 Oscilloscope</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Real-Time Audio Visualizer. Inspect time-domain waveforms, 32-band FFT frequency spectrum bars, and polar lullaby orbits live from the Web Audio master bus.</p>
+            </div>
+
+            <!-- Toolbar Controls -->
+            <div class="vis-toolbar" role="toolbar" aria-label="Audio visualizer controls">
+              <div class="vis-btn-group" role="group" aria-label="Display mode">
+                <button type="button" class="btn btn-tiny vis-mode-btn is-active" data-mode="waveform" aria-pressed="true">〰 Waveform</button>
+                <button type="button" class="btn btn-tiny vis-mode-btn" data-mode="bars" aria-pressed="false">📶 FFT Bars</button>
+                <button type="button" class="btn btn-tiny vis-mode-btn" data-mode="orbit" aria-pressed="false">💫 Orbit</button>
+              </div>
+
+              <div class="vis-ctrl-group">
+                <label for="visThemeSelect" class="sr-only">CRT Color Theme:</label>
+                <select id="visThemeSelect" class="vis-select" aria-label="Oscilloscope CRT theme">
+                  <option value="green">CRT Green</option>
+                  <option value="amber">Amber Glow</option>
+                  <option value="berry">Pip Berry</option>
+                  <option value="cyan">Neon Cyan</option>
+                </select>
+
+                <label for="visGainSlider" class="vis-label">Gain:</label>
+                <input type="range" id="visGainSlider" class="vis-slider" min="0.5" max="3.0" step="0.1" value="1.0" aria-label="Oscilloscope gain sensitivity">
+                <span id="visGainVal" class="vis-val">1.0x</span>
+
+                <button type="button" class="btn btn-tiny" id="visFreezeBtn" aria-label="Pause or resume oscilloscope stream">⏸ Freeze</button>
+              </div>
+            </div>
+
+            <!-- Screen Area -->
+            <div class="vis-screen-wrapper">
+              <canvas id="visCanvas" width="340" height="200" class="vis-canvas" aria-label="Live audio frequency and waveform graph" role="img"></canvas>
             </div>
           </div>
         </article>
@@ -2224,6 +2268,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/visualizer.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 

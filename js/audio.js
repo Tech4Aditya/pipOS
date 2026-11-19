@@ -12,7 +12,7 @@
   var BASS = [261.63, 196.0, 220.0, 174.61];
 
   var ctx = null, master = null, reverbIn = null;
-  var limiter = null, wetGain = null, convNode = null;
+  var limiter = null, wetGain = null, convNode = null, analyser = null;
   var state = store.get('sound', '');
   var currentVolume = parseFloat(store.get('volume', '0.7'));
   if (isNaN(currentVolume) || currentVolume < 0 || currentVolume > 1) currentVolume = 0.7;
@@ -99,8 +99,11 @@
       if (limiter.attack) limiter.attack.value = 0.002;
       if (limiter.release) limiter.release.value = 0.1;
 
+      analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
       master.connect(limiter);
-      limiter.connect(ctx.destination);
+      limiter.connect(analyser);
+      analyser.connect(ctx.destination);
 
       convNode = ctx.createConvolver();
       convNode.buffer = makeImpulse(ctx, 2.2, 3);
@@ -671,13 +674,15 @@
     getSleepTimerRemaining: getSleepTimerRemaining,
     isSleepTimerActive: isSleepTimerActive,
     setNightTheme: setNightTheme,
+    getAnalyser: function () { return analyser; },
     masterBus: {
       configureLimiter: configureLimiter,
       setReverbWet: setReverbWet,
       getReverbWet: getReverbWet,
       makeImpulse: makeImpulse,
+      getAnalyser: function () { return analyser; },
       getMasterNodes: function () {
-        return { master: master, limiter: limiter, convolver: convNode, wet: wetGain };
+        return { master: master, limiter: limiter, convolver: convNode, wet: wetGain, analyser: analyser };
       }
     }
   };
@@ -705,7 +710,8 @@
       stopSleepTimer: stopSleepTimer,
       getSleepTimerRemaining: getSleepTimerRemaining,
       isSleepTimerActive: isSleepTimerActive,
-      setNightTheme: setNightTheme
+      setNightTheme: setNightTheme,
+      getAnalyser: function () { return analyser; }
     };
   }
 })();
