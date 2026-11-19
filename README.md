@@ -17,6 +17,7 @@ Pip OS is designed with a lightweight, modular architecture utilizing plain stan
 - 🚀 **[First PR in 10 Minutes](docs/FIRST_PR.md)**: Step-by-step tutorial from forking to opening your first verified PR.
 - 🏛️ **[Full Architecture Guide](docs/ARCHITECTURE.md)**: Deep dive into `window.PIP` modules, SVG eye-tracking kinematics, and where each toy lives.
 - 🎨 **[CSS & Theming Guide](docs/CSS.md)**: Design tokens, responsive grids, and WCAG AA contrast rules.
+- 💻 **[Terminal CLI, Piping & Redirection Manual](docs/TERMINAL_MANUAL.md)**: Virtual I/O streams, pipeline operators, file redirection, and command catalog.
 
 ```mermaid
 graph TD
