@@ -4778,6 +4778,7 @@ html.mode-wide-spacing body {
   display: none;
   transition: background 0.2s ease;
 }
+* Real-Time FPS Telemetry HUD & Battery Saver (pip-perf.exe)
 
 /* Sensory Bubble Wrap (pip-bubbles.exe) */
 .w-bubbles {
@@ -4941,3 +4942,65 @@ html.mode-wide-spacing body {
 .btn-danger:hover {
   background: #c82333;
 }
+* Rooftop Dream Delivery Flight Mini-Game 2D (pip-flight.exe)
+ * ----------------------------------------------------------- */
+.w-flight {
+  min-width: 320px;
+}
+
+.flight-badge {
+  font-size: 0.75rem;
+  background: rgba(244, 114, 182, 0.25);
+  color: #9d174d;
+  border: 1px solid rgba(244, 114, 182, 0.5);
+
+
+
+
+[data-theme="night"] .flight-badge {
+  background: rgba(244, 114, 182, 0.15);
+  color: #f472b6;
+}
+
+.flight-hud-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--card-bg, rgba(0, 0, 0, 0.04));
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+}
+
+.flight-stat {
+  display: flex;
+  gap: 4px;
+}
+
+.flight-stat-lbl {
+  color: var(--muted, #666);
+}
+
+.flight-stat-val {
+
+
+
+
+.flight-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 480 / 280;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #0f172a;
+}
+
+.flight-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: pointer;
+  touch-action: none;

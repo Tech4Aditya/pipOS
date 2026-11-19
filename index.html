@@ -1788,6 +1788,42 @@
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
               </div>
+          </div>
+          </div>
+        </article>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- Rooftop Dream Delivery Flight Mini-Game 2D -->
+        <article id="flightWin" class="win w-flight" data-foldable aria-labelledby="flightTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="flightTitle">pip-flight.exe</h3>
+            <span class="flight-badge" aria-hidden="true">2D Dream Glider</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Rooftop Dream Delivery. Flutter across the nursery rooftops, drop sweet dreams into chimneys, and collect twinkling starlight motes!</p>
+            </div>
+
+            <!-- Flight Telemetry & Controls -->
+            <div class="flight-hud-bar" role="region" aria-label="Flight telemetry">
+              <div class="flight-stat">
+                <span class="flight-stat-lbl">Score:</span>
+                <span id="flightScore" class="flight-stat-val">0</span>
+              </div>
+              <div class="flight-stat">
+                <span class="flight-stat-lbl">Deliveries:</span>
+                <span id="flightDeliveries" class="flight-stat-val">0</span>
+              </div>
+              <div class="flight-stat">
+                <span class="flight-stat-lbl">High Score:</span>
+                <span id="flightHigh" class="flight-stat-val">0</span>
+              </div>
+              <button type="button" class="btn btn-tiny btn-primary" id="flightStartBtn">🪂 Flutter</button>
+            </div>
+
+            <!-- Flight 2D Canvas -->
+            <div class="flight-canvas-wrapper">
+              <canvas id="flightCanvas" width="480" height="280" class="flight-canvas" aria-label="Rooftop dream delivery game view. Press space or click to flutter upward."></canvas>
             </div>
           </div>
         </article>
@@ -2224,6 +2260,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/flight.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
