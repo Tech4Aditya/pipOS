@@ -2,13 +2,34 @@
 (function () {
   'use strict';
   var PIP = (typeof window !== 'undefined' && window.PIP) ? window.PIP : {};
-  var $ = PIP.$ || function () { return null; };
-  var $$ = PIP.$$ || function () { return []; };
+  var $ = PIP.$ || function (sel, el) {
+    var root = el || ((typeof document !== 'undefined') ? document : null);
+    return (root && typeof root.querySelector === 'function') ? root.querySelector(sel) : null;
+  };
+  var $$ = PIP.$$ || function (sel, el) {
+    var root = el || ((typeof document !== 'undefined') ? document : null);
+    return (root && typeof root.querySelectorAll === 'function') ? Array.prototype.slice.call(root.querySelectorAll(sel)) : [];
+  };
   var store = PIP.store || { get: function () { return ''; }, set: function () {} };
   var clamp = PIP.clamp || function (v, a, b) { return Math.min(b, Math.max(a, v)); };
   var toast = PIP.toast || function () {};
   var reduce = PIP.reduceMotion || { matches: false };
   var audio = PIP.audio || { isOn: function () { return false; }, note: function () {} };
+
+  function getAudio() {
+    if (typeof window !== 'undefined' && window.PIP && window.PIP.audio) {
+      return window.PIP.audio;
+    }
+    if (typeof PIP !== 'undefined' && PIP.audio) {
+      return PIP.audio;
+    }
+    return audio;
+  }
+
+  function getRadarFrequency(distance) {
+    var d = Math.max(0, Math.min(85, distance));
+    return Math.round(520 + (85 - d) * 5.4);
+  }
 
   /* =====================================================================
      1. LULLABY LAB
@@ -360,7 +381,10 @@
       if (rk !== 'nursery' && rk !== 'attic' && rk !== 'garden') return;
       curRoom = rk;
       store.set('dr_room', curRoom);
+      if (maskEl) maskEl.classList.remove('is-near');
+      if (nearTimer) { clearTimeout(nearTimer); nearTimer = null; }
       updateRoomView();
+      checkProximityRadar();
     }
 
     if (roomsEl) {
@@ -406,6 +430,9 @@
         saveProgress();
         syncRoomElements();
         updateRoomView();
+        if (maskEl) maskEl.classList.remove('is-near');
+        if (nearTimer) { clearTimeout(nearTimer); nearTimer = null; }
+        checkProximityRadar();
         var curName = curRoom.charAt(0).toUpperCase() + curRoom.slice(1);
         toast('Dreams hidden again in the ' + curName + '.');
       });
@@ -466,6 +493,78 @@
       lanternsEl.appendChild(b);
     });
 
+    var maskEl = $('#darkroomMask') || $('.dr-glow', room);
+    var RADAR_THROTTLE_MS = 180;
+    var lastRadarPing = -RADAR_THROTTLE_MS;
+    var nearTimer = null;
+
+    function checkProximityRadar() {
+      var activeEl = $('.dr-room[data-room="' + curRoom + '"]', room);
+      if (!activeEl) return Infinity;
+      var activeItems = $$('[data-item]', activeEl);
+      var rb = room.getBoundingClientRect();
+
+      var nearestDist = Infinity;
+      activeItems.forEach(function (it) {
+        if (it.classList.contains('is-found')) return;
+        var ib = it.getBoundingClientRect();
+        var ix, iy;
+        if (ib.width > 0 || ib.height > 0 || ib.left > 0 || ib.top > 0) {
+          ix = ib.left + ib.width / 2 - rb.left;
+          iy = ib.top + ib.height / 2 - rb.top;
+        } else if (it.style && it.style.left && it.style.top) {
+          var pctX = parseFloat(it.style.left) / 100 || 0;
+          var pctY = parseFloat(it.style.top) / 100 || 0;
+          var rw = rb.width || 600;
+          var rh = rb.height || 375;
+          ix = pctX * rw;
+          iy = pctY * rh;
+        } else {
+          ix = ib.left + ib.width / 2 - rb.left;
+          iy = ib.top + ib.height / 2 - rb.top;
+        }
+        var dist = Math.hypot(ix - x, iy - y);
+        if (dist < nearestDist) {
+          nearestDist = dist;
+        }
+      });
+
+      if (!maskEl) {
+        maskEl = $('#darkroomMask') || $('.dr-glow', room);
+      }
+
+      if (nearestDist < 85) {
+        var now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        if (now - lastRadarPing >= RADAR_THROTTLE_MS) {
+          lastRadarPing = now;
+          var freq = getRadarFrequency(nearestDist);
+          audio = getAudio();
+          if (audio && (typeof audio.isOn !== 'function' || audio.isOn())) {
+            audio.note(freq, { gain: 0.06, dur: 0.25 });
+          }
+        }
+
+        if (maskEl) {
+          maskEl.classList.add('is-near');
+          if (nearTimer) clearTimeout(nearTimer);
+          nearTimer = setTimeout(function () {
+            maskEl.classList.remove('is-near');
+            nearTimer = null;
+          }, 250);
+        }
+      } else {
+        if (maskEl && !nearTimer) {
+          maskEl.classList.remove('is-near');
+        }
+      }
+
+      return nearestDist;
+    }
+
+    if (PIP.toys) {
+      PIP.toys.checkProximityRadar = checkProximityRadar;
+    }
+
     function center() {
       var b = room.getBoundingClientRect();
       x = b.width / 2;
@@ -477,6 +576,7 @@
       y = clamp(e.clientY - b.top, 0, b.height);
       lastMove = performance.now();
       paint();
+      checkProximityRadar();
     }
     var handle = $('#drHandle');
     var isDraggingHandle = false;
@@ -558,6 +658,7 @@
       e.preventDefault();
       lastMove = performance.now();
       paint();
+      checkProximityRadar();
       tryFind();
     });
 
@@ -571,7 +672,21 @@
       activeItems.forEach(function (it) {
         if (it.classList.contains('is-found')) return;
         var ib = it.getBoundingClientRect();
-        var ix = ib.left + ib.width / 2 - rb.left, iy = ib.top + ib.height / 2 - rb.top;
+        var ix, iy;
+        if (ib.width > 0 || ib.height > 0 || ib.left > 0 || ib.top > 0) {
+          ix = ib.left + ib.width / 2 - rb.left;
+          iy = ib.top + ib.height / 2 - rb.top;
+        } else if (it.style && it.style.left && it.style.top) {
+          var pctX = parseFloat(it.style.left) / 100 || 0;
+          var pctY = parseFloat(it.style.top) / 100 || 0;
+          var rw = rb.width || 600;
+          var rh = rb.height || 375;
+          ix = pctX * rw;
+          iy = pctY * rh;
+        } else {
+          ix = ib.left + ib.width / 2 - rb.left;
+          iy = ib.top + ib.height / 2 - rb.top;
+        }
         if (Math.hypot(ix - x, iy - y) < Math.max(34, r * 0.55)) {
           it.classList.add('is-found');
           var itName = it.getAttribute('data-name') || it.getAttribute('data-item') || 'dream';
@@ -583,6 +698,7 @@
 
           saveProgress();
           syncRoomElements();
+          checkProximityRadar();
 
           if (trayN) {
             trayN.textContent = curCount + ' of ' + totalInRoom + ' dreams found' + (itName ? ' (' + itName + ')' : '');
@@ -610,6 +726,7 @@
         x = b.width * (0.5 + 0.36 * Math.sin(t * 0.55));
         y = b.height * (0.5 + 0.32 * Math.sin(t * 0.83 + 1));
         paint();
+        checkProximityRadar();
       }
       raf = window.requestAnimationFrame(drift);
     }
@@ -1695,6 +1812,7 @@
     importScores: importScores,
     updateRouteTrail: updateRouteTrail,
     renderRouteTrail: renderRouteTrail,
+    getRadarFrequency: getRadarFrequency,
     init: function () {
       initLab();
       initLights();
@@ -1714,7 +1832,13 @@
       exportScores: exportScores,
       importScores: importScores,
       updateRouteTrail: updateRouteTrail,
-      renderRouteTrail: renderRouteTrail
+      renderRouteTrail: renderRouteTrail,
+      getRadarFrequency: getRadarFrequency,
+      init: PIP.toys.init,
+      initLights: initLights,
+      get checkProximityRadar() {
+        return PIP.toys.checkProximityRadar;
+      }
     };
   }
 })();

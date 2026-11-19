@@ -805,6 +805,13 @@ html.js .growth-chart.is-visible .growth-fill { width: calc(var(--progress, 0) *
 }
 .dr-glow { position: absolute; inset: 0; pointer-events: none; opacity: 0.55; mix-blend-mode: screen; background: radial-gradient(circle var(--r) at var(--x) var(--y), var(--glow) 0%, transparent 100%); }
 .darkroom.is-done .dr-glow { opacity: 0.6; }
+#darkroomMask.is-near,
+.dr-glow.is-near {
+  opacity: 0.85;
+  filter: drop-shadow(0 0 14px var(--glow));
+  transform: scale(1.06);
+  transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+}
 .dr-handle {
   position: absolute;
   left: var(--x);
