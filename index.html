@@ -1787,6 +1787,102 @@
                   <span>Screen Brightness</span>
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
+          </div>
+          </div>
+          </div>
+        </article>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- Desktop Control Panel & Wallpaper Customizer -->
+        <article id="settings" class="win w-settings" data-foldable aria-labelledby="settingsTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="settingsTitle">pip-settings.exe</h3>
+            <span class="settings-badge" aria-hidden="true">⚙ Control Panel</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>PipOS System Preferences &amp; Desktop Customizer. Adjust theme accents, wallpaper aesthetics, audio levels, and display warmth.</p>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="settings-tabs" role="tablist" aria-label="Settings categories">
+              <button type="button" class="btn btn-tiny settings-tab-btn is-active" data-tab="tabAppearance" role="tab" aria-selected="true" id="tabBtnAppearance">🎨 Appearance</button>
+              <button type="button" class="btn btn-tiny settings-tab-btn" data-tab="tabAudio" role="tab" aria-selected="false" id="tabBtnAudio">🔊 Audio</button>
+              <button type="button" class="btn btn-tiny settings-tab-btn" data-tab="tabDisplay" role="tab" aria-selected="false" id="tabBtnDisplay">🌙 Display</button>
+              <button type="button" class="btn btn-tiny settings-tab-btn" data-tab="tabStorage" role="tab" aria-selected="false" id="tabBtnStorage">💾 Storage</button>
+            </div>
+
+            <!-- Appearance Panel -->
+            <div id="tabAppearance" class="settings-panel is-active" role="tabpanel" aria-labelledby="tabBtnAppearance">
+              <fieldset class="settings-section">
+                <legend class="settings-legend">Accent Color Palette</legend>
+                <div class="settings-options" role="group" aria-label="Accent Palette Selection">
+                  <button type="button" class="btn btn-tiny settings-accent-btn is-active" data-accent="berry" aria-label="Berry Pink Accent">🍓 Berry (Default)</button>
+                  <button type="button" class="btn btn-tiny settings-accent-btn" data-accent="cyan" aria-label="Pip Cyan Accent">🌊 Cyan</button>
+                  <button type="button" class="btn btn-tiny settings-accent-btn" data-accent="gold" aria-label="Amber Gold Accent">⭐ Amber Gold</button>
+                  <button type="button" class="btn btn-tiny settings-accent-btn" data-accent="sage" aria-label="Sage Green Accent">🍃 Sage Green</button>
+                  <button type="button" class="btn btn-tiny settings-accent-btn" data-accent="lavender" aria-label="Cosmic Lavender Accent">🔮 Lavender</button>
+                </div>
+              </fieldset>
+
+              <fieldset class="settings-section">
+                <legend class="settings-legend">Desktop Wallpaper Aesthetic</legend>
+                <div class="settings-options" role="group" aria-label="Wallpaper Aesthetic Selection">
+                  <button type="button" class="btn btn-tiny settings-wp-btn is-active" data-wp="dots" aria-label="Cozy Polka Dots Wallpaper">🧁 Cozy Dots</button>
+                  <button type="button" class="btn btn-tiny settings-wp-btn" data-wp="scanlines" aria-label="CRT Scanlines Wallpaper">📺 CRT Scanlines</button>
+                  <button type="button" class="btn btn-tiny settings-wp-btn" data-wp="stars" aria-label="Midnight Starfield Wallpaper">✨ Starfield</button>
+                  <button type="button" class="btn btn-tiny settings-wp-btn" data-wp="grid" aria-label="Retro Blueprint Grid Wallpaper">📐 Blueprint Grid</button>
+                  <button type="button" class="btn btn-tiny settings-wp-btn" data-wp="gradient" aria-label="Pastel Sunset Gradient Wallpaper">🌅 Sunset Gradient</button>
+                </div>
+              </fieldset>
+
+              <fieldset class="settings-section">
+                <legend class="settings-legend">UI Typography Scale</legend>
+                <div class="settings-options" role="group" aria-label="UI Typography Scale Selection">
+                  <button type="button" class="btn btn-tiny settings-font-btn" data-font="compact" aria-label="Compact Typography">Compact</button>
+                  <button type="button" class="btn btn-tiny settings-font-btn is-active" data-font="normal" aria-label="Standard Typography">Standard</button>
+                  <button type="button" class="btn btn-tiny settings-font-btn" data-font="cozy" aria-label="Cozy Large Typography">Cozy (Large)</button>
+                </div>
+              </fieldset>
+            </div>
+
+            <!-- Audio Panel -->
+            <div id="tabAudio" class="settings-panel" role="tabpanel" aria-labelledby="tabBtnAudio" hidden>
+              <div class="settings-control-row">
+                <label for="settingsVolSlider" class="settings-label">Master Volume:</label>
+                <input type="range" id="settingsVolSlider" class="settings-slider" min="0" max="100" value="80" aria-label="Master volume level">
+                <span id="settingsVolVal" class="settings-val-badge">80%</span>
+              </div>
+              <div class="settings-control-row">
+                <label class="settings-checkbox-label">
+                  <input type="checkbox" id="settingsChimesToggle" checked>
+                  <span>Enable pentatonic keyboard &amp; button chimes</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Display Panel -->
+            <div id="tabDisplay" class="settings-panel" role="tabpanel" aria-labelledby="tabBtnDisplay" hidden>
+              <div class="settings-control-row">
+                <label for="settingsNightShift" class="settings-label">Night Shift Warmth (Blue Light Filter):</label>
+                <input type="range" id="settingsNightShift" class="settings-slider" min="0" max="50" value="0" aria-label="Night Shift warmth percentage">
+                <span id="settingsNightShiftVal" class="settings-val-badge">0%</span>
+              </div>
+              <p class="settings-note">Softens harsh blue light across the screen to create a cozy bedtime atmosphere.</p>
+            </div>
+
+            <!-- Storage Panel -->
+            <div id="tabStorage" class="settings-panel" role="tabpanel" aria-labelledby="tabBtnStorage" hidden>
+              <div class="storage-summary-box">
+                <div class="storage-head-row">
+                  <span class="storage-title">Local Browser Storage:</span>
+                  <span id="settingsStorageTotal" class="storage-total">0 KB</span>
+                  <button type="button" class="btn btn-tiny" id="settingsRefreshStorage">Refresh</button>
+                </div>
+                <ul id="settingsStorageList" class="storage-list" aria-label="Local storage key usage"></ul>
+              </div>
+              <div class="settings-actions">
+                <button type="button" class="btn btn-tiny is-danger" id="settingsResetBtn">⚠️ Reset to Factory Defaults</button>
               </div>
             </div>
           </div>
@@ -2224,6 +2320,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/settings.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 

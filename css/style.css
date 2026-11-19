@@ -4777,6 +4777,32 @@ html.mode-wide-spacing body {
   z-index: 99990;
   display: none;
   transition: background 0.2s ease;
+   Desktop Control Panel & System Customizer (pip-settings.exe)
+   ========================================================================== */
+/* Accent Color Themes */
+[data-accent="cyan"] {
+  --berry: #0d828a;
+  --berry-2: #09686e;
+  --berry-ink: #0d828a;
+  --focus: #0d828a;
+}
+[data-accent="gold"] {
+  --berry: #c47d0b;
+  --berry-2: #a36505;
+  --berry-ink: #c47d0b;
+  --focus: #c47d0b;
+}
+[data-accent="sage"] {
+  --berry: #3b7a57;
+  --berry-2: #2f6246;
+  --berry-ink: #3b7a57;
+  --focus: #3b7a57;
+}
+[data-accent="lavender"] {
+  --berry: #7b52ab;
+  --berry-2: #654191;
+  --berry-ink: #7b52ab;
+  --focus: #7b52ab;
 }
 
 /* Sensory Bubble Wrap (pip-bubbles.exe) */
@@ -4790,6 +4816,53 @@ html.mode-wide-spacing body {
   border-radius: 999px;
   background: rgba(236, 72, 153, 0.2);
   color: #f472b6;
+/* Wallpaper Aesthetics */
+[data-wallpaper="scanlines"] body {
+  background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04) 1px, transparent 1px, transparent 3px);
+}
+[data-wallpaper="stars"] body {
+  background-image: radial-gradient(circle at 50% 50%, var(--dot) 1.5px, transparent 1.5px), radial-gradient(circle at 20% 30%, var(--dot) 1px, transparent 1px);
+  background-size: 48px 48px, 96px 96px;
+}
+[data-wallpaper="grid"] body {
+  background-image: linear-gradient(var(--dot) 1px, transparent 1px), linear-gradient(90deg, var(--dot) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+[data-wallpaper="gradient"] body {
+  background-image: linear-gradient(135deg, rgba(255, 227, 234, 0.35) 0%, rgba(214, 230, 245, 0.35) 100%);
+}
+
+/* UI Typography Scale */
+[data-font-scale="compact"] {
+  font-size: 14px;
+}
+[data-font-scale="cozy"] {
+  font-size: 18px;
+}
+
+/* Night Shift Screen Overlay */
+.pip-night-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99998;
+  background: #ff9900;
+  mix-blend-mode: multiply;
+  opacity: var(--night-shift-opacity, 0);
+  transition: opacity 0.3s ease;
+}
+
+/* Settings Window Components */
+.w-settings {
+  min-width: 320px;
+}
+
+.settings-badge {
+  font-size: 0.75rem;
+  background: var(--bar);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
   font-weight: 600;
   margin-left: auto;
 }
@@ -4940,4 +5013,156 @@ html.mode-wide-spacing body {
 
 .btn-danger:hover {
   background: #c82333;
+.settings-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  border-bottom: 2px dashed var(--line);
+  padding-bottom: 8px;
+}
+
+.settings-tab-btn.is-active {
+  background: var(--berry);
+  color: var(--paper);
+  border-color: var(--line);
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.settings-panel {
+  display: block;
+}
+
+.settings-panel[hidden] {
+  display: none !important;
+}
+
+.settings-section {
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: var(--paper);
+}
+.settings-legend {
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0 6px;
+  color: var(--ink);
+}
+
+.settings-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.settings-accent-btn.is-active,
+.settings-wp-btn.is-active,
+.settings-font-btn.is-active {
+  background: var(--berry);
+  color: var(--paper);
+  font-weight: 700;
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.settings-control-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.settings-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.settings-slider {
+  flex: 1;
+  accent-color: var(--berry);
+  cursor: pointer;
+}
+
+.settings-val-badge {
+  font-weight: 700;
+  min-width: 48px;
+  text-align: right;
+  font-family: monospace;
+}
+
+.settings-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.92rem;
+}
+
+.settings-note {
+  font-size: 0.84rem;
+  opacity: 0.85;
+  margin-top: -6px;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.storage-summary-box {
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: var(--paper);
+  margin-bottom: 12px;
+}
+
+.storage-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.storage-total {
+  font-family: monospace;
+  background: var(--bar);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+}
+
+.storage-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 140px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 0.84rem;
+}
+
+.storage-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px dotted var(--line);
+}
+
+.storage-key {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.storage-size {
+  font-weight: 600;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
 }
