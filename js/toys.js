@@ -2,20 +2,63 @@
 (function () {
   'use strict';
   var PIP = (typeof window !== 'undefined' && window.PIP) ? window.PIP : {};
-  var $ = PIP.$ || function () { return null; };
-  var $$ = PIP.$$ || function () { return []; };
+  var $ = PIP.$ || function (sel, el) {
+    var root = el || ((typeof document !== 'undefined') ? document : null);
+    return (root && typeof root.querySelector === 'function') ? root.querySelector(sel) : null;
+  };
+  var $$ = PIP.$$ || function (sel, el) {
+    var root = el || ((typeof document !== 'undefined') ? document : null);
+    return (root && typeof root.querySelectorAll === 'function') ? Array.prototype.slice.call(root.querySelectorAll(sel)) : [];
+  };
   var store = PIP.store || { get: function () { return ''; }, set: function () {} };
   var clamp = PIP.clamp || function (v, a, b) { return Math.min(b, Math.max(a, v)); };
   var toast = PIP.toast || function () {};
   var reduce = PIP.reduceMotion || { matches: false };
   var audio = PIP.audio || { isOn: function () { return false; }, note: function () {} };
 
+  function getAudio() {
+    if (typeof window !== 'undefined' && window.PIP && window.PIP.audio) {
+      return window.PIP.audio;
+    }
+    if (typeof PIP !== 'undefined' && PIP.audio) {
+      return PIP.audio;
+    }
+    return audio;
+  }
+
   /* =====================================================================
      1. LULLABY LAB
      ===================================================================== */
+  var activeSetChordMode = null;
+  var activeIsChordMode = null;
+  var activePress = null;
+
   function initLab() {
     var keysEl = $('#keys'), stage = $('#mbStage'), wind = $('#windBtn'), endless = $('#endlessBtn');
+    var chordBtn = $('#chordModeBtn');
     if (!keysEl || !stage || !wind || !endless) return;
+
+    var chordActive = false;
+
+    function setChordMode(active) {
+      chordActive = !!active;
+      if (chordBtn) {
+        chordBtn.setAttribute('aria-pressed', chordActive ? 'true' : 'false');
+        chordBtn.classList.toggle('is-on', chordActive);
+        chordBtn.textContent = chordActive ? 'Harmony: On' : 'Harmony: Off';
+      }
+      return chordActive;
+    }
+
+    if (chordBtn) {
+      chordBtn.addEventListener('click', function () {
+        setChordMode(!chordActive);
+        toast(chordActive ? 'Harmony on' : 'Harmony off');
+      });
+    }
+
+    activeSetChordMode = setChordMode;
+    activeIsChordMode = function () { return chordActive; };
 
     var NAMES = ['C', 'D', 'E', 'G', 'A', 'high C', 'high D', 'high E'];
     var PAL = ['#ff9fb4', '#ffd27a', '#9fd8c4', '#9ab8f0', '#d3a8f2', '#ffb08a', '#8fd3e8', '#c7e58a'];
@@ -37,8 +80,10 @@
 
     function flash(i) {
       var b = buttons[i];
-      b.classList.add('is-down');
-      window.setTimeout(function () { b.classList.remove('is-down'); }, 180);
+      if (b && b.classList) {
+        b.classList.add('is-down');
+        window.setTimeout(function () { b.classList.remove('is-down'); }, 180);
+      }
       if (reduce.matches) return;
       var f = document.createElement('span');
       f.className = 'float';
@@ -49,16 +94,29 @@
       stage.appendChild(f);
     }
 
-    function press(i) {
-      flash(i);
-      if (audio.request()) {
-        audio.note(audio.SCALE[i], {
+    function press(index) {
+      flash(index);
+      audio = getAudio();
+      var canPlay = (typeof audio.request === 'function') ? audio.request() : true;
+      if (canPlay) {
+        var f = (audio.SCALE && audio.SCALE[index]) || 261.63;
+        audio.note(f, {
           dur: 1.6,
           gain: 0.24,
           adsr: { a: 0.005, d: 0.15, s: 0.25, r: 0.9 },
           bell: true
         });
+        if (chordActive) {
+          audio.note(f * 1.25, { dur: 1.2, gain: 0.1, when: 0.05 });
+        }
       }
+    }
+
+    activePress = press;
+    if (PIP.toys) {
+      PIP.toys.setChordMode = setChordMode;
+      PIP.toys.isChordMode = activeIsChordMode;
+      PIP.toys.press = press;
     }
 
     // number keys 1-8 while the lab is on screen (and you're not typing)
@@ -222,15 +280,17 @@
     }
 
     // muting from the taskbar stops everything the lab is doing
-    audio.onChange(function (s) {
-      if (s !== 'on') {
-        stopTune();
-        stopEndlessUi();
-        if (rainBtn) { rainBtn.setAttribute('aria-pressed', 'false'); rainBtn.classList.remove('is-on'); }
-        if (cricketsBtn) { cricketsBtn.setAttribute('aria-pressed', 'false'); cricketsBtn.classList.remove('is-on'); }
-        if (windBtn) { windBtn.setAttribute('aria-pressed', 'false'); windBtn.classList.remove('is-on'); }
-      }
-    });
+    if (audio && typeof audio.onChange === 'function') {
+      audio.onChange(function (s) {
+        if (s !== 'on') {
+          stopTune();
+          stopEndlessUi();
+          if (rainBtn) { rainBtn.setAttribute('aria-pressed', 'false'); rainBtn.classList.remove('is-on'); }
+          if (cricketsBtn) { cricketsBtn.setAttribute('aria-pressed', 'false'); cricketsBtn.classList.remove('is-on'); }
+          if (windBtn) { windBtn.setAttribute('aria-pressed', 'false'); windBtn.classList.remove('is-on'); }
+        }
+      });
+    }
   }
 
   /* =====================================================================
@@ -1695,6 +1755,17 @@
     importScores: importScores,
     updateRouteTrail: updateRouteTrail,
     renderRouteTrail: renderRouteTrail,
+    setChordMode: function (active) {
+      if (activeSetChordMode) return activeSetChordMode(active);
+      return active;
+    },
+    isChordMode: function () {
+      if (activeIsChordMode) return activeIsChordMode();
+      return false;
+    },
+    press: function (index) {
+      if (activePress) return activePress(index);
+    },
     init: function () {
       initLab();
       initLights();
@@ -1714,7 +1785,21 @@
       exportScores: exportScores,
       importScores: importScores,
       updateRouteTrail: updateRouteTrail,
-      renderRouteTrail: renderRouteTrail
+      renderRouteTrail: renderRouteTrail,
+      init: PIP.toys.init,
+      initLab: initLab,
+      initLights: initLights,
+      setChordMode: function (active) {
+        if (activeSetChordMode) return activeSetChordMode(active);
+        return active;
+      },
+      isChordMode: function () {
+        if (activeIsChordMode) return activeIsChordMode();
+        return false;
+      },
+      press: function (index) {
+        if (activePress) return activePress(index);
+      }
     };
   }
 })();
