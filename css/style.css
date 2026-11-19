@@ -4778,6 +4778,7 @@ html.mode-wide-spacing body {
   display: none;
   transition: background 0.2s ease;
 }
+* Real-Time FPS Telemetry HUD & Battery Saver (pip-perf.exe)
 
 /* Sensory Bubble Wrap (pip-bubbles.exe) */
 .w-bubbles {
@@ -4941,3 +4942,86 @@ html.mode-wide-spacing body {
 .btn-danger:hover {
   background: #c82333;
 }
+* Retro Hex Byte Inspector & Save Vault Viewer (pip-hex.exe)
+ * ----------------------------------------------------------- */
+.w-hex {
+  min-width: 320px;
+}
+
+.hex-badge {
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono, monospace);
+}
+
+.hex-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.hex-select {
+  flex: 1 1 160px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #ccc);
+  background: var(--card-bg, #fff);
+  color: var(--ink, #111);
+  font-size: 0.85rem;
+}
+
+.hex-input-wrap {
+  margin-bottom: 8px;
+}
+
+.hex-input {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #ccc);
+  background: var(--card-bg, #fff);
+  color: var(--ink, #111);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85rem;
+  resize: vertical;
+}
+
+.hex-screen-wrapper {
+  background: #0d1117;
+  color: #58a6ff;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  padding: 8px 10px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.hex-screen-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  color: #8b949e;
+  border-bottom: 1px solid #21262d;
+
+
+
+
+.hex-meta-item {
+  display: inline-block;
+}
+
+.hex-screen {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-mono, "Courier New", monospace);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #7ee787;
+  overflow-x: auto;
+  white-space: pre;
+  user-select: text;

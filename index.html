@@ -1788,6 +1788,44 @@
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
               </div>
+          </div>
+          </div>
+        </article>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- Retro Hex Byte Inspector & Save Vault Viewer -->
+        <article id="hexWin" class="win w-hex" data-foldable aria-labelledby="hexTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="hexTitle">pip-hex.exe</h3>
+            <span class="hex-badge" aria-hidden="true">0x Hex Inspector</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Low-Level Hex Inspector. Audit raw byte buffers, inspect PipFS files, view cryptographic vault envelopes, and verify CRC-32 checksums.</p>
+            </div>
+
+            <!-- Target Selection Toolbar -->
+            <div class="hex-toolbar" role="toolbar" aria-label="Hex inspection controls">
+              <label for="hexTargetSelect" class="sr-only">Select inspection target:</label>
+              <select id="hexTargetSelect" class="hex-select" aria-label="Payload target to inspect">
+                <option value="custom">✏️ Custom Text Input</option>
+              </select>
+              <button type="button" class="btn btn-tiny btn-primary" id="hexInspectBtn">Inspect Bytes</button>
+              <button type="button" class="btn btn-tiny" id="hexCopyBtn">📋 Copy Dump</button>
+            </div>
+
+            <div class="hex-input-wrap">
+              <label for="hexInput" class="sr-only">Raw text or payload to inspect:</label>
+              <textarea id="hexInput" class="hex-input" rows="2" aria-label="Raw text or payload input">haX.baby :: pipOS Starlight Nursery Edition (October 2026)</textarea>
+            </div>
+
+            <!-- Hex Output CRT Screen -->
+            <div class="hex-screen-wrapper">
+              <div class="hex-screen-meta">
+                <span id="hexMetaBytes" class="hex-meta-item">0 Bytes</span>
+                <span id="hexMetaCrc" class="hex-meta-item">CRC32: 0x00000000</span>
+              </div>
+              <pre id="hexScreen" class="hex-screen" aria-label="Hexadecimal byte dump" tabindex="0">00000000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|</pre>
             </div>
           </div>
         </article>
@@ -2224,6 +2262,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/hex.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
