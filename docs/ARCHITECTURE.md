@@ -39,7 +39,7 @@ graph TD
 | **Audio Synthesizer** | `js/audio.js` | Synthesizes live chimes, pops, and giggles with the Web Audio API | `PIP.audio.note()`, `PIP.audio.pop()`, `PIP.audio.isOn()`, `PIP.audio.setVolume()` |
 | **Interactive Mascot** | `js/pip.js` | SVG rendering, pointer tracking, pupil kinematics, and mood states | `PIP.pip.look()`, `PIP.pip.glance()`, `PIP.pip.setMood()`, `PIP.pip.wake()` |
 | **Playable Workbench** | `js/toys.js` | Houses the logic for all interactive nursery toys | `PIP.toys.init()`, `PIP.toys.HOUSE_STORIES` |
-| **Wish Wall Client** | `js/wall.js` | Validates, sanitizes, persists, and exports visitor wishes | `PIP.wall.saveLocalWish()`, `PIP.wall.exportWishes()` |
+| **Wish Wall Client** | `js/wall.js` (see [Specification](WISH_WALL_SPEC.md)) | Validates, sanitizes, rate limits, and synchronizes visitor wishes offline/online | `PIP.wall.validateWish()`, `PIP.wall.checkRateLimit()`, `PIP.wall.syncPendingWishes()` |
 | **Visual Effects** | `js/fx.js` | Confetti physics explosions and pointer sparkle trails | `PIP.fx.confetti()`, `PIP.fx.sparkle()` |
 | **Localization** | `js/i18n.js` | Dictionary engine for real-time English and Hindi translation | `PIP.i18n.setLanguage()`, `PIP.i18n.t()`, `PIP.i18n.TRANSLATIONS` |
 | **Sticker Book** | `js/stickers.js` | Manages achievement unlocks and sticker badges | `PIP.stickers.unlock()`, `PIP.stickers.isUnlocked()`, `PIP.stickers.reset()` |
