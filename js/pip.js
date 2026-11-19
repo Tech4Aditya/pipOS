@@ -16,27 +16,98 @@
   var glanceTimer = 0;
   var lastGlance = 0;
 
+  /* ---------- eye-tracking responsiveness & mood modes ---------- */
+  var lerpFactor = 0.15; // default interpolation factor
+  var trackingMode = 'default';
+  var TRACKING_MODES = {
+    snappy: 1.0,
+    smooth: 0.18,
+    sleepy: 0.05
+  };
+
+  function setTrackingMode(mode) {
+    if (!mode) return false;
+    var m = String(mode).toLowerCase().trim();
+    if (TRACKING_MODES.hasOwnProperty(m)) {
+      trackingMode = m;
+      lerpFactor = TRACKING_MODES[m];
+      PIP.pip.lerpFactor = lerpFactor;
+      try {
+        store.set('pipTrackingMode', m);
+      } catch (e) {}
+      return true;
+    }
+    return false;
+  }
+
+  function getTrackingMode() {
+    return trackingMode;
+  }
+
+  function getLerpFactor() {
+    return lerpFactor;
+  }
+
+  var curEyePositions = [
+    { x: 0, y: 0 },
+    { x: 0, y: 0 }
+  ];
+  var curHead = { x: 0, y: 0, rot: 0 };
+
   /* ---------- eyes follow the pointer (touch drags count too) ---------- */
   function look(x, y) {
-    if (!head || !eyes.length || !eyes[0].sock) return;
+    if (!head || !eyes.length || !eyes[0].sock) return false;
     if (typeof x === 'object' && x && typeof x.getBoundingClientRect === 'function') {
       var rect = x.getBoundingClientRect();
       y = rect.top + Math.min(rect.height * 0.35, 200);
       x = rect.left + rect.width / 2;
     }
+    var needsMore = false;
     for (var i = 0; i < eyes.length; i++) {
       var r = eyes[i].sock.getBoundingClientRect();
       var dx = x - (r.left + r.width / 2), dy = y - (r.top + r.height / 2);
       var d = Math.hypot(dx, dy) || 1;
       var k = Math.min(d / 170, 1);
-      eyes[i].el.style.transform = 'translate(' + ((dx / d) * k * MAX_X).toFixed(1) + 'px,' + ((dy / d) * k * MAX_Y).toFixed(1) + 'px)';
+      var targetX = (dx / d) * k * MAX_X;
+      var targetY = (dy / d) * k * MAX_Y;
+
+      if (!curEyePositions[i]) curEyePositions[i] = { x: 0, y: 0 };
+      if (lerpFactor >= 1.0) {
+        curEyePositions[i].x = targetX;
+        curEyePositions[i].y = targetY;
+      } else {
+        curEyePositions[i].x += (targetX - curEyePositions[i].x) * lerpFactor;
+        curEyePositions[i].y += (targetY - curEyePositions[i].y) * lerpFactor;
+        if (Math.hypot(targetX - curEyePositions[i].x, targetY - curEyePositions[i].y) > 0.08) {
+          needsMore = true;
+        }
+      }
+      eyes[i].el.style.transform = 'translate(' + curEyePositions[i].x.toFixed(1) + 'px,' + curEyePositions[i].y.toFixed(1) + 'px)';
     }
     // head tilts a touch toward the pointer or target
     var winW = (typeof window !== 'undefined' && window.innerWidth) ? window.innerWidth : 1000;
     var winH = (typeof window !== 'undefined' && window.innerHeight) ? window.innerHeight : 800;
     var vx = clamp((x / winW - 0.5) * 2, -1, 1);
     var vy = clamp((y / winH - 0.5) * 2, -1, 1);
-    head.style.transform = 'translate(' + (vx * 5).toFixed(1) + 'px,' + (vy * 3).toFixed(1) + 'px) rotate(' + (vx * 3.5).toFixed(2) + 'deg)';
+    var targetHeadX = vx * 5;
+    var targetHeadY = vy * 3;
+    var targetHeadRot = vx * 3.5;
+
+    if (lerpFactor >= 1.0) {
+      curHead.x = targetHeadX;
+      curHead.y = targetHeadY;
+      curHead.rot = targetHeadRot;
+    } else {
+      curHead.x += (targetHeadX - curHead.x) * lerpFactor;
+      curHead.y += (targetHeadY - curHead.y) * lerpFactor;
+      curHead.rot += (targetHeadRot - curHead.rot) * lerpFactor;
+      if (Math.abs(targetHeadX - curHead.x) > 0.05 || Math.abs(targetHeadY - curHead.y) > 0.05) {
+        needsMore = true;
+      }
+    }
+    head.style.transform = 'translate(' + curHead.x.toFixed(1) + 'px,' + curHead.y.toFixed(1) + 'px) rotate(' + curHead.rot.toFixed(2) + 'deg)';
+
+    return needsMore;
   }
 
   /* ---------- brief glance toward a target section or coordinates ---------- */
@@ -63,13 +134,23 @@
   }
 
   var pending = null, raf = 0;
+  function updateLook() {
+    raf = 0;
+    if (!pending) return;
+    var needsMore = look(pending.x, pending.y);
+    if (needsMore && typeof window !== 'undefined' && window.requestAnimationFrame) {
+      raf = window.requestAnimationFrame(updateLook);
+    }
+  }
+
   function onPointer(e) {
     lastPointer = performance.now();
     pending = { x: e.clientX, y: e.clientY };
-    if (!raf) raf = window.requestAnimationFrame(function () {
-      raf = 0;
-      if (pending) look(pending.x, pending.y);
-    });
+    if (!raf && typeof window !== 'undefined' && window.requestAnimationFrame) {
+      raf = window.requestAnimationFrame(updateLook);
+    } else if (typeof window === 'undefined' || !window.requestAnimationFrame) {
+      look(pending.x, pending.y);
+    }
   }
 
   var idleTimer = 0, blinkTimer = 0;
@@ -304,8 +385,26 @@
     setExpression: setExpression,
     surprise: surprise,
     shy: shy,
-    yawn: yawn
+    yawn: yawn,
+    setTrackingMode: setTrackingMode,
+    getTrackingMode: getTrackingMode,
+    getLerpFactor: getLerpFactor,
+    TRACKING_MODES: TRACKING_MODES,
+    lerpFactor: lerpFactor
   };
+
+  try {
+    Object.defineProperty(PIP.pip, 'lerpFactor', {
+      get: function () { return lerpFactor; },
+      set: function (v) {
+        if (typeof v === 'number' && !isNaN(v)) {
+          lerpFactor = clamp(v, 0.01, 1.0);
+        }
+      },
+      configurable: true,
+      enumerable: true
+    });
+  } catch (e) {}
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = PIP.pip;

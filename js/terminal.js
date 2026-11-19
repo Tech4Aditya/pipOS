@@ -28,7 +28,7 @@
 
   var COMMANDS = [
     'help', 'whoami', 'time', 'date', 'theme', 'sound', 'quiet', 'sleep',
-    'play', 'wish', 'fortune', 'dream', 'calc', 'blocks', 'clear', 'history',
+    'play', 'wish', 'fortune', 'dream', 'calc', 'blocks', 'pip', 'clear', 'history',
     'ls', 'cd', 'pwd', 'cat', 'mkdir', 'touch', 'rm',
     'echo', 'grep', 'wc', 'sort', 'uniq', 'head', 'tail'
   ];
@@ -104,6 +104,7 @@
           "  fortune / dream    - Read a midnight prophecy",
           "  calc <expr>        - Quick arithmetic evaluator (e.g., calc 24 * 7)",
           "  blocks [stats|export] - View or export Rattle & Blocks tower records",
+          "  pip tracking [mode]- Set eye-tracking responsiveness ('snappy', 'smooth', 'sleepy')",
           "  history            - Display recent command history",
           "  clear              - Wipe terminal screen"
         ].join('\n');
@@ -432,6 +433,31 @@
         }
         break;
 
+      case 'pip':
+        var pipSub = (args[0] || '').toLowerCase();
+        if (pipSub === 'tracking') {
+          var modeArg = (args[1] || '').toLowerCase();
+          var p = getPIP();
+          var pipModule = (p && p.pip) || (typeof require !== 'undefined' ? (function () {
+            try { return require('./pip.js'); } catch (e) { return null; }
+          })() : null);
+
+          if (modeArg === 'snappy' || modeArg === 'smooth' || modeArg === 'sleepy') {
+            if (pipModule && typeof pipModule.setTrackingMode === 'function') {
+              pipModule.setTrackingMode(modeArg);
+            }
+            out = "Pip eye-tracking mode set to: " + modeArg;
+          } else if (!modeArg) {
+            var curMode = (pipModule && typeof pipModule.getTrackingMode === 'function') ? pipModule.getTrackingMode() : 'default';
+            out = "Usage: pip tracking [snappy|smooth|sleepy] (Current: " + curMode + ")";
+          } else {
+            out = "Unknown tracking mode: " + modeArg + ". Choose: snappy, smooth, sleepy.";
+          }
+        } else {
+          out = "Usage: pip tracking [snappy|smooth|sleepy]";
+        }
+        break;
+
       case 'history':
         out = history.map(function (h, i) { return (i + 1) + '  ' + h; }).join('\n');
         break;
@@ -711,6 +737,11 @@
   }
 
   var PARAM_HINTS = {
+    pip: {
+      params: ['tracking snappy', 'tracking smooth', 'tracking sleepy'],
+      hint: ' tracking [snappy|smooth|sleepy]',
+      pills: ['pip tracking snappy', 'pip tracking smooth', 'pip tracking sleepy']
+    },
     blocks: {
       params: ['stats', 'export'],
       hint: ' [stats|export]',
