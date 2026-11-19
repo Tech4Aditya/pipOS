@@ -18,6 +18,13 @@
   if (isNaN(currentVolume) || currentVolume < 0 || currentVolume > 1) currentVolume = 0.7;
   var reverbWetLevel = parseFloat(store.get('reverbWet', '0.28'));
   if (isNaN(reverbWetLevel) || reverbWetLevel < 0 || reverbWetLevel > 1) reverbWetLevel = 0.28;
+  var REVERB_PRESETS = {
+    crib: { seconds: 1.0, decay: 4.5, name: 'Crib', desc: 'tight, dry' },
+    attic: { seconds: 2.2, decay: 3.0, name: 'Attic', desc: 'warm chamber' },
+    sky: { seconds: 4.2, decay: 1.8, name: 'Sky', desc: 'sprawling cosmic cathedral' }
+  };
+  var currentReverbPreset = store.get('reverbPreset', 'attic');
+  if (!REVERB_PRESETS[currentReverbPreset]) currentReverbPreset = 'attic';
   var endlessTimer = 0;
   var listeners = [];
 
@@ -67,6 +74,21 @@
     return reverbWetLevel;
   }
 
+  function setReverbPreset(name) {
+    if (!name || !REVERB_PRESETS[name]) return false;
+    currentReverbPreset = name;
+    store.set('reverbPreset', name);
+    if (convNode && ctx) {
+      var preset = REVERB_PRESETS[name];
+      convNode.buffer = makeImpulse(ctx, preset.seconds, preset.decay);
+    }
+    return true;
+  }
+
+  function getReverbPreset() {
+    return currentReverbPreset;
+  }
+
   function makeImpulse(c, seconds, decay) {
     var rate = (c && c.sampleRate) || 44100;
     var len = Math.max(1, Math.floor(rate * (seconds || 2.2)));
@@ -103,7 +125,8 @@
       limiter.connect(ctx.destination);
 
       convNode = ctx.createConvolver();
-      convNode.buffer = makeImpulse(ctx, 2.2, 3);
+      var activePreset = REVERB_PRESETS[currentReverbPreset] || REVERB_PRESETS.attic;
+      convNode.buffer = makeImpulse(ctx, activePreset.seconds, activePreset.decay);
       wetGain = ctx.createGain();
       wetGain.gain.value = reverbWetLevel;
       convNode.connect(wetGain);
@@ -665,6 +688,9 @@
     setReverbWet: setReverbWet,
     getReverbWet: getReverbWet,
     makeImpulse: makeImpulse,
+    REVERB_PRESETS: REVERB_PRESETS,
+    setReverbPreset: setReverbPreset,
+    getReverbPreset: getReverbPreset,
     stopAll: stopAll,
     startSleepTimer: startSleepTimer,
     stopSleepTimer: stopSleepTimer,
@@ -676,6 +702,9 @@
       setReverbWet: setReverbWet,
       getReverbWet: getReverbWet,
       makeImpulse: makeImpulse,
+      REVERB_PRESETS: REVERB_PRESETS,
+      setReverbPreset: setReverbPreset,
+      getReverbPreset: getReverbPreset,
       getMasterNodes: function () {
         return { master: master, limiter: limiter, convolver: convNode, wet: wetGain };
       }
@@ -700,12 +729,27 @@
       setReverbWet: setReverbWet,
       getReverbWet: getReverbWet,
       makeImpulse: makeImpulse,
+      REVERB_PRESETS: REVERB_PRESETS,
+      setReverbPreset: setReverbPreset,
+      getReverbPreset: getReverbPreset,
       stopAll: stopAll,
       startSleepTimer: startSleepTimer,
       stopSleepTimer: stopSleepTimer,
       getSleepTimerRemaining: getSleepTimerRemaining,
       isSleepTimerActive: isSleepTimerActive,
-      setNightTheme: setNightTheme
+      setNightTheme: setNightTheme,
+      masterBus: {
+        configureLimiter: configureLimiter,
+        setReverbWet: setReverbWet,
+        getReverbWet: getReverbWet,
+        makeImpulse: makeImpulse,
+        REVERB_PRESETS: REVERB_PRESETS,
+        setReverbPreset: setReverbPreset,
+        getReverbPreset: getReverbPreset,
+        getMasterNodes: function () {
+          return { master: master, limiter: limiter, convolver: convNode, wet: wetGain };
+        }
+      }
     };
   }
 })();

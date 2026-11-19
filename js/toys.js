@@ -118,6 +118,18 @@
       });
     }
 
+    var reverbSelect = $('#reverbPreset');
+    if (reverbSelect && audio) {
+      if (typeof audio.getReverbPreset === 'function') {
+        reverbSelect.value = audio.getReverbPreset();
+      }
+      reverbSelect.addEventListener('change', function () {
+        if (typeof audio.setReverbPreset === 'function') {
+          audio.setReverbPreset(this.value);
+        }
+      });
+    }
+
     var playing = false, timers = [];
 
     function stopTune() {

@@ -27,7 +27,7 @@
   var toast = PIP.toast || function () {};
 
   var COMMANDS = [
-    'help', 'whoami', 'time', 'date', 'theme', 'sound', 'quiet', 'sleep',
+    'help', 'whoami', 'time', 'date', 'theme', 'sound', 'quiet', 'sleep', 'reverb',
     'play', 'wish', 'fortune', 'dream', 'calc', 'blocks', 'clear', 'history',
     'ls', 'cd', 'pwd', 'cat', 'mkdir', 'touch', 'rm',
     'echo', 'grep', 'wc', 'sort', 'uniq', 'head', 'tail'
@@ -99,6 +99,7 @@
           "  sound [on|off]     - Check or toggle audio synthesizer",
           "  quiet [on|off]     - Check or toggle quiet mode",
           "  sleep [minutes]    - Bedtime timer with gradual lullaby fade-out",
+          "  reverb [preset]    - Set reverb space (crib, attic, sky)",
           "  play [chime|lullaby] - Synthesize Web Audio melody",
           "  wish <text>        - Post a wish to the wish wall",
           "  fortune / dream    - Read a midnight prophecy",
@@ -107,6 +108,34 @@
           "  history            - Display recent command history",
           "  clear              - Wipe terminal screen"
         ].join('\n');
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
         break;
 
       case 'whoami':
@@ -118,10 +147,66 @@
         ].join('\n');
         break;
 
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
+
       case 'time':
       case 'date':
         var now = new Date();
         out = "Nursery Time: " + now.toLocaleTimeString() + " | " + now.toLocaleDateString() + "\nLunar Cycle: " + getMoonPhase();
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
         break;
 
       case 'theme':
@@ -150,6 +235,34 @@
         }
         break;
 
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
+
       case 'sound':
         if (args.length === 0) {
           out = "Sound state: " + (audio.isOn() ? 'ON 🔊' : 'OFF 🔇');
@@ -162,10 +275,66 @@
         }
         break;
 
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
+
       case 'quiet':
         var qBtn = document.getElementById('quietBtn');
         if (qBtn) qBtn.click();
         out = "Quiet mode toggled.";
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
         break;
 
       case 'sleep':
@@ -208,6 +377,34 @@
         }
         break;
 
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
+
       case 'play':
         if (audio.isOn()) {
           var tuneType = (args[0] || '').toLowerCase();
@@ -228,6 +425,34 @@
         }
         break;
 
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
+
       case 'wish':
         if (args.length === 0) {
           out = "Usage: wish <your dream or wish>";
@@ -245,9 +470,65 @@
         }
         break;
 
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
+
       case 'fortune':
       case 'dream':
         out = "⭐ Pip's Prophecy: " + FORTUNES[Math.floor(Math.random() * FORTUNES.length)];
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
         break;
 
       case 'calc':
@@ -276,8 +557,64 @@
         }
         break;
 
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
+
       case 'pwd':
         out = currentCwd;
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
         break;
 
       case 'cd':
@@ -289,6 +626,34 @@
         } else {
           currentCwd = resolvedCd;
           out = '';
+        }
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
         }
         break;
 
@@ -305,6 +670,34 @@
             }).join('\n') || '(empty directory)';
           } catch (e) {
             out = 'ls: ' + (e.message || 'error');
+          }
+        }
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
           }
         }
         break;
@@ -329,6 +722,34 @@
         }
         break;
 
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
+
       case 'touch':
         var vfsTouch = getFS();
         if (!args[0]) {
@@ -340,6 +761,34 @@
             out = 'Created ' + args[0];
           } catch (e) {
             out = 'touch: ' + (e.message || 'error');
+          }
+        }
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
           }
         }
         break;
@@ -359,6 +808,34 @@
         }
         break;
 
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
+
       case 'rm':
         var vfsRm = getFS();
         if (!args[0]) {
@@ -370,6 +847,34 @@
             out = 'Removed ' + args[0];
           } catch (e) {
             out = 'rm: ' + (e.message || 'error');
+          }
+        }
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
           }
         }
         break;
@@ -432,8 +937,64 @@
         }
         break;
 
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
+
       case 'history':
         out = history.map(function (h, i) { return (i + 1) + '  ' + h; }).join('\n');
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
         break;
 
       case 'clear':
@@ -450,6 +1011,34 @@
           }
           echoText = echoText.replace(/\\n/g, '\n').replace(/\\t/g, '\t');
           out = echoText;
+        }
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
         }
         break;
 
@@ -480,6 +1069,34 @@
               } catch (e) {
                 out = 'grep: ' + (e.message || 'file error');
                 break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
               }
             } else if (pipedInput !== null) {
               textToGrep = pipedInput;
@@ -492,6 +1109,34 @@
               return invert ? !m : m;
             });
             out = matched.join('\n');
+          }
+        }
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
           }
         }
         break;
@@ -513,6 +1158,34 @@
           } catch (e) {
             out = 'wc: ' + (e.message || 'file error');
             break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
           }
         } else if (pipedInput !== null) {
           textToWc = pipedInput;
@@ -535,6 +1208,34 @@
         out = wcRes.join('   ') + (wcFile ? ' ' + wcFile : '');
         break;
 
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
+
       case 'sort':
         var reverse = false;
         var sortFile = null;
@@ -550,6 +1251,34 @@
           } catch (e) {
             out = 'sort: ' + (e.message || 'file error');
             break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
           }
         } else if (pipedInput !== null) {
           textToSort = pipedInput;
@@ -558,6 +1287,34 @@
         sortLines.sort();
         if (reverse) sortLines.reverse();
         out = sortLines.join('\n');
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
         break;
 
       case 'uniq':
@@ -570,6 +1327,34 @@
           } catch (e) {
             out = 'uniq: ' + (e.message || 'file error');
             break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
           }
         } else if (pipedInput !== null) {
           textToUniq = pipedInput;
@@ -582,6 +1367,34 @@
           }
         }
         out = deduped.join('\n');
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
         break;
 
       case 'head':
@@ -603,12 +1416,68 @@
           } catch (e) {
             out = 'head: ' + (e.message || 'file error');
             break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
           }
         } else if (pipedInput !== null) {
           textToHead = pipedInput;
         }
         var hLines = textToHead.split(/\r?\n/);
         out = hLines.slice(0, headCount).join('\n');
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
         break;
 
       case 'tail':
@@ -630,12 +1499,68 @@
           } catch (e) {
             out = 'tail: ' + (e.message || 'file error');
             break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
+        break;
           }
         } else if (pipedInput !== null) {
           textToTail = pipedInput;
         }
         var tLines = textToTail.split(/\r?\n/);
         out = tLines.slice(Math.max(0, tLines.length - tailCount)).join('\n');
+        break;
+
+      case 'reverb':
+        var pipAudioObj = getPIP();
+        var rAudio = (pipAudioObj && pipAudioObj.audio) || audio;
+        if (!rAudio || typeof rAudio.setReverbPreset !== 'function') {
+          if (typeof require !== 'undefined') {
+            try { rAudio = require('./audio.js'); } catch (e) {}
+          }
+        }
+        if (args.length === 0) {
+          var curPreset = (rAudio && typeof rAudio.getReverbPreset === 'function') ? rAudio.getReverbPreset() : 'attic';
+          out = "Current reverb space: " + curPreset + "\nAvailable presets: crib (tight, dry), attic (warm chamber), sky (cosmic cathedral)\nUsage: reverb [crib|attic|sky]";
+        } else {
+          var targetPreset = args[0].toLowerCase();
+          if (rAudio && typeof rAudio.setReverbPreset === 'function') {
+            var setSuccess = rAudio.setReverbPreset(targetPreset);
+            if (setSuccess) {
+              var sel = document.getElementById('reverbPreset');
+              if (sel) sel.value = targetPreset;
+              out = "🏛️ Reverb space preset set to: " + targetPreset;
+            } else {
+              out = "Unknown reverb preset: " + targetPreset + ". Available presets: crib, attic, sky";
+            }
+          } else {
+            out = "Audio system unavailable.";
+          }
+        }
         break;
 
       default:
