@@ -1826,6 +1826,44 @@
   </dialog>
 
   <script src="js/crash-reporter.js" defer></script>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- Celestial Memory Match 4x4 Mini-Game -->
+        <article id="memoryWin" class="win w-memory" data-foldable aria-labelledby="memoryTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="memoryTitle">pip-memory.exe</h3>
+            <span class="memory-badge" aria-hidden="true">4x4 Celestial Pairs</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Celestial Memory Match. Find all 8 matching pairs of soothing bedtime symbols with the fewest moves!</p>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="memory-stats-bar" role="region" aria-label="Game statistics">
+              <div class="memory-stat">
+                <span class="memory-stat-lbl">Moves:</span>
+                <span id="memoryMoves" class="memory-stat-val">0</span>
+              </div>
+              <div class="memory-stat">
+                <span class="memory-stat-lbl">Matches:</span>
+                <span id="memoryMatches" class="memory-stat-val">0 / 8</span>
+              </div>
+              <div class="memory-stat">
+                <span class="memory-stat-lbl">Time:</span>
+                <span id="memoryTimer" class="memory-stat-val">00:00</span>
+              </div>
+              <div class="memory-stat">
+                <span class="memory-stat-lbl">Best:</span>
+                <span id="memoryBest" class="memory-stat-val">None</span>
+              </div>
+              <button type="button" class="btn btn-tiny btn-primary" id="memoryRestartBtn">🔄 New Game</button>
+            </div>
+
+            <!-- 4x4 Card Grid -->
+            <div id="memoryGrid" class="memory-grid" role="grid" aria-label="4 by 4 memory card grid"></div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -2224,6 +2262,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/memory.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
