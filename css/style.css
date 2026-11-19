@@ -4778,6 +4778,12 @@ html.mode-wide-spacing body {
   display: none;
   transition: background 0.2s ease;
 }
+* Real-Time FPS Telemetry HUD & Battery Saver (pip-perf.exe)
+* Host Drag-and-Drop File Import & Export Bridge (pip-bridge.exe)
+ * ----------------------------------------------------------- */
+.w-bridge {
+  min-width: 320px;
+}
 
 /* Sensory Bubble Wrap (pip-bubbles.exe) */
 .w-bubbles {
@@ -4940,4 +4946,125 @@ html.mode-wide-spacing body {
 
 .btn-danger:hover {
   background: #c82333;
+.bridge-badge {
+  font-size: 0.75rem;
+  background: rgba(14, 165, 233, 0.25);
+  color: #0369a1;
+  border: 1px solid rgba(14, 165, 233, 0.5);
+
+[data-theme="night"] .bridge-badge {
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+}
+
+.bridge-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.bridge-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bridge-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  background: var(--card-bg, #fff);
+}
+
+.bridge-item-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.bridge-item-meta {
+  flex: 1;
+  overflow: hidden;
+}
+
+.bridge-item-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--ink, #111);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bridge-item-info {
+  font-size: 0.76rem;
+  color: var(--muted, #666);
+  font-family: var(--font-mono, monospace);
+}
+
+.bridge-item-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.bridge-empty {
+  padding: 18px;
+  text-align: center;
+  font-style: italic;
+  color: var(--muted, #666);
+  font-size: 0.88rem;
+  border: 2px dashed var(--border-color, #ccc);
+  border-radius: 8px;
+}
+
+/* Starlight Dropzone Overlay */
+.drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999998;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.drop-overlay.is-hidden {
+
+.drop-modal {
+  text-align: center;
+  border: 3px dashed var(--gold, #f3b562);
+  border-radius: 16px;
+  padding: 36px 48px;
+  background: rgba(30, 41, 59, 0.9);
+  color: #fff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  animation: dropPulse 2s ease-in-out infinite alternate;
+}
+@keyframes dropPulse {
+  0% { transform: scale(0.98); border-color: rgba(243, 181, 98, 0.6); }
+  100% { transform: scale(1.02); border-color: #f3b562; }
+}
+
+.drop-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.drop-title {
+  margin: 0 0 6px 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+}
+.drop-subtitle {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #94a3b8;
+  font-family: var(--font-mono, monospace);
 }
