@@ -37,7 +37,7 @@ graph TD
 | :--- | :--- | :--- | :--- |
 | **DOM Utilities** | `js/util.js` | Micro selectors and safe state storage | `PIP.$`, `PIP.$$`, `PIP.store.get()`, `PIP.store.set()`, `PIP.clamp()` |
 | **Audio Synthesizer** | `js/audio.js` | Synthesizes live chimes, pops, and giggles with the Web Audio API | `PIP.audio.note()`, `PIP.audio.pop()`, `PIP.audio.isOn()`, `PIP.audio.setVolume()` |
-| **Interactive Mascot** | `js/pip.js` | SVG rendering, pointer tracking, pupil kinematics, and mood states | `PIP.pip.look()`, `PIP.pip.glance()`, `PIP.pip.setMood()`, `PIP.pip.wake()` |
+| **Interactive Mascot** | `js/pip.js` (see [Kinematics Guide](PIP_MASCOT_KINEMATICS.md)) | SVG rendering, pointer tracking, pupil kinematics, and mood states | `PIP.pip.look()`, `PIP.pip.glance()`, `PIP.pip.setMood()`, `PIP.pip.wake()` |
 | **Playable Workbench** | `js/toys.js` | Houses the logic for all interactive nursery toys | `PIP.toys.init()`, `PIP.toys.HOUSE_STORIES` |
 | **Wish Wall Client** | `js/wall.js` | Validates, sanitizes, persists, and exports visitor wishes | `PIP.wall.saveLocalWish()`, `PIP.wall.exportWishes()` |
 | **Visual Effects** | `js/fx.js` | Confetti physics explosions and pointer sparkle trails | `PIP.fx.confetti()`, `PIP.fx.sparkle()` |
@@ -84,6 +84,9 @@ When a pointer moves across the screen (or when `glance()` points Pip toward a s
    $$\text{translate}Y = \frac{\Delta y}{d} \times k \times \text{MAX\_Y} \quad (\text{where } \text{MAX\_Y} = 18\text{px})$$
 5. **Head Tilt**: The entire `#pipHead` group rotates slightly toward the pointer:
    $$\text{angle} = v_x \times 3.5^{\circ}$$
+
+> [!NOTE]
+> For a complete analysis of vector math, autonomous idle gaze wandering, Poisson blinking curves, and emotional mood states, see the dedicated **[Pip Mascot Kinematics Guide](PIP_MASCOT_KINEMATICS.md)**.
 
 ---
 
