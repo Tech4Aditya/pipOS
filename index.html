@@ -1826,6 +1826,62 @@
   </dialog>
 
   <script src="js/crash-reporter.js" defer></script>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- Multi-User Profile Switcher & Screen Lock Sandbox -->
+        <article id="usersWin" class="win w-users" data-foldable aria-labelledby="usersTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="usersTitle">pip-users.exe</h3>
+            <span class="users-badge" aria-hidden="true">Profiles &amp; Shield</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Multi-User Profile Manager &amp; Bedtime Screen Lock. Switch user profiles, isolate workspace settings, and engage toddler-safe lock shield.</p>
+            </div>
+
+            <!-- Lock OS Quick Action -->
+            <div class="users-top-actions">
+              <button type="button" class="btn btn-tiny btn-primary" id="usersLockBtn">🔒 Lock PipOS</button>
+            </div>
+
+            <!-- Profiles List -->
+            <div id="usersList" class="users-list" role="region" aria-label="Available user profiles"></div>
+
+            <!-- Create New Profile Form -->
+            <div class="users-create-box">
+              <h4 class="users-box-title">Create Starlight Profile</h4>
+              <div class="users-create-form">
+                <label for="usersNewName" class="sr-only">Profile name</label>
+                <input type="text" id="usersNewName" class="users-input" placeholder="Profile name...">
+                <label for="usersNewAvatar" class="sr-only">Choose profile avatar</label>
+                <select id="usersNewAvatar" class="users-select">
+                  <option value="🍼">🍼 Pip Little One</option>
+                  <option value="🚀">🚀 Astronaut</option>
+                  <option value="🦉">🦉 Night Owl</option>
+                  <option value="🌸">🌸 Moonflower</option>
+                  <option value="🪐">🪐 Stargazer</option>
+                  <option value="🧸">🧸 Teddy Bear</option>
+                </select>
+                <button type="button" class="btn btn-tiny btn-primary" id="usersCreateBtn">Add Profile</button>
+              </div>
+            </div>
+          </div>
+        </article>
+<!-- Floating FPS Telemetry HUD Widget -->
+<!-- Bedtime Screen Lock & Toddler Shield Overlay -->
+  <div id="lockScreen" class="lock-screen is-hidden" role="dialog" aria-modal="true" aria-label="PipOS Lock Screen" inert>
+    <div class="lock-content">
+      <div class="lock-moon" aria-hidden="true">🌙</div>
+      <h2 class="lock-title">PipOS Bedtime Shield</h2>
+      <p class="lock-hint">Screen is gently locked to protect sweet dreams.</p>
+      <div class="lock-controls">
+        <label for="lockPinInput" class="sr-only">Unlock PIN (if set):</label>
+        <input type="password" id="lockPinInput" class="lock-pin-input" placeholder="Enter PIN (or blank)" maxlength="8" autocomplete="current-password">
+        <button type="button" class="btn btn-primary" id="lockUnlockBtn">Wake PipOS</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/users.js" defer></script>
       </div>
     </section>
 
