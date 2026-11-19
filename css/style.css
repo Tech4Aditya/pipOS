@@ -4729,6 +4729,17 @@ html.mode-wide-spacing body {
   border-radius: 999px;
   background: rgba(245, 158, 11, 0.2);
   color: #fbbf24;
+/* Simon-Says Music Sequence Memory (pip-simon.exe) */
+.w-simon {
+  min-width: 300px;
+}
+
+.simon-badge {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(234, 179, 8, 0.2);
+  color: #facc15;
   font-weight: 600;
   margin-left: auto;
 }
@@ -4777,6 +4788,84 @@ html.mode-wide-spacing body {
   z-index: 99990;
   display: none;
   transition: background 0.2s ease;
+.simon-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.simon-round,
+.simon-high {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.simon-round {
+  color: #38bdf8;
+}
+
+.simon-high {
+  color: #f59e0b;
+}
+
+.simon-pad-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 240px;
+  margin: 0 auto 12px auto;
+}
+
+.simon-pad {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  opacity: 0.75;
+}
+
+.simon-pad:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.simon-pad:active,
+.simon-pad.is-active {
+  opacity: 1;
+  transform: scale(0.97);
+  filter: brightness(1.6);
+  box-shadow: 0 0 16px currentColor;
+}
+
+.pad-green {
+  background: #16a34a;
+  color: #4ade80;
+}
+
+.pad-red {
+  background: #dc2626;
+  color: #f87171;
+}
+
+.pad-yellow {
+  background: #ca8a04;
+  color: #facc15;
+}
+
+.pad-blue {
+  background: #2563eb;
+  color: #60a5fa;
+}
+
+.simon-status {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
+  font-family: var(--font-mono, monospace);
+  min-height: 1.2rem;
 }
 
 /* Sensory Bubble Wrap (pip-bubbles.exe) */

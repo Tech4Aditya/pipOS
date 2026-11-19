@@ -1826,6 +1826,30 @@
   </dialog>
 
   <script src="js/crash-reporter.js" defer></script>
+        <!-- Simon-Says Music Sequence Memory (pip-simon.exe) -->
+        <article id="simonWin" class="win w-simon" data-foldable aria-labelledby="simonTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="simonTitle">pip-simon.exe</h3>
+            <span class="simon-badge" aria-hidden="true">Memory &amp; Sound</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Simon-Says Melody Memory. Watch the colored notes light up, listen to the tones, and repeat the pattern.</p>
+            </div>
+            <div class="simon-header">
+              <span id="simonRound" class="simon-round" aria-live="polite">Round: 0</span>
+              <span id="simonHigh" class="simon-high">Best: 0</span>
+              <button type="button" class="btn btn-tiny btn-primary" id="simonStartBtn">▶ Start</button>
+            </div>
+            <div class="simon-pad-grid" role="region" aria-label="Musical tone buttons">
+              <button type="button" id="simonPad0" class="simon-pad pad-green" aria-label="Green pad - Tone C4"></button>
+              <button type="button" id="simonPad1" class="simon-pad pad-red" aria-label="Red pad - Tone E4"></button>
+              <button type="button" id="simonPad2" class="simon-pad pad-yellow" aria-label="Yellow pad - Tone G4"></button>
+              <button type="button" id="simonPad3" class="simon-pad pad-blue" aria-label="Blue pad - Tone C5"></button>
+            </div>
+            <div id="simonStatus" class="simon-status" role="status" aria-live="polite">Press Start to begin listening!</div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -2224,6 +2248,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/simon.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
