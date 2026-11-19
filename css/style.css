@@ -4778,6 +4778,11 @@ html.mode-wide-spacing body {
   display: none;
   transition: background 0.2s ease;
 }
+   Bedtime Storybook Voice Narrator (pip-voice.exe)
+   ========================================================================== */
+.w-voice {
+  min-width: 320px;
+}
 
 /* Sensory Bubble Wrap (pip-bubbles.exe) */
 .w-bubbles {
@@ -4940,4 +4945,131 @@ html.mode-wide-spacing body {
 
 .btn-danger:hover {
   background: #c82333;
+.voice-badge {
+  font-size: 0.75rem;
+  background: var(--bar);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  font-weight: 600;
+  margin-left: auto;
+  transition: all 0.2s ease;
+}
+
+.voice-badge.is-active {
+  background: var(--butter);
+  color: var(--ink);
+  animation: pulse 1.5s infinite;
+}
+
+.voice-badge.is-paused {
+  background: var(--mint);
+}
+
+.voice-scene-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px dashed var(--line);
+}
+
+.voice-bar-label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.voice-text-wrap {
+  margin-bottom: 10px;
+}
+
+.voice-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-ui);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.voice-tracker-box {
+  padding: 8px 12px;
+  background: var(--cream);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--berry);
+  margin-bottom: 12px;
+  min-height: 20px;
+}
+
+.voice-controls-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.voice-ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voice-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  min-width: 48px;
+}
+
+.voice-select {
+  flex: 1;
+  padding: 4px 8px;
+  font: 500 0.85rem var(--f-ui);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.voice-sliders-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.voice-slider-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.voice-slider {
+  flex: 1;
+  accent-color: var(--berry);
+  cursor: pointer;
+}
+
+.voice-val {
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  min-width: 32px;
+}
+
+.voice-actions-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
 }

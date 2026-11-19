@@ -1787,6 +1787,70 @@
                   <span>Screen Brightness</span>
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
+          </div>
+          </div>
+          </div>
+        </article>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- Bedtime Storybook Voice Narrator -->
+        <article id="voice" class="win w-voice" data-foldable aria-labelledby="voiceTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="voiceTitle">pip-voice.exe</h3>
+            <span id="voiceStatusBadge" class="voice-badge">💤 Ready</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Bedtime Voice Narrator. Read aloud nursery flipbook scenes or custom bedtime tales with cozy kid-friendly speech synthesis.</p>
+            </div>
+
+            <!-- Scene Quick Selector -->
+            <div class="voice-scene-bar" role="group" aria-label="Load Bedtime Scenes">
+              <span class="voice-bar-label">Quick Scenes:</span>
+              <button type="button" class="btn btn-tiny voice-scene-btn" data-scene="1">Scene 1</button>
+              <button type="button" class="btn btn-tiny voice-scene-btn" data-scene="2">Scene 2</button>
+              <button type="button" class="btn btn-tiny voice-scene-btn" data-scene="3">Scene 3</button>
+              <button type="button" class="btn btn-tiny voice-scene-btn" data-scene="4">Scene 4</button>
+              <button type="button" class="btn btn-tiny voice-scene-btn" data-scene="5">Scene 5</button>
+              <button type="button" class="btn btn-tiny voice-scene-btn" data-scene="6">Scene 6</button>
+            </div>
+
+            <!-- Text Area -->
+            <div class="voice-text-wrap">
+              <label for="voiceTextInput" class="sr-only">Bedtime story narration text:</label>
+              <textarea id="voiceTextInput" class="voice-textarea" rows="4" aria-label="Bedtime story text to narrate">A wicker basket floated through the nursery fog at quarter past midnight. Inside was Pip: tiny skull face, sleepy amber eyes, and a starry nightcap resting crooked. Pip yawned once, smiled at the moon, and made the nursery home.</textarea>
+            </div>
+
+            <!-- Karaoke Tracking Box -->
+            <div id="voiceTrackerBox" class="voice-tracker-box" aria-live="polite">Ready to read bedtime tale aloud...</div>
+
+            <!-- Controls & Sliders -->
+            <div class="voice-controls-grid">
+              <div class="voice-ctrl-row">
+                <label for="voiceSelect" class="voice-label">Voice:</label>
+                <select id="voiceSelect" class="voice-select" aria-label="Select speech synthesis voice">
+                  <option value="0">Default Bedtime Voice</option>
+                </select>
+              </div>
+
+              <div class="voice-sliders-row">
+                <div class="voice-slider-item">
+                  <label for="voicePitchSlider" class="voice-label">Pitch:</label>
+                  <input type="range" id="voicePitchSlider" class="voice-slider" min="0.5" max="2.0" step="0.1" value="1.0" aria-label="Narration pitch level">
+                  <span id="voicePitchVal" class="voice-val">1.0x</span>
+                </div>
+
+                <div class="voice-slider-item">
+                  <label for="voiceRateSlider" class="voice-label">Speed:</label>
+                  <input type="range" id="voiceRateSlider" class="voice-slider" min="0.5" max="1.5" step="0.1" value="0.9" aria-label="Narration reading speed">
+                  <span id="voiceRateVal" class="voice-val">0.9x</span>
+                </div>
+              </div>
+
+              <div class="voice-actions-row">
+                <button type="button" class="btn btn-primary" id="voicePlayBtn">🔊 Start Narration</button>
+                <button type="button" class="btn" id="voicePauseBtn" disabled>⏸ Pause</button>
+                <button type="button" class="btn is-danger" id="voiceStopBtn" disabled>⏹ Stop</button>
               </div>
             </div>
           </div>
@@ -2224,6 +2288,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/voice.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
