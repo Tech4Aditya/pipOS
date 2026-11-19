@@ -1787,6 +1787,75 @@
                   <span>Screen Brightness</span>
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
+          </div>
+          </div>
+          </div>
+        </article>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- Celestial Clock, Sleep Timer & Bedtime Pomodoro -->
+        <article id="clockWin" class="win w-clock" data-foldable aria-labelledby="clockTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="clockTitle">pip-clock.exe</h3>
+            <span id="clockPhaseBadge" class="clock-phase-badge">🌙 Night</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Celestial Timekeeper. Analog nursery clock dial, digital LED readout, auto-mute sleep timer, and cozy starlight pomodoro.</p>
+            </div>
+
+            <!-- Analog & Digital Face -->
+            <div class="clock-face-wrapper">
+              <svg class="clock-analog-svg" viewBox="0 0 200 200" width="160" height="160" aria-label="Analog clock dial">
+                <!-- Outer Dial -->
+                <circle cx="100" cy="100" r="94" fill="var(--paper)" stroke="var(--line)" stroke-width="4" />
+                <circle cx="100" cy="100" r="86" fill="var(--cream)" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="2,6" />
+                <!-- Center Pivot -->
+                <circle cx="100" cy="100" r="5" fill="var(--berry)" />
+                <!-- Hour Markers -->
+                <circle cx="100" cy="20" r="3" fill="var(--ink)" />
+                <circle cx="180" cy="100" r="3" fill="var(--ink)" />
+                <circle cx="100" cy="180" r="3" fill="var(--ink)" />
+                <circle cx="20" cy="100" r="3" fill="var(--ink)" />
+                <!-- Hands -->
+                <line id="clockHandHour" x1="100" y1="100" x2="100" y2="52" stroke="var(--ink)" stroke-width="5" stroke-linecap="round" />
+                <line id="clockHandMinute" x1="100" y1="100" x2="100" y2="34" stroke="var(--berry)" stroke-width="3" stroke-linecap="round" />
+                <line id="clockHandSecond" x1="100" y1="100" x2="100" y2="24" stroke="var(--gold, #f3b562)" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+
+              <div class="clock-digital-box">
+                <div id="clockDigital" class="clock-digital" role="timer" aria-live="off">12:00:00 AM</div>
+                <button type="button" class="btn btn-tiny" id="clock24hToggle" aria-label="Toggle 12 or 24 hour mode">12H</button>
+              </div>
+            </div>
+
+            <!-- Sleep Timer Section -->
+            <div class="clock-section">
+              <h4 class="clock-section-title">🌙 Bedtime Sleep Timer</h4>
+              <p class="clock-section-sub">Automatically fades and mutes audio so you can fall asleep peacefully.</p>
+              <div class="clock-timer-controls">
+                <label for="clockSleepSelect" class="sr-only">Sleep timer duration:</label>
+                <select id="clockSleepSelect" class="clock-select" aria-label="Sleep timer duration preset">
+                  <option value="15">15 Minutes</option>
+                  <option value="30" selected>30 Minutes</option>
+                  <option value="45">45 Minutes</option>
+                  <option value="60">60 Minutes</option>
+                </select>
+                <button type="button" class="btn btn-tiny btn-primary" id="clockSleepStartBtn">Start Sleep Timer</button>
+                <button type="button" class="btn btn-tiny is-danger" id="clockSleepCancelBtn" disabled>Cancel</button>
+                <span id="clockSleepDisplay" class="clock-countdown" aria-live="polite">00:00</span>
+              </div>
+            </div>
+
+            <!-- Starlight Pomodoro Section -->
+            <div class="clock-section">
+              <h4 class="clock-section-title">⭐ Starlight Pomodoro</h4>
+              <p class="clock-section-sub">25-minute gentle focus session followed by 5-minute restful break.</p>
+              <div class="clock-timer-controls">
+                <button type="button" class="btn btn-tiny btn-primary" id="clockPomoStartBtn">Start Focus (25m)</button>
+                <button type="button" class="btn btn-tiny is-danger" id="clockPomoCancelBtn" disabled>Reset</button>
+                <span id="clockPomoDisplay" class="clock-countdown" aria-live="polite">25:00</span>
+                <span id="clockPomoCycles" class="clock-pomo-badge">Completed: 0</span>
               </div>
             </div>
           </div>
@@ -2224,6 +2293,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/clock.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
