@@ -1787,6 +1787,34 @@
                   <span>Screen Brightness</span>
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
+          </div>
+          </div>
+          </div>
+        </article>
+        <!-- Retro Garden Caterpillar Game (pip-snake.exe) -->
+        <article id="snakeWin" class="win w-snake" data-foldable aria-labelledby="snakeTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="snakeTitle">pip-snake.exe</h3>
+            <span class="snake-badge" aria-hidden="true">Garden Arcade</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Retro Garden Caterpillar. Guide the hungry caterpillar to golden apples without hitting walls or itself.</p>
+            </div>
+            <div class="snake-topbar">
+              <span id="snakeScore" class="snake-score" aria-live="polite">Score: 0</span>
+              <span id="snakeHighScore" class="snake-highscore">Best: 0</span>
+              <button type="button" class="btn btn-tiny btn-primary" id="snakeStartBtn">▶ Start Game</button>
+            </div>
+            <div class="snake-canvas-wrap">
+              <canvas id="snakeCanvas" width="300" height="300" class="snake-canvas" aria-label="Garden caterpillar game canvas" role="img"></canvas>
+            </div>
+            <div class="snake-controls" aria-label="On-screen directional controls">
+              <button type="button" class="btn btn-tiny snake-btn-dir" id="snakeUpBtn" aria-label="Move Up">▲</button>
+              <div class="snake-dir-row">
+                <button type="button" class="btn btn-tiny snake-btn-dir" id="snakeLeftBtn" aria-label="Move Left">◀</button>
+                <button type="button" class="btn btn-tiny snake-btn-dir" id="snakeDownBtn" aria-label="Move Down">▼</button>
+                <button type="button" class="btn btn-tiny snake-btn-dir" id="snakeRightBtn" aria-label="Move Right">▶</button>
               </div>
             </div>
           </div>
@@ -2224,6 +2252,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/snake.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
