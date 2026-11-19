@@ -74,6 +74,19 @@ test('js/toys.js implements combo tracking and DOM updates in initBlocks', () =>
   assert.match(toysSrc, /saveTopScore\(/, 'Must save score on game over');
 });
 
+test('js/toys.js drop() guards against missing st.cur and reports actual height score st.score', () => {
+  const toysSrc = fs.readFileSync(TOYS_JS_PATH, 'utf8');
+
+  // Verify null guards at the top of drop()
+  assert.match(toysSrc, /if\s*\(!st\.cur\)\s*return;/, 'drop() must guard against missing st.cur before reading properties');
+  assert.match(toysSrc, /if\s*\(!top\)\s*return;/, 'drop() must guard against missing top block before calculating overlap');
+
+  // Verify accurate game over score reporting with st.score
+  assert.match(toysSrc, /saveTopScore\(\s*st\.score\s*\)/, 'Must report actual height score st.score to saveTopScore on game over');
+  assert.match(toysSrc, /toast\(\s*['"]Wobbly!\s*Your tower is\s*['"]\s*\+\s*st\.score\s*\+\s*['"]\s*blocks tall\.['"]\s*\)/, 'Must report st.score in game over toast notification');
+  assert.match(toysSrc, /ctx\.fillText\(\s*['"]Wobbly!\s*['"]\s*\+\s*st\.score\s*\+\s*['"]\s*tall['"]/, 'Must draw actual height st.score on game over canvas overlay');
+});
+
 test('Rattle & Blocks freeze prevention: verifies loop wake-up, boundary, and narrow block safeguards', () => {
   const toysSrc = fs.readFileSync(TOYS_JS_PATH, 'utf8');
 

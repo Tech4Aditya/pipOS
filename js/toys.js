@@ -4,11 +4,11 @@
   var PIP = (typeof window !== 'undefined' && window.PIP) ? window.PIP : {};
   var $ = PIP.$ || function () { return null; };
   var $$ = PIP.$$ || function () { return []; };
-  var store = PIP.store || { get: function () { return ''; }, set: function () {} };
+  var store = PIP.store || { get: function () { return ''; }, set: function () { } };
   var clamp = PIP.clamp || function (v, a, b) { return Math.min(b, Math.max(a, v)); };
-  var toast = PIP.toast || function () {};
+  var toast = PIP.toast || function () { };
   var reduce = PIP.reduceMotion || { matches: false };
-  var audio = PIP.audio || { isOn: function () { return false; }, note: function () {} };
+  var audio = PIP.audio || { isOn: function () { return false; }, note: function () { } };
 
   /* =====================================================================
      1. LULLABY LAB
@@ -263,7 +263,7 @@
           });
         }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Fallbacks for individual room store keys if dr_found was empty
     ['nursery', 'attic', 'garden'].forEach(function (k) {
@@ -273,7 +273,7 @@
           try {
             var arr = JSON.parse(ind);
             if (Array.isArray(arr)) foundByRoom[k] = arr;
-          } catch (e) {}
+          } catch (e) { }
         }
       }
     });
@@ -373,7 +373,7 @@
         });
         btn.addEventListener('keydown', function (e) {
           var d = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? 1
-                : (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 0;
+            : (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 0;
           if (d !== 0) {
             e.preventDefault();
             var nextIdx = (idx + d + roomBtns.length) % roomBtns.length;
@@ -486,7 +486,7 @@
         isDraggingHandle = true;
         handle.classList.add('is-dragging');
         if (handle.setPointerCapture) {
-          try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+          try { handle.setPointerCapture(e.pointerId); } catch (err) { }
         }
         toLocal(e);
         tryFind();
@@ -506,7 +506,7 @@
         isDraggingHandle = false;
         handle.classList.remove('is-dragging');
         if (handle.releasePointerCapture && e.pointerId) {
-          try { handle.releasePointerCapture(e.pointerId); } catch (err) {}
+          try { handle.releasePointerCapture(e.pointerId); } catch (err) { }
         }
       }
 
@@ -650,12 +650,12 @@
     var W = 300, H = 420, BH = 28;
     var PAL = ['#ff9fb4', '#ffd27a', '#9fd8c4', '#9ab8f0', '#d3a8f2', '#ffb08a'];
     var LET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-   var dpr = Math.min((window.devicePixelRatio || 1) * 1.15, 3);
+    var dpr = Math.min((window.devicePixelRatio || 1) * 1.15, 3);
     cv.width = W * dpr;
     cv.height = H * dpr;
 
     var st, raf = 0, visible = false, last = 0;
-       var THEMES = {
+    var THEMES = {
       candy: { pal: PAL, line: '#5c4033', bg: null, floor: 'rgba(92,64,51,.18)', dark: false },
       midnight: { pal: ['#7c6cff', '#3ec9ff', '#ff5fc8', '#4dffb0', '#ffd35c', '#ff7a5c'], line: '#140e24', bg: '#1b1430', floor: 'rgba(255,255,255,.14)', dark: true }
     };
@@ -677,8 +677,8 @@
         var parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
           return parsed.filter(function (s) { return typeof s === 'number' && !isNaN(s) && s > 0; })
-                       .sort(function (a, b) { return b - a; })
-                       .slice(0, 5);
+            .sort(function (a, b) { return b - a; })
+            .slice(0, 5);
         }
       } catch (e) { /* ignore parse error */ }
       return [];
@@ -855,866 +855,868 @@
     function drop() {
       if (!st) { reset(); return; }
       if (st.over) { reset(); return; }
-      if (!st.cur || typeof st.cur.x !== 'number' || isNaN(st.cur.x)) {
-        spawn();
-        ensureLoop();
-        return;
-      }
-      var top = (st.stack && st.stack.length) ? st.stack[st.stack.length - 1] : null;
-      if (!top || typeof top.x !== 'number' || isNaN(top.x) || typeof top.w !== 'number' || isNaN(top.w)) {
-        reset();
-        return;
-      }
-      var c = st.cur;
-      var left = Math.max(c.x, top.x), right = Math.min(c.x + c.w, top.x + top.w), ov = right - left;
-      if (isNaN(ov) || ov < 3) {
-        if (Array.isArray(st.chips) && typeof c.w === 'number' && c.w > 0) {
-          st.chips.push({ x: c.x, w: c.w, y: levelY(c.i), vy: 0, i: c.i });
+        if (!st.cur) return;
+        if (typeof st.cur.x !== 'number' || isNaN(st.cur.x)) {
+          spawn();
+          ensureLoop();
+          return;
         }
-        st.cur = null;
-        st.over = true;
-        saveTopScore(st.score);
-        st.combo = 0;
-        if (comboEl) comboEl.hidden = true;
-        if (st.score > best) { best = st.score; store.set(bestKey(), best); }
-        hud();
-        toast('Wobbly! Your tower is ' + st.score + ' blocks tall.');
-        if (audio && typeof audio.isOn === 'function' && audio.isOn()) {
-          audio.note(196, { dur: 0.6, gain: 0.2, type: 'triangle', bell: false });
-        }
-        draw();
-        return;
-      }
-      var perfect = Math.abs(c.x - top.x) < 5, nx = c.x, nw = c.w;
-      if (perfect) {
-        nx = top.x;
-        nw = top.w;
-        st.combo = (st.combo || 0) + 1;
-        if (comboEl) {
-          comboEl.hidden = false;
-          comboEl.textContent = (st.combo > 1 ? st.combo + 'x Combo! ✨' : 'Perfect! ✨');
-        }
-      } else {
-        st.combo = 0;
-        if (comboEl) comboEl.hidden = true;
-        if (Array.isArray(st.chips)) {
-          if (c.x < top.x) {
-            var chipW1 = top.x - c.x;
-            if (chipW1 >= 2) st.chips.push({ x: c.x, w: chipW1, y: levelY(c.i), vy: 0, i: c.i });
+        var top = (st.stack && st.stack.length) ? st.stack[st.stack.length - 1] : null;
+          if (!top) return;
+          if (typeof top.x !== 'number' || isNaN(top.x) || typeof top.w !== 'number' || isNaN(top.w)) {
+            reset();
+            return;
+          }
+          var c = st.cur;
+          var left = Math.max(c.x, top.x), right = Math.min(c.x + c.w, top.x + top.w), ov = right - left;
+          if (isNaN(ov) || ov < 3) {
+            if (Array.isArray(st.chips) && typeof c.w === 'number' && c.w > 0) {
+              st.chips.push({ x: c.x, w: c.w, y: levelY(c.i), vy: 0, i: c.i });
+            }
+            st.cur = null;
+            st.over = true;
+            saveTopScore(st.score);
+            st.combo = 0;
+            if (comboEl) comboEl.hidden = true;
+            if (st.score > best) { best = st.score; store.set(bestKey(), best); }
+            hud();
+            toast('Wobbly! Your tower is ' + st.score + ' blocks tall.');
+            if (audio && typeof audio.isOn === 'function' && audio.isOn()) {
+              audio.note(196, { dur: 0.6, gain: 0.2, type: 'triangle', bell: false });
+            }
+            draw();
+            return;
+          }
+          var perfect = Math.abs(c.x - top.x) < 5, nx = c.x, nw = c.w;
+          if (perfect) {
+            nx = top.x;
+            nw = top.w;
+            st.combo = (st.combo || 0) + 1;
+            if (comboEl) {
+              comboEl.hidden = false;
+              comboEl.textContent = (st.combo > 1 ? st.combo + 'x Combo! ✨' : 'Perfect! ✨');
+            }
           } else {
-            var chipW2 = (c.x + c.w) - (top.x + top.w);
-            if (chipW2 >= 2) st.chips.push({ x: top.x + top.w, w: chipW2, y: levelY(c.i), vy: 0, i: c.i });
+            st.combo = 0;
+            if (comboEl) comboEl.hidden = true;
+            if (Array.isArray(st.chips)) {
+              if (c.x < top.x) {
+                var chipW1 = top.x - c.x;
+                if (chipW1 >= 2) st.chips.push({ x: c.x, w: chipW1, y: levelY(c.i), vy: 0, i: c.i });
+              } else {
+                var chipW2 = (c.x + c.w) - (top.x + top.w);
+                if (chipW2 >= 2) st.chips.push({ x: top.x + top.w, w: chipW2, y: levelY(c.i), vy: 0, i: c.i });
+              }
+            }
+            nx = left;
+            nw = Math.max(3, ov);
           }
-        }
-        nx = left;
-        nw = Math.max(3, ov);
-      }
-      st.stack.push({ x: nx, w: nw, i: c.i });
-      st.score = (st.score || 0) + 1;
-      if (st.score >= 10 && PIP.stickers && typeof PIP.stickers.unlock === 'function') {
-        PIP.stickers.unlock('blocks10');
-      }
-      if (audio && typeof audio.isOn === 'function' && audio.isOn()) {
-        var pitchMult = Math.pow(1.1, Math.min(st.combo, 8));
-        var scaleLen = (audio.SCALE && audio.SCALE.length) || 5;
-        var f = ((audio.SCALE && audio.SCALE[st.score % scaleLen]) || 261) * (st.score % 10 < 5 ? 1 : 1.5) * pitchMult;
-        audio.note(f, { dur: perfect ? 1.4 : 0.8, gain: perfect ? 0.22 : 0.15 });
-        if (perfect) audio.note(f * 1.5, { dur: 1.2, gain: 0.1, when: 0.07 });
-      }
-      if (st.score > best) { best = st.score; store.set(bestKey(), best); }
-      hud();
-      spawn();
-      ensureLoop();
-    }
-
-    function update(dt) {
-      if (!st) return;
-      if (!st.over && st.cur) {
-        var c = st.cur;
-        if (typeof c.x !== 'number' || isNaN(c.x)) {
-          c.x = (c.dir > 0) ? 0 : Math.max(0, W - (c.w || ((mode && mode.start) || 160)));
-        }
-        if (typeof c.dir !== 'number' || (c.dir !== 1 && c.dir !== -1)) {
-          c.dir = 1;
-        }
-        var speed = Math.min(mode.base + (st.score || 0) * mode.step, mode.max);
-        if (isNaN(speed) || speed <= 0) speed = mode.base;
-        c.x += c.dir * speed * dt;
-        if (c.x < 0) { c.x = 0; c.dir = 1; }
-        if (c.x + c.w > W) { c.x = Math.max(0, W - c.w); c.dir = -1; }
-      }
-      if (typeof st.cam !== 'number' || isNaN(st.cam)) st.cam = 0;
-      var target = Math.max(0, (st.stack ? st.stack.length : 1) - 9) * BH;
-      st.cam += (target - st.cam) * Math.min(1, dt * 6);
-      if (Array.isArray(st.chips)) {
-        st.chips.forEach(function (p) {
-          p.vy = (typeof p.vy === 'number' && !isNaN(p.vy)) ? p.vy + 900 * dt : 900 * dt;
-          p.y = (typeof p.y === 'number' && !isNaN(p.y)) ? p.y + p.vy * dt : H;
-        });
-        st.chips = st.chips.filter(function (p) { return p.y < H + st.cam + 60; });
-      }
-    }
-
-    function block(b, y, idx, alpha) {
-      if (!b || typeof b.x !== 'number' || typeof b.w !== 'number' || isNaN(b.x) || isNaN(b.w) || b.w <= 0) return;
-      if (typeof y !== 'number' || isNaN(y)) return;
-      var pal = (theme && theme.pal) || PAL;
-      var lineCol = (theme && theme.line) || '#5c4033';
-      var col = pal[(Math.abs(idx) || 0) % pal.length];
-      ctx.globalAlpha = (typeof alpha === 'number' && !isNaN(alpha)) ? clamp(alpha, 0, 1) : 1;
-      rr(b.x, y, b.w, BH - 2, 7);
-      ctx.fillStyle = col;
-      ctx.fill();
-      ctx.lineWidth = 2.5;
-      ctx.strokeStyle = lineCol;
-      ctx.stroke();
-      if (b.w > 12) {
-        ctx.fillStyle = 'rgba(255,255,255,.35)';
-        rr(b.x + 4, y + 3, Math.max(0, b.w - 8), 6, 3);
-        ctx.fill();
-      }
-      if (b.w > 34) {
-        ctx.fillStyle = lineCol;
-        ctx.font = '600 15px Fredoka, "Trebuchet MS", system-ui, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(LET.charAt((Math.abs(idx) || 0) % LET.length), b.x + b.w / 2, y + BH / 2);
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    function draw() {
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, W, H);
-      if (theme && theme.bg) { ctx.fillStyle = theme.bg; ctx.fillRect(0, 0, W, H); }
-      // floor
-      ctx.fillStyle = (theme && theme.floor) || 'rgba(92,64,51,.18)';
-      ctx.fillRect(0, H - 10 + (st ? st.cam : 0), W, 10 + 400);
-      if (st) {
-        if (Array.isArray(st.stack)) {
-          st.stack.forEach(function (b, i) { block(b, levelY(i) + st.cam, i); });
-        }
-        if (Array.isArray(st.chips)) {
-          st.chips.forEach(function (p) { block(p, p.y + st.cam, p.i, 0.9); });
-        }
-        if (st.cur) block(st.cur, levelY(st.cur.i) + st.cam, st.cur.i);
-        if (st.over || st.score === 0) {
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          if (st.over) {
-            ctx.fillStyle = 'rgba(20, 10, 24, 0.8)';
-            ctx.fillRect(0, 0, W, H);
-            ctx.fillStyle = '#fff8f1';
-            ctx.font = '600 26px Fredoka, system-ui, sans-serif';
-            ctx.fillText('Wobbly! ' + st.score + ' tall', W / 2, H / 2 - 12);
-            ctx.font = '500 16px Fredoka, system-ui, sans-serif';
-            ctx.fillText('Tap to build again', W / 2, H / 2 + 20);
-          } else {
-            var isNight = document.documentElement && document.documentElement.getAttribute('data-theme') === 'night';
-            ctx.fillStyle = (isNight || (theme && theme.dark)) ? '#ffe9d2' : '#5c4033';
-            ctx.font = '500 15px Fredoka, system-ui, sans-serif';
-            ctx.fillText('Tap to drop the block', W / 2, 40);
+          st.stack.push({ x: nx, w: nw, i: c.i });
+          st.score = (st.score || 0) + 1;
+          if (st.score >= 10 && PIP.stickers && typeof PIP.stickers.unlock === 'function') {
+            PIP.stickers.unlock('blocks10');
           }
-        }
-      }
-    }
-
-    function loop() {
-      if (raf) window.cancelAnimationFrame(raf);
-      raf = window.requestAnimationFrame(function (now) {
-        raf = 0;
-        var nowMs = (typeof now === 'number' && !isNaN(now) && now > 0)
-          ? now
-          : ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now());
-        if (!last || isNaN(last) || last <= 0) last = nowMs;
-        var delta = (nowMs - last) / 1000;
-        if (isNaN(delta) || delta < 0) delta = 0.016;
-        var dt = Math.min(delta, 0.05);
-        last = nowMs;
-
-        try {
-          update(dt);
-          draw();
-        } catch (err) {
-          if (typeof console !== 'undefined' && console.error) {
-            console.error('[pip blocks] frame error:', err);
+          if (audio && typeof audio.isOn === 'function' && audio.isOn()) {
+            var pitchMult = Math.pow(1.1, Math.min(st.combo, 8));
+            var scaleLen = (audio.SCALE && audio.SCALE.length) || 5;
+            var f = ((audio.SCALE && audio.SCALE[st.score % scaleLen]) || 261) * (st.score % 10 < 5 ? 1 : 1.5) * pitchMult;
+            audio.note(f, { dur: perfect ? 1.4 : 0.8, gain: perfect ? 0.22 : 0.15 });
+            if (perfect) audio.note(f * 1.5, { dur: 1.2, gain: 0.1, when: 0.07 });
           }
-        }
-
-        if (shouldRun()) {
-          loop();
-        } else {
-          stopLoop();
-        }
-      });
-    }
-
-    function onDrop(e) {
-      if (e && typeof e.preventDefault === 'function') e.preventDefault();
-      visible = true;
-      drop();
-      ensureLoop();
-    }
-
-    cv.addEventListener('pointerdown', onDrop);
-    cv.addEventListener('keydown', function (e) {
-      if (e.key === ' ' || e.key === 'Enter') {
-        onDrop(e);
-      }
-    });
-    if (btn) btn.addEventListener('click', onDrop);
-
-    document.addEventListener('visibilitychange', function () {
-      if (!document.hidden) {
-        if (isCanvasActive()) visible = true;
-        ensureLoop();
-      } else {
-        stopLoop();
-      }
-    });
-
-    window.addEventListener('focus', function () {
-      if (isCanvasActive()) {
-        visible = true;
-        ensureLoop();
-      }
-    });
-
-    var winEl = cv.closest ? cv.closest('.win') : null;
-    if (winEl) {
-      winEl.addEventListener('click', function () {
-        if (isCanvasActive()) {
-          visible = true;
+          if (st.score > best) { best = st.score; store.set(bestKey(), best); }
+          hud();
+          spawn();
           ensureLoop();
         }
-      });
-    }
 
-    PIP.watchVisible(cv, function (v) {
-      visible = v;
-      if (v) {
-        ensureLoop();
-      } else {
-        if (!isCanvasActive()) {
-          stopLoop();
-        } else {
-          visible = true;
-          ensureLoop();
-        }
-      }
-    });
-
-    function updateDpr() {
-      var nextDpr = Math.min((window.devicePixelRatio || 1) * 1.15, 3);
-      if (nextDpr !== dpr) {
-        dpr = nextDpr;
-        cv.width = W * dpr;
-        cv.height = H * dpr;
-        draw();
-      }
-      if (shouldRun()) ensureLoop();
-    }
-    window.addEventListener('resize', updateDpr);
-
-    reset();
-    draw();
-  }
-
-  /* =====================================================================
-     4. DREAM DELIVERY ROUTE (SVG path synced to scroll)
-     ===================================================================== */
-  var HOUSE_STORIES = [
-    "Boo-ton fell fast asleep hugging his favourite wooden button after Pip tucked him in.",
-    "The twins curled together under a patch quilt dreaming of chasing yarn across the clouds.",
-    "Mother Hoot turned down her twig lamp and closed her eyes to gentle night breezes.",
-    "Little Wisp drifted into a warm dream of golden stars and lavender soup.",
-    "Fern curled his bushy tail around his nose and dozed off under pine branches.",
-    "Three little frogs rested on lily pads humming quiet water lullabies until morning.",
-    "The velvet moths settled around the glowing lantern enjoying peaceful, warm dreams."
-  ];
-
-  function initRoute() {
-    var win = $('#route'), path = $('#routePath'), rider = $('#rider'), label = $('#routeLabel'), btn = $('#flyBtn');
-    if (!win || !path || !rider || !path.getTotalLength) return;
-    var canvas = $('#routeCanvas') || (typeof document !== 'undefined' ? document.getElementById('routeCanvas') : null);
-    var ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null;
-    var trail = [];
-    var moving = false;
-    var houses = $$('#routeSvg .house');
-    var len = path.getTotalLength();
-    var p = 0, manual = false;
-    var storyBox = $('#houseStory'), storyTitle = $('#houseStoryTitle'), storyText = $('#houseStoryText'), storyClose = $('#houseStoryClose');
-    var activeHouse = null;
-
-    // progress at which the route passes each house
-    var samples = [];
-    for (var i = 0; i <= 240; i++) samples.push(path.getPointAtLength(len * i / 240).x);
-    var at = houses.map(function (h) {
-      var hx = parseFloat(h.getAttribute('data-x'));
-      for (var j = 0; j < samples.length; j++) if (samples[j] >= hx) return j / 240;
-      return 1;
-    });
-
-    function openStory(h, idx) {
-      var isPassed = h.classList.contains('is-lit') || h.getAttribute('data-passed') === 'true';
-      if (!isPassed) {
-        if (label) label.textContent = 'Pip is still flying! Deliver to ' + h.getAttribute('data-name') + ' first.';
-        return;
-      }
-
-      var name = h.getAttribute('data-name') || ('House ' + (idx + 1));
-      var story = h.getAttribute('data-story') || (HOUSE_STORIES && HOUSE_STORIES[idx]) || '';
-
-      if (activeHouse && activeHouse !== h) {
-        activeHouse.classList.remove('is-active');
-        activeHouse.setAttribute('aria-expanded', 'false');
-      }
-
-      activeHouse = h;
-      h.classList.add('is-active');
-      h.setAttribute('aria-expanded', 'true');
-
-      if (storyBox) {
-        if (storyTitle) storyTitle.textContent = name;
-        if (storyText) storyText.textContent = story;
-        storyBox.removeAttribute('hidden');
-        storyBox.classList.add('is-open');
-      }
-
-      if (label) {
-        label.textContent = name + ': ' + story;
-      }
-
-      if (audio && typeof audio.isOn === 'function' && audio.isOn()) {
-        if (audio.pad) {
-          audio.pad(audio.SCALE[(idx + 2) % audio.SCALE.length], { dur: 1.8, gain: 0.12 });
-        } else {
-          audio.note(audio.SCALE[(idx + 2) % audio.SCALE.length], {
-            dur: 1.8,
-            gain: 0.12,
-            adsr: { a: 0.4, d: 0.3, s: 0.6, r: 0.8 },
-            bell: false
-          });
-        }
-      }
-    }
-
-    function closeStory() {
-      var prevHouse = activeHouse;
-      if (activeHouse) {
-        activeHouse.classList.remove('is-active');
-        activeHouse.setAttribute('aria-expanded', 'false');
-        activeHouse = null;
-      }
-      if (storyBox) {
-        storyBox.setAttribute('hidden', '');
-        storyBox.classList.remove('is-open');
-      }
-      if (prevHouse && typeof prevHouse.focus === 'function') {
-        prevHouse.focus({ preventScroll: true });
-      }
-    }
-
-    houses.forEach(function (h, idx) {
-      h.setAttribute('tabindex', '0');
-      h.setAttribute('role', 'button');
-      h.setAttribute('aria-haspopup', 'dialog');
-      h.setAttribute('aria-expanded', 'false');
-
-      h.addEventListener('click', function (e) {
-        e.stopPropagation();
-        openStory(h, idx);
-      });
-
-      h.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          e.stopPropagation();
-          openStory(h, idx);
-        } else if (e.key === 'Escape') {
-          closeStory();
-        }
-      });
-    });
-
-    if (storyClose) {
-      storyClose.addEventListener('click', function (e) {
-        e.stopPropagation();
-        closeStory();
-      });
-    }
-
-    document.addEventListener('click', function (e) {
-      if (storyBox && !storyBox.hasAttribute('hidden') && !storyBox.contains(e.target)) {
-        closeStory();
-      }
-    });
-
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && storyBox && !storyBox.hasAttribute('hidden')) {
-        closeStory();
-      }
-    });
-
-    function set(v) {
-      p = clamp(v, 0, 1);
-      var pt = path.getPointAtLength(len * p);
-      rider.setAttribute('transform', 'translate(' + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1) + ')');
-      var passed = -1;
-      houses.forEach(function (h, k) {
-        var on = p >= at[k];
-        if (on) {
-          h.classList.add('is-lit');
-          h.setAttribute('data-passed', 'true');
-          passed = k;
-        } else if (!h.hasAttribute('data-passed')) {
-          h.classList.remove('is-lit');
-        }
-      });
-      if (p <= 0.01) label.textContent = 'Waiting at the nursery window';
-      else if (p >= 0.995) {
-        label.textContent = 'All seven dreams delivered';
-        if (PIP.stickers) PIP.stickers.unlock('route7');
-      }
-      else if (passed >= 0) label.textContent = 'Delivered to ' + houses[passed].getAttribute('data-name');
-      else label.textContent = 'Taking off...';
-    }
-
-    function fromScroll() {
-      if (manual) return;
-      var r = win.getBoundingClientRect(), vh = window.innerHeight;
-      set((vh * 0.85 - r.top) / (vh * 0.65));
-    }
-    var ticking = false;
-    window.addEventListener('scroll', function () {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(function () { ticking = false; fromScroll(); });
-    }, { passive: true });
-    window.addEventListener('resize', fromScroll);
-
-    btn.addEventListener('click', function () {
-      if (manual) return;
-      if (reduce.matches) { set(p >= 0.99 ? 0 : 1); return; }
-      manual = true;
-      moving = true;
-      trail = [];
-      btn.setAttribute('aria-busy', 'true');
-      var t0 = performance.now(), dur = 5200;
-      var lastT = t0;
-      (function step(now) {
-        var dt = Math.min((now - lastT) / 1000, 0.1);
-        lastT = now;
-        var k = clamp((now - t0) / dur, 0, 1);
-        var e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; // ease in-out
-        set(e);
-
-        if (k >= 1) {
-          moving = false;
-        }
-
-        var pt = path.getPointAtLength(len * e);
-        if (moving === true) {
-          trail.push({
-            x: pt.x - 14 + (Math.random() * 6 - 3),
-            y: pt.y + 2 + (Math.random() * 6 - 3),
-            opacity: 0.9,
-            radius: 1.5 + Math.random() * 2
-          });
-        }
-
-        for (var i = trail.length - 1; i >= 0; i--) {
-          trail[i].opacity -= dt * 2;
-          if (trail[i].opacity <= 0) {
-            trail.splice(i, 1);
+        function update(dt) {
+          if (!st) return;
+          if (!st.over && st.cur) {
+            var c = st.cur;
+            if (typeof c.x !== 'number' || isNaN(c.x)) {
+              c.x = (c.dir > 0) ? 0 : Math.max(0, W - (c.w || ((mode && mode.start) || 160)));
+            }
+            if (typeof c.dir !== 'number' || (c.dir !== 1 && c.dir !== -1)) {
+              c.dir = 1;
+            }
+            var speed = Math.min(mode.base + (st.score || 0) * mode.step, mode.max);
+            if (isNaN(speed) || speed <= 0) speed = mode.base;
+            c.x += c.dir * speed * dt;
+            if (c.x < 0) { c.x = 0; c.dir = 1; }
+            if (c.x + c.w > W) { c.x = Math.max(0, W - c.w); c.dir = -1; }
+          }
+          if (typeof st.cam !== 'number' || isNaN(st.cam)) st.cam = 0;
+          var target = Math.max(0, (st.stack ? st.stack.length : 1) - 9) * BH;
+          st.cam += (target - st.cam) * Math.min(1, dt * 6);
+          if (Array.isArray(st.chips)) {
+            st.chips.forEach(function (p) {
+              p.vy = (typeof p.vy === 'number' && !isNaN(p.vy)) ? p.vy + 900 * dt : 900 * dt;
+              p.y = (typeof p.y === 'number' && !isNaN(p.y)) ? p.y + p.vy * dt : H;
+            });
+            st.chips = st.chips.filter(function (p) { return p.y < H + st.cam + 60; });
           }
         }
 
-        if (ctx && canvas) {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          for (var j = 0; j < trail.length; j++) {
-            var tp = trail[j];
-            if (tp.opacity > 0) {
-              ctx.beginPath();
-              ctx.arc(tp.x, tp.y, Math.max(0.2, tp.radius), 0, Math.PI * 2);
-              ctx.fillStyle = 'rgba(255, 235, 160, ' + Math.max(0, tp.opacity).toFixed(3) + ')';
-              ctx.fill();
+        function block(b, y, idx, alpha) {
+          if (!b || typeof b.x !== 'number' || typeof b.w !== 'number' || isNaN(b.x) || isNaN(b.w) || b.w <= 0) return;
+          if (typeof y !== 'number' || isNaN(y)) return;
+          var pal = (theme && theme.pal) || PAL;
+          var lineCol = (theme && theme.line) || '#5c4033';
+          var col = pal[(Math.abs(idx) || 0) % pal.length];
+          ctx.globalAlpha = (typeof alpha === 'number' && !isNaN(alpha)) ? clamp(alpha, 0, 1) : 1;
+          rr(b.x, y, b.w, BH - 2, 7);
+          ctx.fillStyle = col;
+          ctx.fill();
+          ctx.lineWidth = 2.5;
+          ctx.strokeStyle = lineCol;
+          ctx.stroke();
+          if (b.w > 12) {
+            ctx.fillStyle = 'rgba(255,255,255,.35)';
+            rr(b.x + 4, y + 3, Math.max(0, b.w - 8), 6, 3);
+            ctx.fill();
+          }
+          if (b.w > 34) {
+            ctx.fillStyle = lineCol;
+            ctx.font = '600 15px Fredoka, "Trebuchet MS", system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(LET.charAt((Math.abs(idx) || 0) % LET.length), b.x + b.w / 2, y + BH / 2);
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        function draw() {
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.clearRect(0, 0, W, H);
+          if (theme && theme.bg) { ctx.fillStyle = theme.bg; ctx.fillRect(0, 0, W, H); }
+          // floor
+          ctx.fillStyle = (theme && theme.floor) || 'rgba(92,64,51,.18)';
+          ctx.fillRect(0, H - 10 + (st ? st.cam : 0), W, 10 + 400);
+          if (st) {
+            if (Array.isArray(st.stack)) {
+              st.stack.forEach(function (b, i) { block(b, levelY(i) + st.cam, i); });
+            }
+            if (Array.isArray(st.chips)) {
+              st.chips.forEach(function (p) { block(p, p.y + st.cam, p.i, 0.9); });
+            }
+            if (st.cur) block(st.cur, levelY(st.cur.i) + st.cam, st.cur.i);
+            if (st.over || st.score === 0) {
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              if (st.over) {
+                ctx.fillStyle = 'rgba(20, 10, 24, 0.8)';
+                ctx.fillRect(0, 0, W, H);
+                ctx.fillStyle = '#fff8f1';
+                ctx.font = '600 26px Fredoka, system-ui, sans-serif';
+                ctx.fillText('Wobbly! ' + st.score + ' tall', W / 2, H / 2 - 12);
+                ctx.font = '500 16px Fredoka, system-ui, sans-serif';
+                ctx.fillText('Tap to build again', W / 2, H / 2 + 20);
+              } else {
+                var isNight = document.documentElement && document.documentElement.getAttribute('data-theme') === 'night';
+                ctx.fillStyle = (isNight || (theme && theme.dark)) ? '#ffe9d2' : '#5c4033';
+                ctx.font = '500 15px Fredoka, system-ui, sans-serif';
+                ctx.fillText('Tap to drop the block', W / 2, 40);
+              }
             }
           }
         }
 
-        if (k < 1 || trail.length > 0) {
-          window.requestAnimationFrame(step);
-        } else {
-          if (ctx && canvas) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-          }
-          window.setTimeout(function () {
-            manual = false;
-            btn.removeAttribute('aria-busy');
-          }, 1500);
+        function loop() {
+          if (raf) window.cancelAnimationFrame(raf);
+          raf = window.requestAnimationFrame(function (now) {
+            raf = 0;
+            var nowMs = (typeof now === 'number' && !isNaN(now) && now > 0)
+              ? now
+              : ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now());
+            if (!last || isNaN(last) || last <= 0) last = nowMs;
+            var delta = (nowMs - last) / 1000;
+            if (isNaN(delta) || delta < 0) delta = 0.016;
+            var dt = Math.min(delta, 0.05);
+            last = nowMs;
+
+            try {
+              update(dt);
+              draw();
+            } catch (err) {
+              if (typeof console !== 'undefined' && console.error) {
+                console.error('[pip blocks] frame error:', err);
+              }
+            }
+
+            if (shouldRun()) {
+              loop();
+            } else {
+              stopLoop();
+            }
+          });
         }
-      })(t0);
-      if (audio.isOn()) {
-        [0, 2, 4, 3, 5, 4, 7].forEach(function (n, k) {
-          if (audio.pad) {
-            audio.pad(audio.SCALE[n], { dur: 2.0, gain: 0.1, when: 0.4 + k * 0.7 });
+
+        function onDrop(e) {
+          if (e && typeof e.preventDefault === 'function') e.preventDefault();
+          visible = true;
+          drop();
+          ensureLoop();
+        }
+
+        cv.addEventListener('pointerdown', onDrop);
+        cv.addEventListener('keydown', function (e) {
+          if (e.key === ' ' || e.key === 'Enter') {
+            onDrop(e);
+          }
+        });
+        if (btn) btn.addEventListener('click', onDrop);
+
+        document.addEventListener('visibilitychange', function () {
+          if (!document.hidden) {
+            if (isCanvasActive()) visible = true;
+            ensureLoop();
           } else {
-            audio.note(audio.SCALE[n], {
-              dur: 2.0,
-              gain: 0.1,
-              when: 0.4 + k * 0.7,
-              adsr: { a: 0.5, d: 0.4, s: 0.6, r: 0.9 },
-              bell: false
+            stopLoop();
+          }
+        });
+
+        window.addEventListener('focus', function () {
+          if (isCanvasActive()) {
+            visible = true;
+            ensureLoop();
+          }
+        });
+
+        var winEl = cv.closest ? cv.closest('.win') : null;
+        if (winEl) {
+          winEl.addEventListener('click', function () {
+            if (isCanvasActive()) {
+              visible = true;
+              ensureLoop();
+            }
+          });
+        }
+
+        PIP.watchVisible(cv, function (v) {
+          visible = v;
+          if (v) {
+            ensureLoop();
+          } else {
+            if (!isCanvasActive()) {
+              stopLoop();
+            } else {
+              visible = true;
+              ensureLoop();
+            }
+          }
+        });
+
+        function updateDpr() {
+          var nextDpr = Math.min((window.devicePixelRatio || 1) * 1.15, 3);
+          if (nextDpr !== dpr) {
+            dpr = nextDpr;
+            cv.width = W * dpr;
+            cv.height = H * dpr;
+            draw();
+          }
+          if (shouldRun()) ensureLoop();
+        }
+        window.addEventListener('resize', updateDpr);
+
+        reset();
+        draw();
+      }
+
+      /* =====================================================================
+         4. DREAM DELIVERY ROUTE (SVG path synced to scroll)
+         ===================================================================== */
+      var HOUSE_STORIES = [
+        "Boo-ton fell fast asleep hugging his favourite wooden button after Pip tucked him in.",
+        "The twins curled together under a patch quilt dreaming of chasing yarn across the clouds.",
+        "Mother Hoot turned down her twig lamp and closed her eyes to gentle night breezes.",
+        "Little Wisp drifted into a warm dream of golden stars and lavender soup.",
+        "Fern curled his bushy tail around his nose and dozed off under pine branches.",
+        "Three little frogs rested on lily pads humming quiet water lullabies until morning.",
+        "The velvet moths settled around the glowing lantern enjoying peaceful, warm dreams."
+      ];
+
+      function initRoute() {
+        var win = $('#route'), path = $('#routePath'), rider = $('#rider'), label = $('#routeLabel'), btn = $('#flyBtn');
+        if (!win || !path || !rider || !path.getTotalLength) return;
+        var canvas = $('#routeCanvas') || (typeof document !== 'undefined' ? document.getElementById('routeCanvas') : null);
+        var ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null;
+        var trail = [];
+        var moving = false;
+        var houses = $$('#routeSvg .house');
+        var len = path.getTotalLength();
+        var p = 0, manual = false;
+        var storyBox = $('#houseStory'), storyTitle = $('#houseStoryTitle'), storyText = $('#houseStoryText'), storyClose = $('#houseStoryClose');
+        var activeHouse = null;
+
+        // progress at which the route passes each house
+        var samples = [];
+        for (var i = 0; i <= 240; i++) samples.push(path.getPointAtLength(len * i / 240).x);
+        var at = houses.map(function (h) {
+          var hx = parseFloat(h.getAttribute('data-x'));
+          for (var j = 0; j < samples.length; j++) if (samples[j] >= hx) return j / 240;
+          return 1;
+        });
+
+        function openStory(h, idx) {
+          var isPassed = h.classList.contains('is-lit') || h.getAttribute('data-passed') === 'true';
+          if (!isPassed) {
+            if (label) label.textContent = 'Pip is still flying! Deliver to ' + h.getAttribute('data-name') + ' first.';
+            return;
+          }
+
+          var name = h.getAttribute('data-name') || ('House ' + (idx + 1));
+          var story = h.getAttribute('data-story') || (HOUSE_STORIES && HOUSE_STORIES[idx]) || '';
+
+          if (activeHouse && activeHouse !== h) {
+            activeHouse.classList.remove('is-active');
+            activeHouse.setAttribute('aria-expanded', 'false');
+          }
+
+          activeHouse = h;
+          h.classList.add('is-active');
+          h.setAttribute('aria-expanded', 'true');
+
+          if (storyBox) {
+            if (storyTitle) storyTitle.textContent = name;
+            if (storyText) storyText.textContent = story;
+            storyBox.removeAttribute('hidden');
+            storyBox.classList.add('is-open');
+          }
+
+          if (label) {
+            label.textContent = name + ': ' + story;
+          }
+
+          if (audio && typeof audio.isOn === 'function' && audio.isOn()) {
+            if (audio.pad) {
+              audio.pad(audio.SCALE[(idx + 2) % audio.SCALE.length], { dur: 1.8, gain: 0.12 });
+            } else {
+              audio.note(audio.SCALE[(idx + 2) % audio.SCALE.length], {
+                dur: 1.8,
+                gain: 0.12,
+                adsr: { a: 0.4, d: 0.3, s: 0.6, r: 0.8 },
+                bell: false
+              });
+            }
+          }
+        }
+
+        function closeStory() {
+          var prevHouse = activeHouse;
+          if (activeHouse) {
+            activeHouse.classList.remove('is-active');
+            activeHouse.setAttribute('aria-expanded', 'false');
+            activeHouse = null;
+          }
+          if (storyBox) {
+            storyBox.setAttribute('hidden', '');
+            storyBox.classList.remove('is-open');
+          }
+          if (prevHouse && typeof prevHouse.focus === 'function') {
+            prevHouse.focus({ preventScroll: true });
+          }
+        }
+
+        houses.forEach(function (h, idx) {
+          h.setAttribute('tabindex', '0');
+          h.setAttribute('role', 'button');
+          h.setAttribute('aria-haspopup', 'dialog');
+          h.setAttribute('aria-expanded', 'false');
+
+          h.addEventListener('click', function (e) {
+            e.stopPropagation();
+            openStory(h, idx);
+          });
+
+          h.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              e.stopPropagation();
+              openStory(h, idx);
+            } else if (e.key === 'Escape') {
+              closeStory();
+            }
+          });
+        });
+
+        if (storyClose) {
+          storyClose.addEventListener('click', function (e) {
+            e.stopPropagation();
+            closeStory();
+          });
+        }
+
+        document.addEventListener('click', function (e) {
+          if (storyBox && !storyBox.hasAttribute('hidden') && !storyBox.contains(e.target)) {
+            closeStory();
+          }
+        });
+
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && storyBox && !storyBox.hasAttribute('hidden')) {
+            closeStory();
+          }
+        });
+
+        function set(v) {
+          p = clamp(v, 0, 1);
+          var pt = path.getPointAtLength(len * p);
+          rider.setAttribute('transform', 'translate(' + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1) + ')');
+          var passed = -1;
+          houses.forEach(function (h, k) {
+            var on = p >= at[k];
+            if (on) {
+              h.classList.add('is-lit');
+              h.setAttribute('data-passed', 'true');
+              passed = k;
+            } else if (!h.hasAttribute('data-passed')) {
+              h.classList.remove('is-lit');
+            }
+          });
+          if (p <= 0.01) label.textContent = 'Waiting at the nursery window';
+          else if (p >= 0.995) {
+            label.textContent = 'All seven dreams delivered';
+            if (PIP.stickers) PIP.stickers.unlock('route7');
+          }
+          else if (passed >= 0) label.textContent = 'Delivered to ' + houses[passed].getAttribute('data-name');
+          else label.textContent = 'Taking off...';
+        }
+
+        function fromScroll() {
+          if (manual) return;
+          var r = win.getBoundingClientRect(), vh = window.innerHeight;
+          set((vh * 0.85 - r.top) / (vh * 0.65));
+        }
+        var ticking = false;
+        window.addEventListener('scroll', function () {
+          if (ticking) return;
+          ticking = true;
+          window.requestAnimationFrame(function () { ticking = false; fromScroll(); });
+        }, { passive: true });
+        window.addEventListener('resize', fromScroll);
+
+        btn.addEventListener('click', function () {
+          if (manual) return;
+          if (reduce.matches) { set(p >= 0.99 ? 0 : 1); return; }
+          manual = true;
+          moving = true;
+          trail = [];
+          btn.setAttribute('aria-busy', 'true');
+          var t0 = performance.now(), dur = 5200;
+          var lastT = t0;
+          (function step(now) {
+            var dt = Math.min((now - lastT) / 1000, 0.1);
+            lastT = now;
+            var k = clamp((now - t0) / dur, 0, 1);
+            var e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; // ease in-out
+            set(e);
+
+            if (k >= 1) {
+              moving = false;
+            }
+
+            var pt = path.getPointAtLength(len * e);
+            if (moving === true) {
+              trail.push({
+                x: pt.x - 14 + (Math.random() * 6 - 3),
+                y: pt.y + 2 + (Math.random() * 6 - 3),
+                opacity: 0.9,
+                radius: 1.5 + Math.random() * 2
+              });
+            }
+
+            for (var i = trail.length - 1; i >= 0; i--) {
+              trail[i].opacity -= dt * 2;
+              if (trail[i].opacity <= 0) {
+                trail.splice(i, 1);
+              }
+            }
+
+            if (ctx && canvas) {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              for (var j = 0; j < trail.length; j++) {
+                var tp = trail[j];
+                if (tp.opacity > 0) {
+                  ctx.beginPath();
+                  ctx.arc(tp.x, tp.y, Math.max(0.2, tp.radius), 0, Math.PI * 2);
+                  ctx.fillStyle = 'rgba(255, 235, 160, ' + Math.max(0, tp.opacity).toFixed(3) + ')';
+                  ctx.fill();
+                }
+              }
+            }
+
+            if (k < 1 || trail.length > 0) {
+              window.requestAnimationFrame(step);
+            } else {
+              if (ctx && canvas) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+              }
+              window.setTimeout(function () {
+                manual = false;
+                btn.removeAttribute('aria-busy');
+              }, 1500);
+            }
+          })(t0);
+          if (audio.isOn()) {
+            [0, 2, 4, 3, 5, 4, 7].forEach(function (n, k) {
+              if (audio.pad) {
+                audio.pad(audio.SCALE[n], { dur: 2.0, gain: 0.1, when: 0.4 + k * 0.7 });
+              } else {
+                audio.note(audio.SCALE[n], {
+                  dur: 2.0,
+                  gain: 0.1,
+                  when: 0.4 + k * 0.7,
+                  adsr: { a: 0.5, d: 0.4, s: 0.6, r: 0.9 },
+                  bell: false
+                });
+              }
             });
           }
         });
+
+        fromScroll();
       }
-    });
 
-    fromScroll();
-  }
-
-  function updateRouteTrail(trail, dt, moving, cloudPt) {
-    if (!Array.isArray(trail)) return [];
-    var delta = typeof dt === 'number' && !isNaN(dt) ? dt : 0.016;
-    if (moving === true && cloudPt) {
-      trail.push({
-        x: (typeof cloudPt.x === 'number' ? cloudPt.x : 0) - 14 + (Math.random() * 6 - 3),
-        y: (typeof cloudPt.y === 'number' ? cloudPt.y : 0) + 2 + (Math.random() * 6 - 3),
-        opacity: 0.9,
-        radius: 1.5 + Math.random() * 2
-      });
-    }
-    for (var i = trail.length - 1; i >= 0; i--) {
-      trail[i].opacity -= delta * 2;
-      if (trail[i].opacity <= 0) {
-        trail.splice(i, 1);
+      function updateRouteTrail(trail, dt, moving, cloudPt) {
+        if (!Array.isArray(trail)) return [];
+        var delta = typeof dt === 'number' && !isNaN(dt) ? dt : 0.016;
+        if (moving === true && cloudPt) {
+          trail.push({
+            x: (typeof cloudPt.x === 'number' ? cloudPt.x : 0) - 14 + (Math.random() * 6 - 3),
+            y: (typeof cloudPt.y === 'number' ? cloudPt.y : 0) + 2 + (Math.random() * 6 - 3),
+            opacity: 0.9,
+            radius: 1.5 + Math.random() * 2
+          });
+        }
+        for (var i = trail.length - 1; i >= 0; i--) {
+          trail[i].opacity -= delta * 2;
+          if (trail[i].opacity <= 0) {
+            trail.splice(i, 1);
+          }
+        }
+        return trail;
       }
-    }
-    return trail;
-  }
 
-  function renderRouteTrail(ctx, trail, width, height) {
-    if (!ctx) return;
-    var w = typeof width === 'number' ? width : 600;
-    var h = typeof height === 'number' ? height : 290;
-    ctx.clearRect(0, 0, w, h);
-    if (!Array.isArray(trail) || trail.length === 0) return;
-    for (var j = 0; j < trail.length; j++) {
-      var tp = trail[j];
-      if (tp.opacity > 0) {
-        ctx.beginPath();
-        ctx.arc(tp.x, tp.y, Math.max(0.2, tp.radius), 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 235, 160, ' + Math.max(0, tp.opacity).toFixed(3) + ')';
-        ctx.fill();
+      function renderRouteTrail(ctx, trail, width, height) {
+        if (!ctx) return;
+        var w = typeof width === 'number' ? width : 600;
+        var h = typeof height === 'number' ? height : 290;
+        ctx.clearRect(0, 0, w, h);
+        if (!Array.isArray(trail) || trail.length === 0) return;
+        for (var j = 0; j < trail.length; j++) {
+          var tp = trail[j];
+          if (tp.opacity > 0) {
+            ctx.beginPath();
+            ctx.arc(tp.x, tp.y, Math.max(0.2, tp.radius), 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 235, 160, ' + Math.max(0, tp.opacity).toFixed(3) + ')';
+            ctx.fill();
+          }
+        }
       }
-    }
-  }
 
-  /* =====================================================================
-     5. BEDTIME STORYBOOK (flipbook)
-     ===================================================================== */
-  function initStorybook() {
-    var book = $('#book'), prevBtn = $('#bookPrev'), nextBtn = $('#bookNext'), ind = $('#bookInd');
-    if (!book || !prevBtn || !nextBtn || !ind) return;
-    var pages = $$('.book-page', book);
-    var total = pages.length;
-    var current = 0;
+      /* =====================================================================
+         5. BEDTIME STORYBOOK (flipbook)
+         ===================================================================== */
+      function initStorybook() {
+        var book = $('#book'), prevBtn = $('#bookPrev'), nextBtn = $('#bookNext'), ind = $('#bookInd');
+        if (!book || !prevBtn || !nextBtn || !ind) return;
+        var pages = $$('.book-page', book);
+        var total = pages.length;
+        var current = 0;
 
-    var speechBtn = document.getElementById('storySpeechBtn');
-    var pauseBtn = document.getElementById('storyPauseBtn');
-    var stopBtn = document.getElementById('storyStopBtn');
+        var speechBtn = document.getElementById('storySpeechBtn');
+        var pauseBtn = document.getElementById('storyPauseBtn');
+        var stopBtn = document.getElementById('storyStopBtn');
 
-    function stopSpeech() {
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-      if (speechBtn) speechBtn.hidden = false;
-      if (pauseBtn) { pauseBtn.hidden = true; pauseBtn.textContent = '⏸ Pause'; }
-      if (stopBtn) stopBtn.hidden = true;
-    }
+        function stopSpeech() {
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          if (speechBtn) speechBtn.hidden = false;
+          if (pauseBtn) { pauseBtn.hidden = true; pauseBtn.textContent = '⏸ Pause'; }
+          if (stopBtn) stopBtn.hidden = true;
+        }
 
-    if (speechBtn && 'speechSynthesis' in window) {
-      speechBtn.addEventListener('click', function () {
-        var activePage = pages[current];
-        if (!activePage) return;
-        var textToRead = (activePage.querySelector('h4')?.textContent || '') + '. ' + (activePage.querySelector('p')?.textContent || '');
-        window.speechSynthesis.cancel();
-        var utterance = new SpeechSynthesisUtterance(textToRead);
-        utterance.rate = 0.9;
-        utterance.onstart = function () {
-          speechBtn.hidden = true;
-          if (pauseBtn) pauseBtn.hidden = false;
-          if (stopBtn) stopBtn.hidden = false;
+        if (speechBtn && 'speechSynthesis' in window) {
+          speechBtn.addEventListener('click', function () {
+            var activePage = pages[current];
+            if (!activePage) return;
+            var textToRead = (activePage.querySelector('h4')?.textContent || '') + '. ' + (activePage.querySelector('p')?.textContent || '');
+            window.speechSynthesis.cancel();
+            var utterance = new SpeechSynthesisUtterance(textToRead);
+            utterance.rate = 0.9;
+            utterance.onstart = function () {
+              speechBtn.hidden = true;
+              if (pauseBtn) pauseBtn.hidden = false;
+              if (stopBtn) stopBtn.hidden = false;
+            };
+            utterance.onend = stopSpeech;
+            window.speechSynthesis.speak(utterance);
+          });
+        } else if (speechBtn) {
+          speechBtn.style.display = 'none';
+        }
+
+        if (pauseBtn) {
+          pauseBtn.addEventListener('click', function () {
+            if (window.speechSynthesis.paused) {
+              window.speechSynthesis.resume();
+              pauseBtn.textContent = '⏸ Pause';
+            } else if (window.speechSynthesis.speaking) {
+              window.speechSynthesis.pause();
+              pauseBtn.textContent = '▶ Resume';
+            }
+          });
+        }
+        if (stopBtn) stopBtn.addEventListener('click', stopSpeech);
+
+        function renderPage(idx) {
+          stopSpeech();
+          current = clamp(idx, 0, total - 1);
+          pages.forEach(function (page, i) {
+            var isCur = i === current;
+            page.classList.toggle('is-current', isCur);
+            page.classList.toggle('is-past', i < current);
+            if (isCur) {
+              page.removeAttribute('aria-hidden');
+              page.removeAttribute('inert');
+            } else {
+              page.setAttribute('aria-hidden', 'true');
+              page.setAttribute('inert', '');
+            }
+          });
+          ind.textContent = 'Page ' + (current + 1) + ' of ' + total;
+          prevBtn.disabled = current === 0;
+          nextBtn.disabled = current === total - 1;
+          prevBtn.setAttribute('aria-disabled', current === 0 ? 'true' : 'false');
+          nextBtn.setAttribute('aria-disabled', current === total - 1 ? 'true' : 'false');
+        }
+
+        prevBtn.addEventListener('click', function () {
+          if (current > 0) {
+            renderPage(current - 1);
+            if (audio.isOn()) audio.pop();
+          }
+        });
+
+        nextBtn.addEventListener('click', function () {
+          if (current < total - 1) {
+            renderPage(current + 1);
+            if (audio.isOn()) audio.pop();
+          }
+        });
+
+        book.addEventListener('keydown', function (e) {
+          if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+            e.preventDefault();
+            nextBtn.click();
+          } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            e.preventDefault();
+            prevBtn.click();
+          }
+        });
+
+        var touchStartX = 0, touchStartY = 0;
+        book.addEventListener('touchstart', function (e) {
+          if (e.touches && e.touches[0]) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+          }
+        }, { passive: true });
+
+        book.addEventListener('touchend', function (e) {
+          if (!touchStartX) return;
+          var touchEndX = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : 0;
+          var touchEndY = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : 0;
+          var dx = touchEndX - touchStartX;
+          var dy = touchEndY - touchStartY;
+          if (Math.abs(dx) > 35 && Math.abs(dx) > Math.abs(dy)) {
+            if (dx < 0 && current < total - 1) nextBtn.click();
+            else if (dx > 0 && current > 0) prevBtn.click();
+          }
+          touchStartX = 0;
+        }, { passive: true });
+
+        renderPage(0);
+      }
+
+      /* =====================================================================
+         6. PIP'S GROWTH CHART
+         ===================================================================== */
+      function initGrowthChart() {
+        var chart = $('#growthChart');
+        if (!chart) return;
+        var steps = $$('.growth-step', chart);
+
+        steps.forEach(function (step) {
+          var progress = clamp(parseFloat(step.getAttribute('data-progress')) || 0, 0, 100);
+          var fill = $('.growth-fill', step);
+          if (fill) fill.style.setProperty('--progress', progress);
+        });
+
+        PIP.watchVisible(chart, function (visible) {
+          if (visible) chart.classList.add('is-visible');
+        }, '0px');
+      }
+
+      function updateLeaderboardList(list, newScore, mode) {
+        var copy = Array.isArray(list) ? list.filter(function (entry) {
+          if (typeof entry === 'number' && !isNaN(entry) && entry > 0) return true;
+          return entry && typeof entry === 'object' && typeof entry.score === 'number' && entry.score > 0;
+        }).map(function (entry) {
+          if (typeof entry === 'number') return { score: Math.floor(entry), mode: 'normal', date: '' };
+          return {
+            score: Math.floor(entry.score),
+            mode: typeof entry.mode === 'string' ? entry.mode : 'normal',
+            date: typeof entry.date === 'string' ? entry.date : ''
+          };
+        }) : [];
+
+        if (newScore && typeof newScore === 'number' && newScore > 0) {
+          var d = new Date();
+          var dateStr = (d.getMonth() + 1) + '/' + d.getDate();
+          copy.push({
+            score: Math.floor(newScore),
+            mode: mode || 'normal',
+            date: dateStr
+          });
+        }
+        copy.sort(function (a, b) { return b.score - a.score; });
+        return copy.slice(0, 5);
+      }
+
+      function getComboPitchMultiplier(combo) {
+        if (!combo || combo <= 1) return 1;
+        return Math.pow(1.08, Math.min(combo - 1, 8));
+      }
+
+      function getBestMarkerY(best, cam) {
+        var H = 420, BH = 28;
+        return (H - 10 - (best + 1) * BH) + (cam || 0);
+      }
+
+      function getPIP() {
+        if (typeof window !== 'undefined' && window.PIP) return window.PIP;
+        if (typeof global !== 'undefined' && global.PIP) return global.PIP;
+        return PIP;
+      }
+
+      function getStore() {
+        var p = getPIP();
+        return (p && p.store) ? p.store : store;
+      }
+
+      function exportScores() {
+        var curStore = getStore();
+        var topScores = [];
+        try {
+          var raw = curStore.get('blockTopScores', '[]');
+          var parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            topScores = parsed.filter(function (s) { return typeof s === 'number' && !isNaN(s) && s > 0; })
+              .sort(function (a, b) { return b - a; })
+              .slice(0, 5);
+          }
+        } catch (e) { }
+
+        var best = parseInt(curStore.get('best', '0'), 10) || 0;
+        var mode = curStore.get('blockMode', 'normal') || 'normal';
+
+        var payload = {
+          game: 'rattle-and-blocks',
+          version: '1.0',
+          best: best,
+          mode: mode,
+          topScores: topScores,
+          exportedAt: new Date().toISOString()
         };
-        utterance.onend = stopSpeech;
-        window.speechSynthesis.speak(utterance);
-      });
-    } else if (speechBtn) {
-      speechBtn.style.display = 'none';
-    }
+        return JSON.stringify(payload, null, 2);
+      }
 
-    if (pauseBtn) {
-      pauseBtn.addEventListener('click', function () {
-        if (window.speechSynthesis.paused) {
-          window.speechSynthesis.resume();
-          pauseBtn.textContent = '⏸ Pause';
-        } else if (window.speechSynthesis.speaking) {
-          window.speechSynthesis.pause();
-          pauseBtn.textContent = '▶ Resume';
+      function importScores(json) {
+        var curStore = getStore();
+        var data = json;
+        if (typeof json === 'string') {
+          try {
+            data = JSON.parse(json);
+          } catch (e) {
+            return false;
+          }
         }
-      });
-    }
-    if (stopBtn) stopBtn.addEventListener('click', stopSpeech);
+        if (!data || typeof data !== 'object') return false;
 
-    function renderPage(idx) {
-      stopSpeech(); 
-      current = clamp(idx, 0, total - 1);
-      pages.forEach(function (page, i) {
-        var isCur = i === current;
-        page.classList.toggle('is-current', isCur);
-        page.classList.toggle('is-past', i < current);
-        if (isCur) {
-          page.removeAttribute('aria-hidden');
-          page.removeAttribute('inert');
-        } else {
-          page.setAttribute('aria-hidden', 'true');
-          page.setAttribute('inert', '');
+        var list = [];
+        if (Array.isArray(data)) {
+          list = data;
+        } else if (Array.isArray(data.topScores)) {
+          list = data.topScores;
+        } else if (Array.isArray(data.scores)) {
+          list = data.scores;
         }
-      });
-      ind.textContent = 'Page ' + (current + 1) + ' of ' + total;
-      prevBtn.disabled = current === 0;
-      nextBtn.disabled = current === total - 1;
-      prevBtn.setAttribute('aria-disabled', current === 0 ? 'true' : 'false');
-      nextBtn.setAttribute('aria-disabled', current === total - 1 ? 'true' : 'false');
-    }
 
-    prevBtn.addEventListener('click', function () {
-      if (current > 0) {
-        renderPage(current - 1);
-        if (audio.isOn()) audio.pop();
+        var validScores = list.map(function (val) {
+          if (typeof val === 'number') return val;
+          if (val && typeof val === 'object' && typeof val.score === 'number') return val.score;
+          return parseInt(val, 10);
+        }).filter(function (s) {
+          return typeof s === 'number' && !isNaN(s) && s > 0;
+        }).sort(function (a, b) {
+          return b - a;
+        }).slice(0, 5);
+
+        curStore.set('blockTopScores', JSON.stringify(validScores));
+
+        var importedBest = 0;
+        if (typeof data.best === 'number' && !isNaN(data.best) && data.best > 0) {
+          importedBest = data.best;
+        } else if (validScores.length > 0) {
+          importedBest = validScores[0];
+        }
+
+        if (importedBest > 0) {
+          var curBest = parseInt(curStore.get('best', '0'), 10) || 0;
+          if (importedBest > curBest) {
+            curStore.set('best', importedBest);
+          }
+        }
+
+        if (typeof blocksRenderLeaderboard === 'function') {
+          blocksRenderLeaderboard(validScores);
+        }
+        if (typeof blocksSyncBest === 'function' && importedBest > 0) {
+          blocksSyncBest(importedBest);
+        }
+
+        return true;
       }
-    });
 
-    nextBtn.addEventListener('click', function () {
-      if (current < total - 1) {
-        renderPage(current + 1);
-        if (audio.isOn()) audio.pop();
-      }
-    });
-
-    book.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-        e.preventDefault();
-        nextBtn.click();
-      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-        e.preventDefault();
-        prevBtn.click();
-      }
-    });
-
-    var touchStartX = 0, touchStartY = 0;
-    book.addEventListener('touchstart', function (e) {
-      if (e.touches && e.touches[0]) {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-      }
-    }, { passive: true });
-
-    book.addEventListener('touchend', function (e) {
-      if (!touchStartX) return;
-      var touchEndX = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : 0;
-      var touchEndY = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : 0;
-      var dx = touchEndX - touchStartX;
-      var dy = touchEndY - touchStartY;
-      if (Math.abs(dx) > 35 && Math.abs(dx) > Math.abs(dy)) {
-        if (dx < 0 && current < total - 1) nextBtn.click();
-        else if (dx > 0 && current > 0) prevBtn.click();
-      }
-      touchStartX = 0;
-    }, { passive: true });
-     
-    renderPage(0);
-  }
-
-  /* =====================================================================
-     6. PIP'S GROWTH CHART
-     ===================================================================== */
-  function initGrowthChart() {
-    var chart = $('#growthChart');
-    if (!chart) return;
-    var steps = $$('.growth-step', chart);
-
-    steps.forEach(function (step) {
-      var progress = clamp(parseFloat(step.getAttribute('data-progress')) || 0, 0, 100);
-      var fill = $('.growth-fill', step);
-      if (fill) fill.style.setProperty('--progress', progress);
-    });
-
-    PIP.watchVisible(chart, function (visible) {
-      if (visible) chart.classList.add('is-visible');
-    }, '0px');
-  }
-
-  function updateLeaderboardList(list, newScore, mode) {
-    var copy = Array.isArray(list) ? list.filter(function (entry) {
-      if (typeof entry === 'number' && !isNaN(entry) && entry > 0) return true;
-      return entry && typeof entry === 'object' && typeof entry.score === 'number' && entry.score > 0;
-    }).map(function (entry) {
-      if (typeof entry === 'number') return { score: Math.floor(entry), mode: 'normal', date: '' };
-      return {
-        score: Math.floor(entry.score),
-        mode: typeof entry.mode === 'string' ? entry.mode : 'normal',
-        date: typeof entry.date === 'string' ? entry.date : ''
+      PIP.toys = {
+        HOUSE_STORIES: HOUSE_STORIES,
+        updateLeaderboardList: updateLeaderboardList,
+        getComboPitchMultiplier: getComboPitchMultiplier,
+        getBestMarkerY: getBestMarkerY,
+        exportScores: exportScores,
+        importScores: importScores,
+        updateRouteTrail: updateRouteTrail,
+        renderRouteTrail: renderRouteTrail,
+        init: function () {
+          initLab();
+          initLights();
+          initBlocks();
+          initRoute();
+          initStorybook();
+          initGrowthChart();
+        }
       };
-    }) : [];
 
-    if (newScore && typeof newScore === 'number' && newScore > 0) {
-      var d = new Date();
-      var dateStr = (d.getMonth() + 1) + '/' + d.getDate();
-      copy.push({
-        score: Math.floor(newScore),
-        mode: mode || 'normal',
-        date: dateStr
-      });
-    }
-    copy.sort(function (a, b) { return b.score - a.score; });
-    return copy.slice(0, 5);
-  }
-
-  function getComboPitchMultiplier(combo) {
-    if (!combo || combo <= 1) return 1;
-    return Math.pow(1.08, Math.min(combo - 1, 8));
-  }
-
-  function getBestMarkerY(best, cam) {
-    var H = 420, BH = 28;
-    return (H - 10 - (best + 1) * BH) + (cam || 0);
-  }
-
-  function getPIP() {
-    if (typeof window !== 'undefined' && window.PIP) return window.PIP;
-    if (typeof global !== 'undefined' && global.PIP) return global.PIP;
-    return PIP;
-  }
-
-  function getStore() {
-    var p = getPIP();
-    return (p && p.store) ? p.store : store;
-  }
-
-  function exportScores() {
-    var curStore = getStore();
-    var topScores = [];
-    try {
-      var raw = curStore.get('blockTopScores', '[]');
-      var parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        topScores = parsed.filter(function (s) { return typeof s === 'number' && !isNaN(s) && s > 0; })
-                          .sort(function (a, b) { return b - a; })
-                          .slice(0, 5);
+      if (typeof module !== 'undefined' && module.exports) {
+        module.exports = {
+          HOUSE_STORIES: HOUSE_STORIES,
+          updateLeaderboardList: updateLeaderboardList,
+          getComboPitchMultiplier: getComboPitchMultiplier,
+          getBestMarkerY: getBestMarkerY,
+          exportScores: exportScores,
+          importScores: importScores,
+          updateRouteTrail: updateRouteTrail,
+          renderRouteTrail: renderRouteTrail
+        };
       }
-    } catch (e) {}
-
-    var best = parseInt(curStore.get('best', '0'), 10) || 0;
-    var mode = curStore.get('blockMode', 'normal') || 'normal';
-
-    var payload = {
-      game: 'rattle-and-blocks',
-      version: '1.0',
-      best: best,
-      mode: mode,
-      topScores: topScores,
-      exportedAt: new Date().toISOString()
-    };
-    return JSON.stringify(payload, null, 2);
-  }
-
-  function importScores(json) {
-    var curStore = getStore();
-    var data = json;
-    if (typeof json === 'string') {
-      try {
-        data = JSON.parse(json);
-      } catch (e) {
-        return false;
-      }
-    }
-    if (!data || typeof data !== 'object') return false;
-
-    var list = [];
-    if (Array.isArray(data)) {
-      list = data;
-    } else if (Array.isArray(data.topScores)) {
-      list = data.topScores;
-    } else if (Array.isArray(data.scores)) {
-      list = data.scores;
-    }
-
-    var validScores = list.map(function (val) {
-      if (typeof val === 'number') return val;
-      if (val && typeof val === 'object' && typeof val.score === 'number') return val.score;
-      return parseInt(val, 10);
-    }).filter(function (s) {
-      return typeof s === 'number' && !isNaN(s) && s > 0;
-    }).sort(function (a, b) {
-      return b - a;
-    }).slice(0, 5);
-
-    curStore.set('blockTopScores', JSON.stringify(validScores));
-
-    var importedBest = 0;
-    if (typeof data.best === 'number' && !isNaN(data.best) && data.best > 0) {
-      importedBest = data.best;
-    } else if (validScores.length > 0) {
-      importedBest = validScores[0];
-    }
-
-    if (importedBest > 0) {
-      var curBest = parseInt(curStore.get('best', '0'), 10) || 0;
-      if (importedBest > curBest) {
-        curStore.set('best', importedBest);
-      }
-    }
-
-    if (typeof blocksRenderLeaderboard === 'function') {
-      blocksRenderLeaderboard(validScores);
-    }
-    if (typeof blocksSyncBest === 'function' && importedBest > 0) {
-      blocksSyncBest(importedBest);
-    }
-
-    return true;
-  }
-
-  PIP.toys = {
-    HOUSE_STORIES: HOUSE_STORIES,
-    updateLeaderboardList: updateLeaderboardList,
-    getComboPitchMultiplier: getComboPitchMultiplier,
-    getBestMarkerY: getBestMarkerY,
-    exportScores: exportScores,
-    importScores: importScores,
-    updateRouteTrail: updateRouteTrail,
-    renderRouteTrail: renderRouteTrail,
-    init: function () {
-      initLab();
-      initLights();
-      initBlocks();
-      initRoute();
-      initStorybook();
-      initGrowthChart();
-    }
-  };
-
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-      HOUSE_STORIES: HOUSE_STORIES,
-      updateLeaderboardList: updateLeaderboardList,
-      getComboPitchMultiplier: getComboPitchMultiplier,
-      getBestMarkerY: getBestMarkerY,
-      exportScores: exportScores,
-      importScores: importScores,
-      updateRouteTrail: updateRouteTrail,
-      renderRouteTrail: renderRouteTrail
-    };
-  }
-})();
+    }) ();
