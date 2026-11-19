@@ -4778,6 +4778,7 @@ html.mode-wide-spacing body {
   display: none;
   transition: background 0.2s ease;
 }
+* Real-Time FPS Telemetry HUD & Battery Saver (pip-perf.exe)
 
 /* Sensory Bubble Wrap (pip-bubbles.exe) */
 .w-bubbles {
@@ -4941,3 +4942,75 @@ html.mode-wide-spacing body {
 .btn-danger:hover {
   background: #c82333;
 }
+* Peer-to-Peer QR Code Share Sheet for Songs & Wishes (pip-share.exe)
+ * ----------------------------------------------------------- */
+.w-share {
+  min-width: 320px;
+}
+
+.share-badge {
+  font-size: 0.75rem;
+  background: rgba(234, 179, 8, 0.25);
+  color: #854d0e;
+  border: 1px solid rgba(234, 179, 8, 0.5);
+
+
+[data-theme="night"] .share-badge {
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+}
+
+.share-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.share-select {
+  flex: 1 1 150px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #ccc);
+  background: var(--card-bg, #fff);
+  color: var(--ink, #111);
+  font-size: 0.85rem;
+}
+
+.share-input-wrap {
+  margin-bottom: 12px;
+}
+
+.share-input {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #ccc);
+  background: var(--card-bg, #fff);
+  color: var(--ink, #111);
+  font-size: 0.85rem;
+  resize: vertical;
+}
+
+.share-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.share-qr-box {
+  width: 196px;
+  height: 196px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.share-actions {
+  display: flex;
+  gap: 8px;

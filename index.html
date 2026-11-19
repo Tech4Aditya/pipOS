@@ -1787,6 +1787,48 @@
                   <span>Screen Brightness</span>
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
+          </div>
+          </div>
+          </div>
+        </article>
+        <!-- Peer-to-Peer QR Code Share Sheet for Songs & Wishes -->
+        <article id="shareWin" class="win w-share" data-foldable aria-labelledby="shareTitle" hidden>
+          <div class="win-bar">
+            <h3 class="win-title" id="shareTitle">pip-share.exe</h3>
+            <span class="share-badge" aria-hidden="true">P2P Beam</span>
+            <div class="win-actions">
+              <button type="button" class="btn btn-sm btn-ghost win-min" aria-label="Minimize Share Window">_</button>
+              <button type="button" class="btn btn-sm btn-ghost win-close" aria-label="Close Share Window">✕</button>
+            </div>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's P2P Share Sheet &amp; QR Code Beam. Share melodies, bedtime wishes, or app URLs across mobile devices instantly without external servers.</p>
+            </div>
+
+            <!-- Share Controls -->
+            <div class="share-toolbar" role="toolbar" aria-label="Share options">
+              <label for="shareTypeSelect" class="sr-only">Payload type:</label>
+              <select id="shareTypeSelect" class="share-select">
+                <option value="text">✏️ Custom Text</option>
+                <option value="wish">🌟 Guestbook Wish</option>
+                <option value="melody">🎵 Lullaby Melody</option>
+                <option value="url">🔗 PipOS Web Link</option>
+              </select>
+              <button type="button" class="btn btn-tiny btn-primary" id="shareGenerateBtn">Generate QR</button>
+            </div>
+
+            <div class="share-input-wrap">
+              <label for="shareInput" class="sr-only">Content to share:</label>
+              <textarea id="shareInput" class="share-input" rows="2" placeholder="Enter message or paste payload...">May stars watch over your nursery tonight.</textarea>
+            </div>
+
+            <!-- QR Code Display Area -->
+            <div class="share-preview-card">
+              <div id="shareQrContainer" class="share-qr-box" role="img" aria-label="Generated QR code"></div>
+              <div class="share-actions">
+                <button type="button" class="btn btn-tiny" id="shareCopyLinkBtn">📋 Copy Link</button>
+                <button type="button" class="btn btn-tiny btn-primary" id="shareNativeBtn">📱 Share to Device</button>
               </div>
             </div>
           </div>
@@ -2224,6 +2266,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/share.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
