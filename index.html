@@ -1787,6 +1787,71 @@
                   <span>Screen Brightness</span>
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
+          </div>
+          </div>
+          </div>
+        </article>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- About PipOS System Info & GPU Benchmark -->
+        <article id="sysInfo" class="win w-about" data-foldable aria-labelledby="sysInfoTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="sysInfoTitle">pip-about.exe</h3>
+            <span class="about-badge" aria-hidden="true">ℹ System Diagnostics</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>About PipOS. System specifications, client memory heap usage, GPU renderer diagnostics, and canvas particle stress benchmark.</p>
+            </div>
+
+            <!-- Specs Grid -->
+            <div class="about-specs-grid">
+              <div class="about-spec-row">
+                <span class="about-spec-key">Operating System:</span>
+                <span id="aboutOsName" class="about-spec-val">pipOS 1.0 (Starlight Edition)</span>
+              </div>
+              <div class="about-spec-row">
+                <span class="about-spec-key">Kernel Architecture:</span>
+                <span id="aboutKernel" class="about-spec-val">Vanilla Web Engine</span>
+              </div>
+              <div class="about-spec-row">
+                <span class="about-spec-key">Host Platform:</span>
+                <span id="aboutPlatform" class="about-spec-val">Loading...</span>
+              </div>
+              <div class="about-spec-row">
+                <span class="about-spec-key">Display Resolution:</span>
+                <span id="aboutScreen" class="about-spec-val">Loading...</span>
+              </div>
+              <div class="about-spec-row">
+                <span class="about-spec-key">GPU Renderer:</span>
+                <span id="aboutGpu" class="about-spec-val">Loading...</span>
+              </div>
+              <div class="about-spec-row">
+                <span class="about-spec-key">CPU Processor:</span>
+                <span id="aboutCores" class="about-spec-val">Loading...</span>
+              </div>
+              <div class="about-spec-row">
+                <span class="about-spec-key">JS Memory Heap:</span>
+                <span id="aboutMemory" class="about-spec-val">Loading...</span>
+              </div>
+            </div>
+
+            <div class="about-actions-bar">
+              <button type="button" class="btn btn-tiny" id="aboutCopyBtn">📋 Copy System Specs</button>
+            </div>
+
+            <!-- Particle Benchmark Section -->
+            <div class="about-bench-section">
+              <div class="about-bench-head">
+                <h4 class="about-bench-title">⚡ 1,000 Particle GPU Stress Benchmark</h4>
+                <span id="benchFpsLive" class="about-fps-badge">60 FPS</span>
+              </div>
+              <div class="about-bench-canvas-wrapper">
+                <canvas id="benchCanvas" width="340" height="120" class="about-bench-canvas" aria-label="Particle stress test canvas"></canvas>
+              </div>
+              <div class="about-bench-controls">
+                <button type="button" class="btn btn-tiny btn-primary" id="aboutStartBenchBtn">Run Benchmark (3s)</button>
+                <div id="aboutBenchResult" class="about-bench-result" aria-live="polite">Click Run to measure real rendering FPS</div>
               </div>
             </div>
           </div>
@@ -2224,6 +2289,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/about.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
