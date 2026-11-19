@@ -54,3 +54,21 @@ test('js/pip.js hooks nose hover and double-click interactions', () => {
   assert.match(pipSrc, /head\.addEventListener\(['"]click['"][\s\S]*?shy\(/, 'Rapid clicking head must trigger shy expression');
   assert.match(pipSrc, /mood\s*===\s*['"]night['"][\s\S]*?yawn\(/, 'Night idle loop must trigger yawn');
 });
+
+test('css/style.css defines @keyframes pipJiggle and .pip-svg.is-jiggling class', () => {
+  const css = fs.readFileSync(CSS_PATH, 'utf8');
+
+  assert.match(css, /@keyframes\s+pipJiggle/, 'Must define @keyframes pipJiggle');
+  assert.match(css, /rotate\(-?5deg\)/, 'pipJiggle must include quick +/- 5 deg rotations');
+  assert.match(css, /\.pip-svg\.is-jiggling/, 'Must style .pip-svg.is-jiggling');
+});
+
+test('js/pip.js implements pointerdown poke sound and jiggle reaction', () => {
+  const pipSrc = fs.readFileSync(PIP_JS_PATH, 'utf8');
+
+  assert.match(pipSrc, /svg\.addEventListener\(['"]pointerdown['"]/, 'Must attach pointerdown listener to #pipSvg');
+  assert.match(pipSrc, /PIP\.audio\.note\(587,\s*\{\s*dur:\s*0\.12,\s*gain:\s*0\.18\s*\}\)/, 'Must trigger rising note at 587Hz');
+  assert.match(pipSrc, /PIP\.audio\.note\(880,\s*\{\s*dur:\s*0\.18,\s*gain:\s*0\.15,\s*when:\s*0\.08\s*\}\)/, 'Must trigger rising note at 880Hz');
+  assert.match(pipSrc, /is-jiggling/, 'Must apply .is-jiggling class');
+  assert.match(pipSrc, /450/, 'Must remove .is-jiggling class after 450ms');
+});

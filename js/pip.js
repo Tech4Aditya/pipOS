@@ -147,6 +147,23 @@
     }
   }
 
+  var jiggleTimer = 0;
+  function jiggle() {
+    if (svg) {
+      svg.classList.remove('is-jiggling');
+      void svg.getBoundingClientRect();
+      svg.classList.add('is-jiggling');
+      window.clearTimeout(jiggleTimer);
+      jiggleTimer = window.setTimeout(function () {
+        svg.classList.remove('is-jiggling');
+      }, 450);
+    }
+    if (PIP.audio && typeof PIP.audio.note === 'function') {
+      PIP.audio.note(587, { dur: 0.12, gain: 0.18 });
+      PIP.audio.note(880, { dur: 0.18, gain: 0.15, when: 0.08 });
+    }
+  }
+
   /* ---------- moods ---------- */
   function setMood(m) {
     mood = m;
@@ -243,6 +260,19 @@
     blinkLoop();
     greet();
 
+    if (svg) {
+      svg.addEventListener('pointerdown', function (e) {
+        if (e && e.target && (e.target.id === 'egg' || (e.target.closest && e.target.closest('#egg')))) return;
+        jiggle();
+      });
+      svg.addEventListener('click', function (e) {
+        if (e && e.target && (e.target.id === 'egg' || (e.target.closest && e.target.closest('#egg')))) return;
+        if (!svg.classList.contains('is-jiggling')) {
+          jiggle();
+        }
+      });
+    }
+
     var hi = $('#sayHi');
     if (hi) hi.addEventListener('click', function () {
       wake(2600);
@@ -304,7 +334,8 @@
     setExpression: setExpression,
     surprise: surprise,
     shy: shy,
-    yawn: yawn
+    yawn: yawn,
+    jiggle: jiggle
   };
 
   if (typeof module !== 'undefined' && module.exports) {
