@@ -1788,6 +1788,41 @@
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
               </div>
+          </div>
+          </div>
+        </article>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- Desktop Sticky Notes & Multi-Clipboard History -->
+        <article id="stickiesWin" class="win w-stickies" data-foldable aria-labelledby="stickiesTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="stickiesTitle">pip-stickies.exe</h3>
+            <span class="stickies-badge" aria-hidden="true">Pastel Scratchpad</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Pastel Sticky Notes &amp; Multi-Clipboard Ring. Keep quick notes on your desk, organize ideas with colors, and retrieve recent clippings.</p>
+            </div>
+
+            <!-- Sticky Toolbar -->
+            <div class="stickies-toolbar" role="toolbar" aria-label="Sticky note controls">
+              <button type="button" class="btn btn-tiny btn-primary" id="stickiesAddBtn">➕ New Note</button>
+              <div class="stickies-search-wrap">
+                <label for="stickiesSearch" class="sr-only">Search notes</label>
+                <input type="search" id="stickiesSearch" class="stickies-search-input" placeholder="🔍 Search notes..." aria-label="Search sticky notes">
+              </div>
+            </div>
+
+            <!-- Sticky Notes Grid -->
+            <div id="stickiesList" class="stickies-grid" role="region" aria-label="Sticky notes list"></div>
+
+            <!-- Multi-Clipboard History Drawer -->
+            <div class="stickies-clip-section">
+              <div class="stickies-clip-head">
+                <h4 class="stickies-clip-title">📋 Multi-Clipboard History</h4>
+                <button type="button" class="btn btn-tiny" id="stickiesClearClipBtn">Clear History</button>
+              </div>
+              <ul id="stickiesClipList" class="stickies-clip-list" aria-label="Clipboard history items"></ul>
             </div>
           </div>
         </article>
@@ -2224,6 +2259,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/stickies.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 
