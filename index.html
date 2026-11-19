@@ -1788,6 +1788,53 @@
                 </div>
                 <input type="range" id="dimmerBrightness" class="dimmer-slider" min="30" max="100" value="85">
               </div>
+          </div>
+          </div>
+        </article>
+        <!-- Real-Time FPS Telemetry HUD & Battery Saver Power Mode -->
+
+        <!-- Retro Pixel Art & Nursery Painter -->
+        <article id="paint" class="win w-paint" data-foldable aria-labelledby="paintTitle">
+          <div class="win-bar">
+            <h3 class="win-title" id="paintTitle">pip-paint.exe</h3>
+            <span class="paint-badge" aria-hidden="true">🎨 Pixel Art Studio</span>
+          </div>
+          <div class="win-body">
+            <div class="proj-head">
+              <p>Pip's Retro Pixel Art Studio. Create 16x16 or 32x32 sprites with pencil, eraser, flood fill, and export to crisp PNG.</p>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="paint-toolbar" role="toolbar" aria-label="Pixel art drawing tools">
+              <div class="paint-tool-group">
+                <button type="button" class="btn btn-tiny paint-tool-btn is-active" data-tool="pencil" aria-pressed="true" aria-label="Pencil tool">✏️ Pencil</button>
+                <button type="button" class="btn btn-tiny paint-tool-btn" data-tool="eraser" aria-pressed="false" aria-label="Eraser tool">🧼 Eraser</button>
+                <button type="button" class="btn btn-tiny paint-tool-btn" data-tool="bucket" aria-pressed="false" aria-label="Bucket fill tool">🪣 Fill</button>
+                <button type="button" class="btn btn-tiny paint-tool-btn" data-tool="picker" aria-pressed="false" aria-label="Color eyedropper tool">🧪 Pick</button>
+              </div>
+
+              <div class="paint-tool-group">
+                <label for="paintSizeSelect" class="sr-only">Grid resolution:</label>
+                <select id="paintSizeSelect" class="paint-size-select" aria-label="Canvas grid size">
+                  <option value="16">16 × 16</option>
+                  <option value="32">32 × 32</option>
+                </select>
+                <button type="button" class="btn btn-tiny" id="paintUndoBtn" aria-label="Undo last pixel change">↩ Undo</button>
+                <button type="button" class="btn btn-tiny" id="paintRedoBtn" aria-label="Redo pixel change">↪ Redo</button>
+                <button type="button" class="btn btn-tiny" id="paintClearBtn" aria-label="Clear canvas">🗑 Clear</button>
+                <button type="button" class="btn btn-tiny btn-primary" id="paintExportBtn" aria-label="Export drawing as PNG">💾 Export PNG</button>
+              </div>
+            </div>
+
+            <!-- Canvas Work Area -->
+            <div class="paint-canvas-wrapper">
+              <canvas id="paintCanvas" width="320" height="320" class="paint-canvas" aria-label="Pixel drawing canvas" role="img"></canvas>
+            </div>
+
+            <!-- Color Palette Swatches -->
+            <div class="paint-palette-wrapper">
+              <span class="paint-palette-label">Nursery Palette:</span>
+              <div id="paintPalette" class="paint-palette" role="group" aria-label="Nursery color palette swatches"></div>
             </div>
           </div>
         </article>
@@ -2224,6 +2271,7 @@
   <script src="js/a11y-earcons.js" defer></script>
 
   <script src="js/bubbles.js" defer></script>
+  <script src="js/paint.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 

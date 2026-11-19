@@ -4777,6 +4777,10 @@ html.mode-wide-spacing body {
   z-index: 99990;
   display: none;
   transition: background 0.2s ease;
+   Retro Pixel Art & Nursery Painter (pip-paint.exe)
+   ========================================================================== */
+.w-paint {
+  min-width: 340px;
 }
 
 /* Sensory Bubble Wrap (pip-bubbles.exe) */
@@ -4790,6 +4794,12 @@ html.mode-wide-spacing body {
   border-radius: 999px;
   background: rgba(236, 72, 153, 0.2);
   color: #f472b6;
+.paint-badge {
+  font-size: 0.75rem;
+  background: var(--bar);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
   font-weight: 600;
   margin-left: auto;
 }
@@ -4940,4 +4950,109 @@ html.mode-wide-spacing body {
 
 .btn-danger:hover {
   background: #c82333;
+.paint-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px dashed var(--line);
+}
+
+.paint-tool-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.paint-tool-btn.is-active,
+.paint-tool-btn[aria-pressed="true"] {
+  background: var(--berry);
+  color: var(--paper);
+  border-color: var(--line);
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.paint-size-select {
+  padding: 3px 6px;
+  font: 600 0.8rem var(--f-ui);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.paint-canvas-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  background: var(--cream);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.paint-canvas {
+  display: block;
+  width: 320px;
+  height: 320px;
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  cursor: crosshair;
+  background: #ffffff;
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.paint-palette-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.paint-palette-label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.paint-palette {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  padding: 8px;
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+}
+
+.paint-swatch {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  padding: 0;
+}
+
+.paint-swatch:hover,
+.paint-swatch:focus-visible {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2px var(--focus);
+  z-index: 2;
+}
+
+.paint-swatch.is-active {
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink);
+  transform: scale(1.1);
+  z-index: 3;
 }
